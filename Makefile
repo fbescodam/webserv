@@ -6,7 +6,7 @@
 #    By: lde-la-h <lde-la-h@student.codam.nl>         +#+                      #
 #                                                    +#+                       #
 #    Created: 2022/05/13 11:36:28 by lde-la-h      #+#    #+#                  #
-#    Updated: 2022/05/13 11:51:01 by lde-la-h      ########   odam.nl          #
+#    Updated: 2022/05/13 12:11:54 by lde-la-h      ########   odam.nl          #
 #                                                                              #
 # **************************************************************************** #
 
@@ -27,7 +27,7 @@ CC		=	clang++
 NAME	=	webserv
 HEADERS =	-I ./include
 # TODO: Remove last arg before defence!
-CFLAGS		:= -std=c++11 -Wextra -Wall -Werror -Wunreachable-code -Wno-char-subscripts -Wno-unused-parameter
+CFLAGS		:= -std=c++17 -Wextra -Wall -Werror -Wunreachable-code -Wno-char-subscripts -Wno-unused-parameter
 ifdef DEBUG
 	CFLAGS	+=	-g3
 else

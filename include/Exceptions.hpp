@@ -1,22 +1,34 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        ::::::::            */
-/*   Common.hpp                                         :+:    :+:            */
+/*   Exceptions.hpp                                     :+:    :+:            */
 /*                                                     +:+                    */
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
-/*   Created: 2022/05/13 11:39:22 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/05/13 13:45:53 by lde-la-h      ########   odam.nl         */
+/*   Created: 2022/05/13 13:50:52 by lde-la-h      #+#    #+#                 */
+/*   Updated: 2022/05/13 14:18:01 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
-// Common includes that get used all the time.
+//= All exceptions =//
 
-#ifndef COMMON_HPP
-# define COMMON_HPP
-# include <iostream>
+#ifndef EXCEPTIONS_HPP
+# define EXCEPTIONS_HPP
+# include <exception>
+# include <errno.h>
 # include <string>
-# include <memory>
-# define CAST(to, val) static_cast<to>(val)
 
+// Simplificationt typedef
+typedef std::exception Exception;
+
+namespace ft
+{
+    // Simple strerror exception wrapper.
+    struct GenericErrnoExecption : public Exception
+    {
+        virtual const char* what() const throw() {
+            return (strerror(errno));
+        }
+    };
+}
 #endif
