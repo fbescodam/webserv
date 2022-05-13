@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/13 12:30:26 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/05/13 14:55:14 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/05/13 16:26:35 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,8 @@
 # include <netinet/in.h>
 # include <sys/socket.h>
 # include "Exceptions.hpp"
+
+#define PORT 8080
 
 //= Typedefs =//
 
@@ -60,7 +62,7 @@ namespace ft
      * 
      * @return -1 is returned if an error occurs, otherwise its a descriptor referencing the socket.
      */
-    int32_t Socket(ft::Domain Domain, ft::Protocol Protocol, int32_t SocketProtocol)
+    int32_t Socket(ft::Domain Domain, ft::Protocol Protocol, int32_t SocketProtocol = 0)
     {
         int32_t fd = socket(static_cast<int32_t>(Domain), static_cast<int32_t>(Protocol), SocketProtocol);
         if (fd < 0)
@@ -72,9 +74,9 @@ namespace ft
      * Bind assigns a name to an unnamed socket. When a socket is created with ft::Socket it exists in a name space (address family) 
      * but has no name assigned. It requests that address be assigned to the socket.
      * 
-     * @param Socketfd 
-     * @param Address 
-     * @param AddressLength 
+     * @param[in] Socketfd 
+     * @param[in] Address 
+     * @param[in] AddressLength 
      */
     void Bind(int32_t Socketfd, IntSockAddr_t* Address, size_t AddressLength)
     {
@@ -85,10 +87,10 @@ namespace ft
     /**
      * Listen for connections on a socket.
      * 
-     * @param Socketfd The socket file descriptor.
-     * @param BackLog Defines the maximum length for the queue of pending connections.
+     * @param[in] Socketfd The socket file descriptor.
+     * @param[in] BackLog Defines the maximum length for the queue of pending connections.
      */
-    void Listen(int32_t Socketfd, int32_t BackLog)
+    void Listen(int32_t Socketfd, int32_t BackLog = 10)
     {
         if (listen(Socketfd, BackLog) < 0)
             throw ft::GenericErrnoExecption();
@@ -97,9 +99,9 @@ namespace ft
     /**
      * Extracts the first connection request of the queue of pending connections.
      * 
-     * @param Socketfd The socket to accept.
-     * @param Address Address info.
-     * @param AddressLength Length/size of the Address.
+     * @param[in] Socketfd The socket to accept.
+     * @param[in] Address Address info.
+     * @param[in] AddressLength Length/size of the Address.
      * @return Returns a non-negative integer that is a descriptor for the accepted socket, else -1.
      */
     int32_t Accept(int32_t Socketfd, IntSockAddr_t* Address, uint32_t* AddressLength)

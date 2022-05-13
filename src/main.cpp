@@ -6,25 +6,12 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/13 11:38:46 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/05/13 14:55:46 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/05/13 16:34:35 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <stdio.h>
-#include <sys/socket.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include <netinet/in.h>
-#include <string.h>
 #include "Socket.hpp"
 #include "Common.hpp"
-
-#define PORT 8080
-
-enum class Banana
-{
-    Yellow
-};
 
 /**
  * @brief Entry point of the application.
@@ -35,7 +22,6 @@ enum class Banana
  */
 int32_t main(int32_t argc, const char* argv[])
 {
-
     int32_t ServerFD, NewSocket, Valread;
     IntSockAddr_t Address;
     uint32_t Addrlen = sizeof(Address);
@@ -46,7 +32,7 @@ int32_t main(int32_t argc, const char* argv[])
     // Setup
     try
     {
-        ServerFD = ft::Socket(ft::Domain::DM_IPV6, ft::Protocol::PR_TCP, 0);
+        ServerFD = ft::Socket(ft::Domain::DM_IPV4, ft::Protocol::PR_TCP);
         {
             Address.sin_family = AF_INET;
             Address.sin_addr.s_addr = INADDR_ANY;
@@ -57,9 +43,9 @@ int32_t main(int32_t argc, const char* argv[])
         ft::Bind(ServerFD, &Address, Addrlen);
         ft::Listen(ServerFD, 10);
     }
-    catch(const std::exception& e)
+    catch(const ft::Exception& e)
     {
-        std::cerr << "Webserv: " << e.what() << std::endl;
+        ft::ExceptionExit(e);
     }
 
     // Stay open
@@ -78,9 +64,9 @@ int32_t main(int32_t argc, const char* argv[])
             printf("------------------Hello message sent-------------------");
             close(NewSocket);
         }
-        catch(const std::exception& e)
+        catch(const ft::Exception& e)
         {
-            std::cerr << "Webserv: " << e.what() << std::endl;
+            ft::ExceptionExit(e);
         }
     }
     return (EXIT_SUCCESS);

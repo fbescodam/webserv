@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/13 11:39:22 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/05/13 14:31:33 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/05/13 16:25:45 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,5 +17,6 @@
 # include <iostream>
 # include <string>
 # include <memory>
+# include <unistd.h>
 
 #endif
