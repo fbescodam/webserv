@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/13 12:30:26 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/05/13 14:53:03 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/05/13 14:55:14 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,7 +102,7 @@ namespace ft
      * @param AddressLength Length/size of the Address.
      * @return Returns a non-negative integer that is a descriptor for the accepted socket, else -1.
      */
-    int32_t Accept(int32_t Socketfd, IntSockAddr_t* Address, size_t *AddressLength)
+    int32_t Accept(int32_t Socketfd, IntSockAddr_t* Address, uint32_t* AddressLength)
     {
         int32_t fd = accept(Socketfd, reinterpret_cast<struct sockaddr*>(Address), (socklen_t*)AddressLength);
         if (fd < 0)

@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/13 11:38:46 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/05/13 14:54:21 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/05/13 14:55:46 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ int32_t main(int32_t argc, const char* argv[])
 
     int32_t ServerFD, NewSocket, Valread;
     IntSockAddr_t Address;
-    const size_t Addrlen = sizeof(Address);
+    uint32_t Addrlen = sizeof(Address);
     
     // HTTP Content
     const char* hello = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
@@ -68,7 +68,7 @@ int32_t main(int32_t argc, const char* argv[])
         printf("\n+++++++ Waiting for new connection ++++++++\n\n");
         try
         {
-            ft::Accept(ServerFD, &Address, &Addrlen);
+            NewSocket = ft::Accept(ServerFD, &Address, &Addrlen);
 
             char buffer[30000] = {0};
             Valread = read(NewSocket, buffer, 30000);
