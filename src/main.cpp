@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/13 11:38:46 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/05/13 14:20:25 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/05/13 14:54:21 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,44 +36,52 @@ enum class Banana
 int32_t main(int32_t argc, const char* argv[])
 {
 
-    int server_fd, new_socket; long valread;
-    IntSockAddr_t address;
-    int addrlen = sizeof(address);
+    int32_t ServerFD, NewSocket, Valread;
+    IntSockAddr_t Address;
+    const size_t Addrlen = sizeof(Address);
     
-    // Only this line has been changed. Everything is same.
+    // HTTP Content
     const char* hello = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
 
+    // Setup
     try
     {
-        server_fd = ft::Socket(ft::Domain::DM_IPV4, ft::Protocol::PR_TCP, 0);
-        address.sin_family = AF_INET;
-        address.sin_addr.s_addr = INADDR_ANY;
-        address.sin_port = htons(PORT);
-
-        std::memset(address.sin_zero, '\0', sizeof(address.sin_zero));
+        ServerFD = ft::Socket(ft::Domain::DM_IPV6, ft::Protocol::PR_TCP, 0);
+        {
+            Address.sin_family = AF_INET;
+            Address.sin_addr.s_addr = INADDR_ANY;
+            Address.sin_port = htons(PORT);
+        }
+        std::memset(Address.sin_zero, '\0', sizeof(Address.sin_zero));
         
-        ft::Bind(server_fd, &address, sizeof(address));
-        ft::Listen(server_fd, 10);
+        ft::Bind(ServerFD, &Address, Addrlen);
+        ft::Listen(ServerFD, 10);
     }
     catch(const std::exception& e)
     {
-        std::cerr << e.what() << '\n';
+        std::cerr << "Webserv: " << e.what() << std::endl;
     }
 
-    while(1)
+    // Stay open
+    while(true)
     {
         printf("\n+++++++ Waiting for new connection ++++++++\n\n");
-        if ((new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen))<0)
+        try
         {
-            perror("In accept");
-            exit(EXIT_FAILURE);
+            ft::Accept(ServerFD, &Address, &Addrlen);
+
+            char buffer[30000] = {0};
+            Valread = read(NewSocket, buffer, 30000);
+            printf("%s\n", buffer);
+
+            write(NewSocket, hello, strlen(hello));
+            printf("------------------Hello message sent-------------------");
+            close(NewSocket);
         }
-        
-        char buffer[30000] = {0};
-        valread = read( new_socket , buffer, 30000);
-        printf("%s\n",buffer );
-        write(new_socket , hello , strlen(hello));
-        printf("------------------Hello message sent-------------------");
-        close(new_socket);
+        catch(const std::exception& e)
+        {
+            std::cerr << "Webserv: " << e.what() << std::endl;
+        }
     }
+    return (EXIT_SUCCESS);
 }
