@@ -25,8 +25,7 @@
  * @param argv Argument values.
  * @return Exit status.
  */
-int32_t main(int32_t argc, const char* argv[])
-{
+int32_t main(int32_t argc, const char* argv[]) {
     int32_t ServerFD, NewSocket, Valread;
     IntSockAddr_t Address;
     uint32_t Addrlen = sizeof(Address);
