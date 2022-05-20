@@ -6,12 +6,17 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/13 11:38:46 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/05/13 16:34:35 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/05/20 16:09:32 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Socket.hpp"
 #include "Common.hpp"
+#include "Status.hpp"
+#include "../HTTP/exchange.hpp"
+
+//set in config file
+#define CLIENT_BODY_SIZE 30000
 
 /**
  * @brief Entry point of the application.
@@ -56,8 +61,8 @@ int32_t main(int32_t argc, const char* argv[])
         {
             NewSocket = ft::Accept(ServerFD, &Address, &Addrlen);
 
-            char buffer[30000] = {0};
-            Valread = read(NewSocket, buffer, 30000);
+            char buffer[CLIENT_BODY_SIZE] = {0};
+            Valread = read(NewSocket, buffer, CLIENT_BODY_SIZE);
             printf("%s\n", buffer);
 
             write(NewSocket, hello, strlen(hello));
