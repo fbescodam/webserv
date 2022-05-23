@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 17:40:38 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/05/23 19:56:33 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/05/23 20:08:45 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,11 +71,9 @@ int32_t Socket(int32_t Domain, int32_t Type, int32_t Protocol)
 }
 
 // Assigns a name to an unnamed socket, requests that address be assigned to the socket.
-void Bind(int32_t Socketfd, const SocketAddress* Address, size_t AddressLength)
+void Bind(int32_t Socketfd, SocketAddress* Address, size_t AddressLength)
 {
-	auto* CAddr = &Address->GetCStyle();
-
-    if (bind(Socketfd, reinterpret_cast<struct sockaddr*>(CAddr), AddressLength) < 0)
+    if (bind(Socketfd, reinterpret_cast<sockaddr*>(Address), AddressLength) < 0)
         throw ft::GenericErrnoExecption();
 }
 
@@ -87,11 +85,9 @@ void Listen(int32_t Socketfd, int32_t BackLog = 128)
 }
 
 // Extracts the first connection request on the queue of pending connections
-int32_t Accept(int32_t Socketfd, const SocketAddress* Address, uint32_t* AddressLength)
+int32_t Accept(int32_t Socketfd, SocketAddress* Address, uint32_t* AddressLength)
 {
-	auto* CAddr = &Address->GetCStyle();
-
-    int32_t fd = accept(Socketfd, reinterpret_cast<struct sockaddr*>(CAddr), (socklen_t*)AddressLength);
+    int32_t fd = accept(Socketfd, reinterpret_cast<sockaddr*>(Address), (socklen_t*)AddressLength);
     if (fd < 0)
         throw ft::GenericErrnoExecption();
     return (fd);
@@ -108,9 +104,9 @@ int32_t Poll(struct pollfd Fds[], size_t Size, int32_t Timeout)
 
 // Provides for control over descriptors.  The argument fildes is a descriptor to be operated on by cmd as follows
 template<typename... Args>
-int32_t Fcntl(int32_t Fd, int32_t Cmd, Args... Args)
+int32_t Fcntl(int32_t Fd, int32_t Cmd, Args... args)
 {
-	int32_t Value = fcntl(Fd, Cmd, Args);
+	int32_t Value = fcntl(Fd, Cmd, std::forward<Args>(args)...);
     if (Value < 0)
         throw ft::GenericErrnoExecption();
     return (Value);
