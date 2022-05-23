@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:44:03 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/05/23 19:44:32 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/05/23 19:53:24 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,3 +16,8 @@
 
 
 //////////////////////////////////////////
+
+ft::Config* ft::Config::GetInstance(void)
+{
+    return (_Instance == nullptr ? new Config() : _Instance);
+}

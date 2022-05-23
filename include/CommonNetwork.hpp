@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 17:40:38 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/05/23 19:40:35 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/05/23 19:56:33 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,9 +43,9 @@ public: // Functions
 	{
 		struct sockaddr_in Out = {
 			.sin_len = Length,
-			.sin_len = AddressFamily,
-			.sin_len = Port,
-			.sin_len = Address,
+			.sin_family = AddressFamily,
+			.sin_port = Port,
+			.sin_addr.s_addr = Address,
 		};
 
 		std::memset(Out.sin_zero, 0, sizeof(Out.sin_zero));
@@ -73,7 +73,9 @@ int32_t Socket(int32_t Domain, int32_t Type, int32_t Protocol)
 // Assigns a name to an unnamed socket, requests that address be assigned to the socket.
 void Bind(int32_t Socketfd, const SocketAddress* Address, size_t AddressLength)
 {
-    if (bind(Socketfd, reinterpret_cast<struct sockaddr*>(&Address->GetCStyle()), AddressLength) < 0)
+	auto* CAddr = &Address->GetCStyle();
+
+    if (bind(Socketfd, reinterpret_cast<struct sockaddr*>(CAddr), AddressLength) < 0)
         throw ft::GenericErrnoExecption();
 }
 
@@ -87,7 +89,9 @@ void Listen(int32_t Socketfd, int32_t BackLog = 128)
 // Extracts the first connection request on the queue of pending connections
 int32_t Accept(int32_t Socketfd, const SocketAddress* Address, uint32_t* AddressLength)
 {
-    int32_t fd = accept(Socketfd, reinterpret_cast<struct sockaddr*>(&Address->GetCStyle()), (socklen_t*)AddressLength);
+	auto* CAddr = &Address->GetCStyle();
+
+    int32_t fd = accept(Socketfd, reinterpret_cast<struct sockaddr*>(CAddr), (socklen_t*)AddressLength);
     if (fd < 0)
         throw ft::GenericErrnoExecption();
     return (fd);
