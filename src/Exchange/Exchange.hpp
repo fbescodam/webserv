@@ -1,32 +1,27 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        ::::::::            */
-/*   Common.hpp                                         :+:    :+:            */
+/*   Exchange.hpp                                       :+:    :+:            */
 /*                                                     +:+                    */
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
-/*   Created: 2022/05/23 17:39:22 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/05/23 19:27:01 by lde-la-h      ########   odam.nl         */
+/*   Created: 2022/05/23 19:13:27 by lde-la-h      #+#    #+#                 */
+/*   Updated: 2022/05/23 19:19:31 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
-/**
- * Common includes, typedefs and other stuff that we constantly need.
- */
+#ifndef EXCHANGE_HPP
+# define EXCHANGE_HPP
+# include "Common.hpp"
+FT_BEGIN
 
-#ifndef COMMON_HPP
-# define COMMON_HPP
-# include <iostream>
-# include <vector>
-# include <string>
-# include <memory>
-# include <unistd.h>
+// An exchange is both a response and a request via http
+class Exchange
+{
 
-// To avoid ugly idents
+};
 
-# define FT_BEGIN namespace ft {
-# define FT_END }
-
+FT_END
 #endif
