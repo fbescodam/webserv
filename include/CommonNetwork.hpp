@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 17:40:38 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/05/23 19:28:55 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/05/23 19:40:35 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,10 +21,11 @@
 # include <netinet/in.h>
 # include <sys/socket.h>
 # include <sys/poll.h>
+# include <fcntl.h>
 # include <map>
 FT_BEGIN
 
-// C Network functions
+// C Network function & type wrappers
 //////////////////////////////////////////
 
 /**
@@ -99,7 +100,16 @@ int32_t Poll(struct pollfd Fds[], size_t Size, int32_t Timeout)
     if (FDs < 0)
         throw ft::GenericErrnoExecption();
     return (FDs);
-	
+}
+
+// Provides for control over descriptors.  The argument fildes is a descriptor to be operated on by cmd as follows
+template<typename... Args>
+int32_t Fcntl(int32_t Fd, int32_t Cmd, Args... Args)
+{
+	int32_t Value = fcntl(Fd, Cmd, Args);
+    if (Value < 0)
+        throw ft::GenericErrnoExecption();
+    return (Value);
 }
 
 // HTTP Status codes
