@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 17:40:38 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/05/24 12:22:41 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/05/24 13:46:18 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 # include "Common.hpp"
 # include "Exceptions.hpp"
 # include <netinet/in.h>
+# include <arpa/inet.h>
 # include <sys/socket.h>
 # include <sys/poll.h>
 # include <fcntl.h>
@@ -65,7 +66,7 @@ public: // Functions
 	}
 
 	// Gets the size of the Socket Address.
-	size_t GetSize(void) const
+	constexpr size_t GetSize(void) const
 	{
 		return (sizeof(SocketAddress));
 	}
@@ -128,6 +129,24 @@ int32_t Fcntl(int32_t Fd, int32_t Cmd, Args... args)
 {
 	int32_t Value = fcntl(Fd, Cmd, std::forward<Args>(args)...);
     if (Value < 0)
+        throw ft::GenericErrnoExecption();
+    return (Value);
+}
+
+// Send a message from a socket.
+ssize_t Send(int32_t Socket, const void* Buffer, size_t Length, int32_t Flags)
+{
+	ssize_t Value = send(Socket, Buffer, Length, Flags);
+	if (Value == -1)
+        throw ft::GenericErrnoExecption();
+    return (Value);
+}
+
+// Receive a message from a socket.
+ssize_t Receive(int32_t Socket, void* Buffer, size_t Length, int32_t Flags)
+{
+	ssize_t Value = recv(Socket, Buffer, Length, Flags);
+	if (Value == -1)
         throw ft::GenericErrnoExecption();
     return (Value);
 }

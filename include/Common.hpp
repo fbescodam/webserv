@@ -6,15 +6,13 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 17:39:22 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/05/24 12:32:15 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/05/24 12:38:38 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
-#pragma once
+// Common includes, typedefs and other stuff that we constantly need.
 
-/**
- * Common includes, typedefs and other stuff that we constantly need.
- */
+#pragma once
 
 #ifndef COMMON_HPP
 # define COMMON_HPP

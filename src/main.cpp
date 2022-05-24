@@ -6,13 +6,12 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 17:39:03 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/05/24 12:31:27 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/05/24 13:45:32 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Common.hpp"
 #include "CommonNetwork.hpp"
-#include <arpa/inet.h>
 
 #define CLIENT_BODY_SIZE 30000
 
@@ -23,9 +22,12 @@ int main(int argc, char const *argv[])
 
 	const char* hello = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
 
+	// NOTE: Maybe use signal to catch ctrl+c to properly exit ?
+	// Setup a server class ?
+
 	try
 	{
-        ServerFD = ft::Socket(IPV4, TCP, NULL);
+        ServerFD = ft::Socket(IPV4, TCP, NONE);
 		ft::Bind(ServerFD, &Address, Address.GetSize());
 		ft::Listen(ServerFD, 128);
 	}
