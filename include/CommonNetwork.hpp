@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 17:40:38 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/05/23 20:08:45 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/05/24 12:22:41 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,10 @@
 # include <map>
 FT_BEGIN
 
+// More sensible naming ... Thanks cstdlib :)
+# define IPV4 PF_INET
+# define TCP SOCK_STREAM
+
 // C Network function & type wrappers
 //////////////////////////////////////////
 
@@ -35,6 +39,14 @@ FT_BEGIN
  */
 struct SocketAddress
 {
+public: // Ctor
+	SocketAddress() = default;
+	SocketAddress(uint8_t InFamily, uint16_t InPort, uint32_t InAddress)
+	{
+		AddressFamily = InFamily;
+		Port = InPort;
+		Address = InAddress;
+	}
 
 public: // Functions
 
@@ -52,11 +64,19 @@ public: // Functions
 		return (Out);
 	}
 
+	// Gets the size of the Socket Address.
+	size_t GetSize(void) const
+	{
+		return (sizeof(SocketAddress));
+	}
+
 public: // Attributes
 	uint8_t		Length;
 	uint8_t		AddressFamily;
 	uint16_t	Port;
 	uint32_t	Address;
+protected:
+	char		Zero[8]; // Literally useless ?
 };
 
 //////////////////////////////////////////

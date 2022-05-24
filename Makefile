@@ -6,7 +6,7 @@
 #    By: lde-la-h <lde-la-h@student.codam.nl>         +#+                      #
 #                                                    +#+                       #
 #    Created: 2022/05/13 11:36:28 by lde-la-h      #+#    #+#                  #
-#    Updated: 2022/05/23 17:38:36 by lde-la-h      ########   odam.nl          #
+#    Updated: 2022/05/24 12:31:54 by lde-la-h      ########   odam.nl          #
 #                                                                              #
 # **************************************************************************** #
 
@@ -26,7 +26,7 @@ RESET	= \033[0m
 CC		=	clang++
 NAME	=	webserv
 HEADERS =	-I ./include
-CFLAGS		:= -std=c++17 -Wextra -Wall -Werror -Wunreachable-code -Wno-char-subscripts
+CFLAGS		:= -std=c++17 -Wextra -Wall -Werror -Wunreachable-code -Wno-char-subscripts -Wno-unused-variable -Wno-unused-parameter
 ifdef DEBUG
 	CFLAGS	+=	-g3
 else
@@ -36,7 +36,8 @@ SRCS	=	$(shell find ./src -iname "*.cpp")
 OBJS	=	${SRCS:.cpp=.o}
 
 #//= Recipes =//#
-all: $(NAME)
+all: # Multi threading badness because C++ is slow
+	@$(MAKE) $(NAME) -j4
 
 %.o: %.cpp
 	@$(CC) $(CFLAGS) -o $@ -c $< $(HEADERS) && printf "$(GREEN)$(BOLD)\rCompiling: $(notdir $<)\r\e[35C[OK]\n$(RESET)"
