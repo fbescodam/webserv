@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 17:39:03 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/05/24 13:45:32 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/05/24 15:46:39 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,17 +15,25 @@
 
 #define CLIENT_BODY_SIZE 30000
 
+void ft_exit(int lol)
+{
+	std::cout << "Bye Bye!" << std::endl;
+	exit(EXIT_SUCCESS);
+}
+
 int main(int argc, char const *argv[])
 {
-	int32_t ServerFD, NewSocket, ValRead;
+	int32_t ServerFD, ClientSocket, ValRead;
 	ft::SocketAddress Address(AF_INET, htons(8080), INADDR_ANY); // Internet Address on Port 8080 on Localhost
+
+	signal(SIGINT, ft_exit);
 
 	const char* hello = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
 
 	// NOTE: Maybe use signal to catch ctrl+c to properly exit ?
 	// Setup a server class ?
 
-	try
+	try // Create internet socket.
 	{
         ServerFD = ft::Socket(IPV4, TCP, NONE);
 		ft::Bind(ServerFD, &Address, Address.GetSize());
@@ -43,19 +51,18 @@ int main(int argc, char const *argv[])
 
 		// NOTE: Use send and recv functions instead of read and write!
 
-        printf("\n+++++++ Waiting for new connection ++++++++\n\n");
+        std::cout << "\n//=/ ...Listening... /=//\n" << std::endl;
         try
         {
-			uint32_t size = Address.GetSize();
-            NewSocket = ft::Accept(ServerFD, &Address, &size);
+            ClientSocket = ft::Accept(ServerFD, &Address);
 
             char buffer[CLIENT_BODY_SIZE] = {0};
-            ValRead = read(NewSocket, buffer, CLIENT_BODY_SIZE);
-            printf("%s\n", buffer);
+			ft::Receive(ClientSocket, buffer, CLIENT_BODY_SIZE, 0);
+            printf("%s\n", buffer); // Print Client request
 
-            write(NewSocket, hello, strlen(hello));
-            printf("------------------Hello message sent-------------------");
-            close(NewSocket);
+			ft::Send(ClientSocket, hello, strlen(hello), 0); // Send Response
+			std::cout << "//=/ Sent Response /=//" << std::endl;
+            close(ClientSocket); // End of Exchange
         }
         catch(const ft::Exception& e)
         {

@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 17:40:38 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/05/24 13:46:18 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/05/24 15:18:59 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,9 +106,11 @@ void Listen(int32_t Socketfd, int32_t BackLog = 128)
 }
 
 // Extracts the first connection request on the queue of pending connections
-int32_t Accept(int32_t Socketfd, SocketAddress* Address, uint32_t* AddressLength)
+int32_t Accept(int32_t Socketfd, SocketAddress* Address)
 {
-    int32_t fd = accept(Socketfd, reinterpret_cast<sockaddr*>(Address), (socklen_t*)AddressLength);
+	socklen_t Length = Address->GetSize();
+
+    int32_t fd = accept(Socketfd, reinterpret_cast<sockaddr*>(Address), &Length);
     if (fd < 0)
         throw ft::GenericErrnoExecption();
     return (fd);

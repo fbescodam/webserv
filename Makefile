@@ -6,34 +6,35 @@
 #    By: lde-la-h <lde-la-h@student.codam.nl>         +#+                      #
 #                                                    +#+                       #
 #    Created: 2022/05/13 11:36:28 by lde-la-h      #+#    #+#                  #
-#    Updated: 2022/05/24 12:31:54 by lde-la-h      ########   odam.nl          #
+#    Updated: 2022/05/25 14:11:18 by lde-la-h      ########   odam.nl          #
 #                                                                              #
 # **************************************************************************** #
 
 #//= Colors =//#
-BOLD	= \033[1m
-BLACK	= \033[30;1m
-RED		= \033[31;1m
-GREEN	= \033[32;1m
-YELLOW	= \033[33;1m
-BLUE	= \033[34;1m
-MAGENTA	= \033[35;1m
-CYAN	= \033[36;1m
-WHITE	= \033[37;1m
-RESET	= \033[0m
+BOLD	:= \033[1m
+BLACK	:= \033[30;1m
+RED		:= \033[31;1m
+GREEN	:= \033[32;1m
+YELLOW	:= \033[33;1m
+BLUE	:= \033[34;1m
+MAGENTA	:= \033[35;1m
+CYAN	:= \033[36;1m
+WHITE	:= \033[37;1m
+RESET	:= \033[0m
 
 #//= Files =//#
-CC		=	clang++
-NAME	=	webserv
-HEADERS =	-I ./include
-CFLAGS		:= -std=c++17 -Wextra -Wall -Werror -Wunreachable-code -Wno-char-subscripts -Wno-unused-variable -Wno-unused-parameter
+CC		:=	clang++
+NAME	:=	webserv
+HEADERS :=	-I ./include
+# Project requires you do it in 98, we frankly don't care (We asked)
+CFLAGS	:= -std=c++17 -Wextra -Wall -Werror -Wunreachable-code -Wno-char-subscripts -Wno-unused-variable -Wno-unused-parameter
 ifdef DEBUG
 	CFLAGS	+=	-g3
 else
 	CFLAGS	+=	-Ofast -D NDEBUG
 endif
-SRCS	=	$(shell find ./src -iname "*.cpp")
-OBJS	=	${SRCS:.cpp=.o}
+SRCS	:=	$(shell find ./src -iname "*.cpp")
+OBJS	:=	${SRCS:.cpp=.o}
 
 #//= Recipes =//#
 all: # Multi threading badness because C++ is slow
