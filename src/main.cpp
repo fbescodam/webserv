@@ -6,12 +6,13 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 17:39:03 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/05/24 15:46:39 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/05/25 16:51:08 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Common.hpp"
 #include "CommonNetwork.hpp"
+#include "Exchange/Request.hpp"
 
 #define CLIENT_BODY_SIZE 30000
 
@@ -28,6 +29,8 @@ int main(int argc, char const *argv[])
 
 	signal(SIGINT, ft_exit);
 
+
+
 	const char* hello = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
 
 	// NOTE: Maybe use signal to catch ctrl+c to properly exit ?
@@ -36,6 +39,8 @@ int main(int argc, char const *argv[])
 	try // Create internet socket.
 	{
         ServerFD = ft::Socket(IPV4, TCP, NONE);
+		int really_true = 1;
+		setsockopt(ServerFD,SOL_SOCKET,SO_REUSEADDR,&really_true,sizeof(int)); //Should make the kernel release socket resources
 		ft::Bind(ServerFD, &Address, Address.GetSize());
 		ft::Listen(ServerFD, 128);
 	}
@@ -58,7 +63,9 @@ int main(int argc, char const *argv[])
 
             char buffer[CLIENT_BODY_SIZE] = {0};
 			ft::Receive(ClientSocket, buffer, CLIENT_BODY_SIZE, 0);
-            printf("%s\n", buffer); // Print Client request
+			
+			ft::Request request(buffer); //literally just shits everything into a map
+			request.print();
 
 			ft::Send(ClientSocket, hello, strlen(hello), 0); // Send Response
 			std::cout << "//=/ Sent Response /=//" << std::endl;
@@ -71,3 +78,6 @@ int main(int argc, char const *argv[])
     }
 	return (EXIT_SUCCESS);
 }
+
+// curl --verbose http://localhost:8080/
+// --header for custom headers ala "header:123"
