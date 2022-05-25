@@ -6,13 +6,13 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/25 19:34:04 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/05/25 20:25:27 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/05/25 21:46:20 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Common.hpp"
 
-void ft::Split(const std::string& String, char Delim, std::vector<std::string>& Output)
+void ft::split(const std::string& String, char Delim, std::vector<std::string>& Output)
 {
 	Output.clear();
 	Output.reserve(std::count(String.begin(), String.end(), Delim));
@@ -25,7 +25,7 @@ void ft::Split(const std::string& String, char Delim, std::vector<std::string>& 
     }
 }
 
-void ft::Slice(const std::string& String, char Delim, std::pair<std::string, std::string>& Output)
+void ft::slice(const std::string& String, char Delim, std::pair<std::string, std::string>& Output)
 {
     size_t Start, End = 0;
 	Start = String.find_first_of(Delim, End);

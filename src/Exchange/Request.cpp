@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:34:12 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/05/25 20:27:34 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/05/25 22:16:37 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,6 @@
 ft::Request::Request(const char* Buffer)
 {
     std::string Item;
-	std::string Temp;
     std::istringstream Iss(Buffer);
 
     std::getline(Iss, Item, ' ');
@@ -26,8 +25,12 @@ ft::Request::Request(const char* Buffer)
 	std::pair<std::string, std::string> Output;
 	while (std::getline(Iss, Item)) // TODO: Make this better
 	{
-		ft::Slice(Item, ':', Output);
-		Fields[Output.first] = Output.second;
+    	Item.erase(remove_if(Item.begin(),Item.end(), [](char c){return !(c>=32);}), Item.end());  
+		if (!Item.empty())
+		{
+			ft::slice(Item, ':', Output);
+			Fields[Output.first] = Output.second;
+		}
 	}
 }
 
@@ -35,7 +38,7 @@ ft::Request::Request(const char* Buffer)
 
 void ft::Request::Display(void) const
 {
-	std::cout << static_cast<uint8_t>(Method) << "-";
+	std::cout << static_cast<int>(Method) << "-";
 	std::cout << Path << "-";
 	std::cout << Version << std::endl;
 
