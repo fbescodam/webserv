@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:13:27 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/05/25 14:58:37 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/05/25 17:43:17 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,8 @@
 # include "Common.hpp"
 FT_BEGIN
 
-enum method
+// Supported exchange methods for the webserver.
+enum class ExchangeMethod : uint8_t
 {
 	GET,
 	POST,

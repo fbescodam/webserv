@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 17:40:38 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/05/24 15:18:59 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/05/25 17:40:18 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,24 +85,24 @@ protected:
 // Socket creates an endpoint for communication and returns a descriptor.
 int32_t Socket(int32_t Domain, int32_t Type, int32_t Protocol)
 {
-    int32_t fd = socket(Domain, Type, Protocol);
-    if (fd < 0)
-        throw ft::GenericErrnoExecption();
-    return (fd);
+	int32_t fd = socket(Domain, Type, Protocol);
+	if (fd < 0)
+		throw ft::GenericErrnoExecption();
+	return (fd);
 }
 
 // Assigns a name to an unnamed socket, requests that address be assigned to the socket.
 void Bind(int32_t Socketfd, SocketAddress* Address, size_t AddressLength)
 {
-    if (bind(Socketfd, reinterpret_cast<sockaddr*>(Address), AddressLength) < 0)
-        throw ft::GenericErrnoExecption();
+	if (bind(Socketfd, reinterpret_cast<sockaddr*>(Address), AddressLength) < 0)
+		throw ft::GenericErrnoExecption();
 }
 
 // Defines the maximum length for the queue of pending connections.
 void Listen(int32_t Socketfd, int32_t BackLog = 128)
 {
-    if (listen(Socketfd, BackLog) < 0)
-        throw ft::GenericErrnoExecption();
+	if (listen(Socketfd, BackLog) < 0)
+		throw ft::GenericErrnoExecption();
 }
 
 // Extracts the first connection request on the queue of pending connections
@@ -110,19 +110,19 @@ int32_t Accept(int32_t Socketfd, SocketAddress* Address)
 {
 	socklen_t Length = Address->GetSize();
 
-    int32_t fd = accept(Socketfd, reinterpret_cast<sockaddr*>(Address), &Length);
-    if (fd < 0)
-        throw ft::GenericErrnoExecption();
-    return (fd);
+	int32_t fd = accept(Socketfd, reinterpret_cast<sockaddr*>(Address), &Length);
+	if (fd < 0)
+		throw ft::GenericErrnoExecption();
+	return (fd);
 }
 
 // Examines a set of file descriptors to see if some of them are ready for I/O or if certain events have occurred on them.
 int32_t Poll(struct pollfd Fds[], size_t Size, int32_t Timeout)
 {
 	int32_t FDs = poll(Fds, Size, Timeout);
-    if (FDs < 0)
-        throw ft::GenericErrnoExecption();
-    return (FDs);
+	if (FDs < 0)
+		throw ft::GenericErrnoExecption();
+	return (FDs);
 }
 
 // Provides for control over descriptors.  The argument fildes is a descriptor to be operated on by cmd as follows
@@ -130,9 +130,9 @@ template<typename... Args>
 int32_t Fcntl(int32_t Fd, int32_t Cmd, Args... args)
 {
 	int32_t Value = fcntl(Fd, Cmd, std::forward<Args>(args)...);
-    if (Value < 0)
-        throw ft::GenericErrnoExecption();
-    return (Value);
+	if (Value < 0)
+		throw ft::GenericErrnoExecption();
+	return (Value);
 }
 
 // Send a message from a socket.
@@ -140,8 +140,8 @@ ssize_t Send(int32_t Socket, const void* Buffer, size_t Length, int32_t Flags)
 {
 	ssize_t Value = send(Socket, Buffer, Length, Flags);
 	if (Value == -1)
-        throw ft::GenericErrnoExecption();
-    return (Value);
+		throw ft::GenericErrnoExecption();
+	return (Value);
 }
 
 // Receive a message from a socket.
@@ -149,8 +149,17 @@ ssize_t Receive(int32_t Socket, void* Buffer, size_t Length, int32_t Flags)
 {
 	ssize_t Value = recv(Socket, Buffer, Length, Flags);
 	if (Value == -1)
-        throw ft::GenericErrnoExecption();
-    return (Value);
+		throw ft::GenericErrnoExecption();
+	return (Value);
+}
+
+// Manipulate the options associated with a socket.
+int32_t SetSocketOption(int32_t Socket, int32_t Level, int32_t OptionName, bool OptionValue, size_t OptionLen)
+{
+	int32_t Value = setsockopt(Socket, Level, OptionName, &OptionValue, OptionLen);
+	if (Value == -1)
+		throw ft::GenericErrnoExecption();
+	return (Value);	
 }
 
 // HTTP Status codes

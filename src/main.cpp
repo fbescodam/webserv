@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 17:39:03 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/05/25 16:51:08 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/05/25 17:40:47 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,8 +39,9 @@ int main(int argc, char const *argv[])
 	try // Create internet socket.
 	{
         ServerFD = ft::Socket(IPV4, TCP, NONE);
-		int really_true = 1;
-		setsockopt(ServerFD,SOL_SOCKET,SO_REUSEADDR,&really_true,sizeof(int)); //Should make the kernel release socket resources
+
+		// Should make the kernel release socket resources
+		ft::SetSocketOption(ServerFD, SOL_SOCKET, SO_REUSEADDR, true, sizeof(int32_t));
 		ft::Bind(ServerFD, &Address, Address.GetSize());
 		ft::Listen(ServerFD, 128);
 	}
