@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 17:39:03 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/05/25 17:40:47 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/05/25 19:24:36 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,8 +65,8 @@ int main(int argc, char const *argv[])
             char buffer[CLIENT_BODY_SIZE] = {0};
 			ft::Receive(ClientSocket, buffer, CLIENT_BODY_SIZE, 0);
 			
-			ft::Request request(buffer); //literally just shits everything into a map
-			request.print();
+			ft::Request Request(buffer); //literally just shits everything into a map
+			Request.Display();
 
 			ft::Send(ClientSocket, hello, strlen(hello), 0); // Send Response
 			std::cout << "//=/ Sent Response /=//" << std::endl;
