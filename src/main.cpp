@@ -6,13 +6,12 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 17:39:03 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/05/26 09:45:57 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/05/26 16:06:28 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Common.hpp"
-#include "CommonNetwork.hpp"
 #include "Exchange/Request.hpp"
+#include "Exchange/Response.hpp"
 
 #define CLIENT_BODY_SIZE 30000
 
@@ -47,7 +46,7 @@ int main(int argc, char const *argv[])
 	}
 	catch(const ft::Exception& e)
 	{
-		ft::exceptionExit(e);
+		ft::exceptionExit(e, EXIT_FAILURE);
 	}
 	
 	//////////////////////////////////
@@ -62,19 +61,26 @@ int main(int argc, char const *argv[])
         {
             ClientSocket = ft::accept(ServerFD, &Address);
 
-            char buffer[CLIENT_BODY_SIZE] = {0};
-			ft::receive(ClientSocket, buffer, CLIENT_BODY_SIZE, 0);
-			
-			ft::Request Request(buffer); //literally just shits everything into a map
+
+			 //literally just shits everything into a map
+			ft::Request Request = ft::Request::getFirst(ClientSocket);
 			Request.display();
 
+			// Do stuff
+			/*
+			ft::Response Response;
+			Response.send(ClientSocket);
+			*/
 			ft::send(ClientSocket, hello, strlen(hello), 0); // send Response
+
+
+
 			std::cout << "//=/ Sent Response /=//" << std::endl;
             close(ClientSocket); // End of Exchange
         }
         catch(const ft::Exception& e)
         {
-            ft::exceptionExit(e);
+            ft::exceptionExit(e, EXIT_FAILURE);
         }
     }
 	return (EXIT_SUCCESS);

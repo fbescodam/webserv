@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:34:12 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/05/26 09:45:11 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/05/26 15:49:06 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,13 @@ void ft::Request::display(void) const
 
 	for (const auto [key, value] : fields)
 		std::cout << key << ":" << value << std::endl;
+}
+
+ft::Request ft::Request::getFirst(int32_t Socket)
+{
+    char buffer[30000] = {0};
+	ft::receive(Socket, buffer, sizeof(buffer), 0);
+	return (ft::Request(buffer));
 }
 
 void ft::Request::setMethod(const std::string& inMethod)

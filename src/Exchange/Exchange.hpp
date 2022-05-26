@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:13:27 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/05/26 14:24:40 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/05/26 15:53:34 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 #ifndef EXCHANGE_HPP
 # define EXCHANGE_HPP
-# include "Common.hpp"
+# include "CommonNetwork.hpp"
 FT_BEGIN
 
 // Supported exchange methods for the webserver.
