@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 17:40:38 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/05/25 17:40:18 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/05/26 09:41:10 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,84 +42,86 @@ struct SocketAddress
 {
 public: // Ctor
 	SocketAddress() = default;
-	SocketAddress(uint8_t InFamily, uint16_t InPort, uint32_t InAddress)
+	SocketAddress(uint8_t inFamily, uint16_t inPort, uint32_t inAddress)
 	{
-		AddressFamily = InFamily;
-		Port = InPort;
-		Address = InAddress;
+		addressFamily = inFamily;
+		port = inPort;
+		address = inAddress;
 	}
 
 public: // Functions
 
 	// Converts the wrapper to the C Style type.
-	struct sockaddr_in GetCStyle(void) const
+	struct sockaddr_in getCStyle(void) const
 	{
-		struct sockaddr_in Out = {
-			.sin_len = Length,
-			.sin_family = AddressFamily,
-			.sin_port = Port,
-			.sin_addr.s_addr = Address,
+		struct sockaddr_in out = {
+			.sin_len = length,
+			.sin_family = addressFamily,
+			.sin_port = port,
+			.sin_addr.s_addr = address,
 		};
 
-		std::memset(Out.sin_zero, 0, sizeof(Out.sin_zero));
-		return (Out);
+		std::memset(out.sin_zero, 0, sizeof(out.sin_zero));
+		return (out);
 	}
 
 	// Gets the size of the Socket Address.
-	constexpr size_t GetSize(void) const
+	constexpr size_t getSize(void) const
 	{
 		return (sizeof(SocketAddress));
 	}
 
 public: // Attributes
-	uint8_t		Length;
-	uint8_t		AddressFamily;
-	uint16_t	Port;
-	uint32_t	Address;
+	uint8_t		length;
+	uint8_t		addressFamily;
+	uint16_t	port;
+	uint32_t	address;
 protected:
-	char		Zero[8]; // Literally useless ?
+	char		zero[8]; // Literally useless ?
 };
 
 //////////////////////////////////////////
 
 // Socket creates an endpoint for communication and returns a descriptor.
-int32_t Socket(int32_t Domain, int32_t Type, int32_t Protocol)
+int32_t socket(int32_t Domain, int32_t Type, int32_t Protocol)
 {
-	int32_t fd = socket(Domain, Type, Protocol);
+	int32_t fd = ::socket(Domain, Type, Protocol);
 	if (fd < 0)
 		throw ft::GenericErrnoExecption();
 	return (fd);
 }
 
 // Assigns a name to an unnamed socket, requests that address be assigned to the socket.
-void Bind(int32_t Socketfd, SocketAddress* Address, size_t AddressLength)
+void bind(int32_t socketFD, SocketAddress* address)
 {
-	if (bind(Socketfd, reinterpret_cast<sockaddr*>(Address), AddressLength) < 0)
+	socklen_t length = address->getSize();
+
+	if (::bind(socketFD, reinterpret_cast<sockaddr*>(address), length) < 0)
 		throw ft::GenericErrnoExecption();
 }
 
 // Defines the maximum length for the queue of pending connections.
-void Listen(int32_t Socketfd, int32_t BackLog = 128)
+void listen(int32_t socketFD, int32_t BackLog = 128)
 {
-	if (listen(Socketfd, BackLog) < 0)
+	if (::listen(socketFD, BackLog) < 0)
 		throw ft::GenericErrnoExecption();
 }
 
 // Extracts the first connection request on the queue of pending connections
-int32_t Accept(int32_t Socketfd, SocketAddress* Address)
+int32_t accept(int32_t socketFD, SocketAddress* address)
 {
-	socklen_t Length = Address->GetSize();
+	socklen_t length = address->getSize();
 
-	int32_t fd = accept(Socketfd, reinterpret_cast<sockaddr*>(Address), &Length);
+	int32_t fd = ::accept(socketFD, reinterpret_cast<sockaddr*>(address), &length);
 	if (fd < 0)
 		throw ft::GenericErrnoExecption();
 	return (fd);
 }
 
 // Examines a set of file descriptors to see if some of them are ready for I/O or if certain events have occurred on them.
-int32_t Poll(struct pollfd Fds[], size_t Size, int32_t Timeout)
+int32_t poll(struct pollfd fds[], size_t size, int32_t timeout)
 {
-	int32_t FDs = poll(Fds, Size, Timeout);
+	int32_t FDs = ::poll(fds, size, timeout);
 	if (FDs < 0)
 		throw ft::GenericErrnoExecption();
 	return (FDs);
@@ -127,36 +129,36 @@ int32_t Poll(struct pollfd Fds[], size_t Size, int32_t Timeout)
 
 // Provides for control over descriptors.  The argument fildes is a descriptor to be operated on by cmd as follows
 template<typename... Args>
-int32_t Fcntl(int32_t Fd, int32_t Cmd, Args... args)
+int32_t fcntl(int32_t fd, int32_t cmd, Args... args)
 {
-	int32_t Value = fcntl(Fd, Cmd, std::forward<Args>(args)...);
+	int32_t Value = ::fcntl(fd, cmd, std::forward<Args>(args)...);
 	if (Value < 0)
 		throw ft::GenericErrnoExecption();
 	return (Value);
 }
 
 // Send a message from a socket.
-ssize_t Send(int32_t Socket, const void* Buffer, size_t Length, int32_t Flags)
+ssize_t send(int32_t socket, const void* buffer, size_t length, int32_t flags)
 {
-	ssize_t Value = send(Socket, Buffer, Length, Flags);
+	ssize_t Value = ::send(socket, buffer, length, flags);
 	if (Value == -1)
 		throw ft::GenericErrnoExecption();
 	return (Value);
 }
 
 // Receive a message from a socket.
-ssize_t Receive(int32_t Socket, void* Buffer, size_t Length, int32_t Flags)
+ssize_t receive(int32_t socket, void* buffer, size_t length, int32_t flags)
 {
-	ssize_t Value = recv(Socket, Buffer, Length, Flags);
+	ssize_t Value = ::recv(socket, buffer, length, flags);
 	if (Value == -1)
 		throw ft::GenericErrnoExecption();
 	return (Value);
 }
 
 // Manipulate the options associated with a socket.
-int32_t SetSocketOption(int32_t Socket, int32_t Level, int32_t OptionName, bool OptionValue, size_t OptionLen)
+int32_t setSocketOption(int32_t socket, int32_t level, int32_t optionName, bool optionValue, size_t optionLen)
 {
-	int32_t Value = setsockopt(Socket, Level, OptionName, &OptionValue, OptionLen);
+	int32_t Value = setsockopt(socket, level, optionName, &optionValue, optionLen);
 	if (Value == -1)
 		throw ft::GenericErrnoExecption();
 	return (Value);	
@@ -170,9 +172,9 @@ int32_t SetSocketOption(int32_t Socket, int32_t Level, int32_t OptionName, bool 
  * 
  * @see https://bit.ly/3No2GDN
  */
-const std::map<uint16_t, std::string>& GetStatusCodes()
+const std::map<uint16_t, std::string>& getStatusCodes()
 {
-	static std::map<uint16_t, std::string> List = {
+	static std::map<uint16_t, std::string> list = {
 		// 1xx Informational
 		{100, "Continue"},
 		{101, "Switching Protocols"},
@@ -247,7 +249,7 @@ const std::map<uint16_t, std::string>& GetStatusCodes()
 		{599, "Network Connect Timeout Error"}
 	};
 
-	return (List);
+	return (list);
 }
 
 FT_END

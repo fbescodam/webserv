@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 18:05:00 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/05/23 19:12:07 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/05/26 09:34:52 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,13 +26,13 @@ struct Exception
     virtual ~Exception() noexcept { };
 	
     // What went wrong.
-    virtual const char* What() const noexcept = 0;
+    virtual const char* what() const noexcept = 0;
 };
 
 // Simple strerror exception wrapper.
 struct GenericErrnoExecption : public ft::Exception
 {
-    virtual const char* What() const throw() {
+    virtual const char* what() const throw() {
         return (strerror(errno));
     }
 };
@@ -43,10 +43,10 @@ struct GenericErrnoExecption : public ft::Exception
  * @param[in] Exception The exception to print.
  * @param[in] Code The exit code.
  */
-[[noreturn]] void ExceptionExit(const ft::Exception& Exception, int32_t Code = EXIT_FAILURE)
+[[noreturn]] void exceptionExit(const ft::Exception& exception, int32_t code = EXIT_FAILURE)
 {
-    std::cerr << "Webserv: " << Exception.What() << std::endl;
-	exit(Code);
+    std::cerr << "Webserv: " << exception.what() << std::endl;
+	exit(code);
 }
 
 FT_END

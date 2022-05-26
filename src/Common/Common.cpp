@@ -6,30 +6,30 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/25 19:34:04 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/05/25 20:25:27 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/05/26 09:34:52 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Common.hpp"
 
-void ft::Split(const std::string& String, char Delim, std::vector<std::string>& Output)
+void ft::split(const std::string& string, char delim, std::vector<std::string>& output)
 {
-	Output.clear();
-	Output.reserve(std::count(String.begin(), String.end(), Delim));
+	output.clear();
+	output.reserve(std::count(string.begin(), string.end(), delim));
 
-    size_t Start, End = 0; 
-    while ((Start = String.find_first_not_of(Delim, End)) != std::string::npos)
+    size_t start, end = 0; 
+    while ((start = string.find_first_not_of(delim, end)) != std::string::npos)
     {
-        End = String.find(Delim, Start);
-        Output.push_back(String.substr(Start, End - Start));
+        end = string.find(delim, start);
+        output.push_back(string.substr(start, end - start));
     }
 }
 
-void ft::Slice(const std::string& String, char Delim, std::pair<std::string, std::string>& Output)
+void ft::slice(const std::string& string, char delim, std::pair<std::string, std::string>& output)
 {
-    size_t Start, End = 0;
-	Start = String.find_first_of(Delim, End);
-	Output.first = String.substr(0, Start);
-	Output.second = String.substr(Start + 1);
+    size_t start, end = 0;
+	start = string.find_first_of(delim, end);
+	output.first = string.substr(0, start);
+	output.second = string.substr(start + 1);
 }
 

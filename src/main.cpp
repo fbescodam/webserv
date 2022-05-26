@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 17:39:03 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/05/25 19:24:36 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/05/26 09:41:16 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,16 +38,16 @@ int main(int argc, char const *argv[])
 
 	try // Create internet socket.
 	{
-        ServerFD = ft::Socket(IPV4, TCP, NONE);
+        ServerFD = ft::socket(IPV4, TCP, NONE);
 
 		// Should make the kernel release socket resources
-		ft::SetSocketOption(ServerFD, SOL_SOCKET, SO_REUSEADDR, true, sizeof(int32_t));
-		ft::Bind(ServerFD, &Address, Address.GetSize());
-		ft::Listen(ServerFD, 128);
+		ft::setSocketOption(ServerFD, SOL_SOCKET, SO_REUSEADDR, true, sizeof(int32_t));
+		ft::bind(ServerFD, &Address);
+		ft::listen(ServerFD, 128);
 	}
 	catch(const ft::Exception& e)
 	{
-		ft::ExceptionExit(e);
+		ft::exceptionExit(e);
 	}
 	
 	//////////////////////////////////
@@ -60,21 +60,21 @@ int main(int argc, char const *argv[])
         std::cout << "\n//=/ ...Listening... /=//\n" << std::endl;
         try
         {
-            ClientSocket = ft::Accept(ServerFD, &Address);
+            ClientSocket = ft::accept(ServerFD, &Address);
 
             char buffer[CLIENT_BODY_SIZE] = {0};
-			ft::Receive(ClientSocket, buffer, CLIENT_BODY_SIZE, 0);
+			ft::receive(ClientSocket, buffer, CLIENT_BODY_SIZE, 0);
 			
 			ft::Request Request(buffer); //literally just shits everything into a map
 			Request.Display();
 
-			ft::Send(ClientSocket, hello, strlen(hello), 0); // Send Response
+			ft::send(ClientSocket, hello, strlen(hello), 0); // send Response
 			std::cout << "//=/ Sent Response /=//" << std::endl;
             close(ClientSocket); // End of Exchange
         }
         catch(const ft::Exception& e)
         {
-            ft::ExceptionExit(e);
+            ft::exceptionExit(e);
         }
     }
 	return (EXIT_SUCCESS);

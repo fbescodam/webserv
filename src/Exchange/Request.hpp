@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:13:27 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/05/25 20:44:57 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/05/26 09:41:52 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,16 +24,16 @@ public: // Ctor ~ Dtor
 	Request(const char* Buffer);
 
 public: // Methods
-	void Display(void) const;
+	void display(void) const;
 
 private:
-	void SetMethod(const std::string& SMethod);
+	void setMethod(const std::string& method);
 
 public: // Attributes
-	ft::ExchangeMethod Method;
-	std::string Path;
-	std::string Version;
-	std::map<std::string, std::string> Fields;
+	ft::ExchangeMethod method;
+	std::string path;
+	std::string version;
+	std::map<std::string, std::string> fields;
 };
 
 FT_END
