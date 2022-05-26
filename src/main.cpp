@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 17:39:03 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/05/26 16:06:28 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/05/26 19:23:02 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,11 +67,11 @@ int main(int argc, char const *argv[])
 			Request.display();
 
 			// Do stuff
-			/*
+
 			ft::Response Response;
-			Response.send(ClientSocket);
-			*/
-			ft::send(ClientSocket, hello, strlen(hello), 0); // send Response
+			Response.send(ClientSocket, hello);
+
+			//ft::send(ClientSocket, hello, strlen(hello), 0); // send Response
 
 
 

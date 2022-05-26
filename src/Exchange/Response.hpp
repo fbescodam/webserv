@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:13:27 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/05/26 17:00:49 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/05/26 19:23:19 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,8 @@ public: // Functions
 	 */
 	void send(int32_t socket, const std::vector<uint8_t>& buffer);
 
+	// Send a string
+	void send(int32_t socket, const std::string& buffer);
 
 public: // Attributes
 
