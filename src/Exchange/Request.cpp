@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:34:12 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/05/26 15:49:06 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/05/26 20:13:41 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ ft::Request::Request(const char* Buffer)
 
 void ft::Request::display(void) const
 {
-	std::cout << static_cast<uint8_t>(method) << "-";
+	std::cout << static_cast<int>(method) << "-";
 	std::cout << path << "-";
 	std::cout << version << std::endl;
 
