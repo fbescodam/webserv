@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 17:39:03 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/05/26 22:25:38 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/05/26 22:27:41 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,7 @@ int main(int argc, char const *argv[])
 	
 
     nfds_t  nfds = 0;
-	int maxClients = 5;
+	int maxClients = 5; //maximum allowed connections
 	int numFds = 1;
 	struct pollfd *pollfds;
     pollfds = (pollfd *)malloc(maxClients * sizeof(struct pollfd));
