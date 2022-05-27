@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 17:39:03 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/05/26 22:27:41 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/05/27 12:25:31 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,9 +93,9 @@ int main(int argc, char const *argv[])
 							{
 								if ((pollfds + j)->fd == -1)
 								{
-									(pollfds + numFds - 1)->fd = clientSocket;
-									(pollfds + numFds - 1)->events = POLLIN;
-									(pollfds + numFds - 1)->revents = 0;
+									(pollfds + j)->fd = clientSocket;
+									(pollfds + j)->events = POLLIN;
+									(pollfds + j)->revents = 0;
 									goto label;
 								}
 							}
