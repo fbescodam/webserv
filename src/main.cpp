@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 17:39:03 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/05/27 12:25:31 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/05/27 12:42:57 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,7 @@ int main(int argc, char const *argv[])
 	pollfds->fd = serverFD;
 	pollfds->events = POLLIN;
 
-	std::map<int, std::string> requests;
+	std::map<int, ft::Request> requests;
 	//////////////////////////////////
 
     while(true)
@@ -129,10 +129,10 @@ int main(int argc, char const *argv[])
 						}	
 						else
 						{
-							ft::Request request(buffer);
-							request.display();
+							ft::Request req(buffer);
+							//requests[(pollfds + i)->fd] = req; this doesnt work and im retarded
+							req.display();
 							(pollfds + i)->events = POLLOUT;
-							// ft::send((pollfds + i)->fd, hello, strlen(hello), 0); // send Response
 							std::cout << "//=/ Sent Response /=//" << std::endl;
 						}
 					}
@@ -144,6 +144,7 @@ int main(int argc, char const *argv[])
 				else if ((pollfds + i)->revents & POLLOUT) //pollfd is ready for writing
 				{
 					std::cout << "sending shit" << std::endl;
+					//requests[(pollfds + i)->fd].display();
 					ft::send((pollfds + i)->fd, hello, strlen(hello), 0); // send Response
 					(pollfds + i)->events = POLLIN;
 				}
