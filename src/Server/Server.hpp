@@ -19,6 +19,9 @@ public:
 	void init(void);
 	void run(void);
 
+	void newSocket(void);
+	void pollInEvent(int i);
+	void pollOutEvent(int i);
 
 	// Config _config;
 

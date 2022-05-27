@@ -23,6 +23,84 @@ void ft::Server::init(void)
 
 }
 
+//TODO: proper error responses
+void ft::Server::newSocket(void)
+{
+	std::cout << "\n//=/ ...Accepting connection... /=//\n" << std::endl;
+	try
+	{
+		clientSocket = ft::accept(serverFD, &Address);
+
+		if (numFds == maxClients)
+		{
+			const char* error = "HTTP/1.1 503 Service Unavailabe\nContent-Type: text/plain\nContent-Length: 12\n\n503 error";
+			char buffer[30000] = {0};
+			recv(pollfds->fd, buffer, 30000, 0);
+			ft::send(clientSocket, error, strlen(error), 0); // send Response						
+			close(clientSocket); // End of Exchange
+		}
+		else
+		{
+			for (int j = 0; j < numFds; j++)
+			{
+				if ((pollfds + j)->fd == -1)
+				{
+					(pollfds + j)->fd = clientSocket;
+					(pollfds + j)->events = POLLIN;
+					(pollfds + j)->revents = 0;
+					goto label;
+				}
+			}
+			numFds++;
+			(pollfds + numFds - 1)->fd = clientSocket;
+			(pollfds + numFds - 1)->events = POLLIN;
+			(pollfds + numFds - 1)->revents = 0;
+		label: ;
+		}
+	}
+	catch(const ft::Exception& e)
+	{
+		ft::exceptionExit(e, EXIT_FAILURE);
+	}	
+}
+
+//TODO: implement proper request parsing
+void ft::Server::pollInEvent(int i)
+{
+	try
+	{
+		char buffer[30000] = {0};
+		ssize_t bytesrec = recv((pollfds + i)->fd, buffer, 30000, 0);
+		if (bytesrec == 0)
+		{
+			std::cout << "Connection closed\n";
+			close((pollfds + i)->fd); // End of Exchange
+			(pollfds + i)->fd = -1;
+		}	
+		else
+		{
+			ft::Request req(buffer);
+			//requests[(pollfds + i)->fd] = req; this doesnt work and im retarded
+			req.display();
+			(pollfds + i)->events = POLLOUT;
+			std::cout << "//=/ Sent Response /=//" << std::endl;
+		}
+	}
+	catch(const ft::Exception& e)
+	{
+		ft::exceptionExit(e, EXIT_FAILURE);
+	}	
+}
+
+//TODO: implement proper response
+void ft::Server::pollOutEvent(int i)
+{
+	std::cout << "sending shit" << std::endl;
+	//requests[(pollfds + i)->fd].display();
+	ft::send((pollfds + i)->fd, hello, strlen(hello), 0); // send Response
+	(pollfds + i)->events = POLLIN;
+}
+
 void ft::Server::run(void)
 {
     while(true)
@@ -35,84 +113,15 @@ void ft::Server::run(void)
 			if (!i)
 			{
 				if (pollfds[0].revents & POLLIN)
-				{
-					std::cout << "\n//=/ ...Accepting connection... /=//\n" << std::endl;
-					try
-					{
-						clientSocket = ft::accept(serverFD, &Address);
-
-						if (numFds == maxClients)
-						{
-							const char* error = "HTTP/1.1 503 Service Unavailabe\nContent-Type: text/plain\nContent-Length: 12\n\n503 error";
-							char buffer[30000] = {0};
-							recv((pollfds + i)->fd, buffer, 30000, 0);
-							ft::send(clientSocket, error, strlen(error), 0); // send Response						
-							close(clientSocket); // End of Exchange
-						}
-						else
-						{
-							for (int j = 0; j < numFds; j++)
-							{
-								if ((pollfds + j)->fd == -1)
-								{
-									(pollfds + j)->fd = clientSocket;
-									(pollfds + j)->events = POLLIN;
-									(pollfds + j)->revents = 0;
-									goto label;
-								}
-							}
-							numFds++;
-							(pollfds + numFds - 1)->fd = clientSocket;
-							(pollfds + numFds - 1)->events = POLLIN;
-							(pollfds + numFds - 1)->revents = 0;
-						label: ;
-						}
-					}
-					catch(const ft::Exception& e)
-					{
-						ft::exceptionExit(e, EXIT_FAILURE);
-					}	
-				}
+					this->newSocket();
 			}
 			else
 			{
-				if ((pollfds + i)->revents & POLLIN) //pollfd is ready for reading operation
-				{
-					try
-					{
-
-						char buffer[30000] = {0};
-						ssize_t bytesrec = recv((pollfds + i)->fd, buffer, 30000, 0);
-						if (bytesrec == 0)
-						{
-							std::cout << "Connection closed\n";
-							close((pollfds + i)->fd); // End of Exchange
-							(pollfds + i)->fd = -1;
-						}	
-						else
-						{
-							ft::Request req(buffer);
-							//requests[(pollfds + i)->fd] = req; this doesnt work and im retarded
-							req.display();
-							(pollfds + i)->events = POLLOUT;
-							std::cout << "//=/ Sent Response /=//" << std::endl;
-						}
-					}
-					catch(const ft::Exception& e)
-					{
-						ft::exceptionExit(e, EXIT_FAILURE);
-					}						
-				}
+				if ((pollfds + i)->revents & POLLIN) //pollfd is ready for reading
+					this->pollInEvent(i);
 				else if ((pollfds + i)->revents & POLLOUT) //pollfd is ready for writing
-				{
-					std::cout << "sending shit" << std::endl;
-					//requests[(pollfds + i)->fd].display();
-					ft::send((pollfds + i)->fd, hello, strlen(hello), 0); // send Response
-					(pollfds + i)->events = POLLIN;
-				}
+					this->pollOutEvent(i);
 			}
-	
 		}
-
     }
 }
