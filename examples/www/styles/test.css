@@ -1,0 +1,13 @@
+html {
+    font-family: sans-serif;
+}
+
+h1 {
+    color: red;
+    text-decoration: underline;
+    font-weight: bold;
+}
+
+img {
+    border: solid blue 4px;
+}
