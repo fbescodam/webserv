@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:43:14 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/05/30 14:08:34 by fbes          ########   odam.nl         */
+/*   Updated: 2022/05/30 16:49:48 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 # define GlobalConfig_HPP
 # include "Common.hpp"
 # include "Config.hpp"
-# include "../Server/Server.hpp"
+# include "Server.hpp"
 # include <list>
 FT_BEGIN
 

@@ -21,8 +21,8 @@ public:
 	void run(void);
 
 	void newSocket(void);
-	void pollInEvent(int i);
-	void pollOutEvent(int i);
+	void pollInEvent(int32_t i);
+	void pollOutEvent(int32_t i);
 
 	Config _config;
 
@@ -31,10 +31,10 @@ public:
 	ft::SocketAddress Address;
 
 	//running part
-	nfds_t  nfds;
-	int maxClients;
-	int numFds;
-	struct pollfd *pollfds;
+	int32_t maxClients;
+	int32_t numFds;
+	pollfd* pollfds;
+	nfds_t nfds;
 
 	std::map<int, ft::Request> requests; //idk if this is the best solution yet
 

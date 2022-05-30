@@ -6,7 +6,7 @@
 #    By: lde-la-h <lde-la-h@student.codam.nl>         +#+                      #
 #                                                    +#+                       #
 #    Created: 2022/05/13 11:36:28 by lde-la-h      #+#    #+#                  #
-#    Updated: 2022/05/25 16:48:31 by pvan-dij      ########   odam.nl          #
+#    Updated: 2022/05/30 16:57:35 by lde-la-h      ########   odam.nl          #
 #                                                                              #
 # **************************************************************************** #
 
@@ -25,8 +25,9 @@ RESET	:= \033[0m
 #//= Files =//#
 CC		:=	clang++
 NAME	:=	webserv
-HEADERS :=	-I ./include
-# Project requires you do it in 98, we frankly don't care (We asked)
+# TODO: Pjotr pls explain lol
+HEADERS :=	$(addprefix -I , $(shell find ./src -iname '*.hpp' | sed -E "s|/[^/]+$$||" | uniq)) -I include
+# Project requires you do it in 98, frankly we don't care (We asked)
 CFLAGS	:= -std=c++17 -Wextra -Wall -Werror -Wunreachable-code -Wno-char-subscripts -Wno-unused-variable -Wno-unused-parameter
 ifdef DEBUG
 	CFLAGS	+=	-g3
@@ -38,7 +39,8 @@ OBJS	:=	${SRCS:.cpp=.o}
 
 #//= Recipes =//#
 all: # Multi threading badness because C++ is slow
-	@$(MAKE) $(NAME) -j4
+	echo $(HEADERS)
+	$(MAKE) $(NAME) -j4 
 
 %.o: %.cpp
 	@$(CC) $(CFLAGS) -o $@ -c $< $(HEADERS) && printf "$(GREEN)$(BOLD)\rCompiling: $(notdir $<)\r\e[35C[OK]\n$(RESET)"

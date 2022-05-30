@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:13:27 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/05/26 19:23:19 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/05/30 17:26:45 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ FT_BEGIN
  */
 
 // A Response is from the outgoing server.
-class Response : public Exchange
+class Response final : public Exchange
 {
 public: // Ctor ~ Dtor
 
@@ -43,8 +43,10 @@ public: // Functions
 	// Send a string
 	void send(int32_t socket, const std::string& buffer);
 
-public: // Attributes
+private:
+	void writeHeader(std::vector<uint8_t>& buffer);
 
+public: // Attributes
 
 };
 
