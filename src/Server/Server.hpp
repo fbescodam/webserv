@@ -5,6 +5,7 @@
 
 #include "../Exchange/Request.hpp"
 #include "../Exchange/Response.hpp"
+#include "../Config/Config.hpp"
 #include <poll.h>
 
 
@@ -14,7 +15,7 @@ FT_BEGIN
 class Server
 {
 public:
-	Server(void); //should load in config file probs
+	Server(Config& config);
 
 	void init(void);
 	void run(void);
@@ -23,7 +24,7 @@ public:
 	void pollInEvent(int i);
 	void pollOutEvent(int i);
 
-	// Config _config;
+	Config _config;
 
 	//listening socket
 	int32_t serverFD, clientSocket, ValRead;

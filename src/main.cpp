@@ -6,11 +6,12 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 17:39:03 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/05/27 14:21:14 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/05/30 13:14:42 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server/Server.hpp"
+#include "Config/Config.hpp"
 
 #define CLIENT_BODY_SIZE 30000
 
@@ -24,7 +25,8 @@ int main(int argc, char const *argv[])
 {
 	signal(SIGINT, ft_exit);
 
-	ft::Server server;
+	ft::Config config;
+	ft::Server server(config);
 
 	server.init();
 	server.run();

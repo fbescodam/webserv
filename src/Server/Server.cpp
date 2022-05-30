@@ -1,8 +1,8 @@
 #include "Server.hpp"
 
-ft::Server::Server(void)
+ft::Server::Server(Config& config)
 {
-	//setup config
+	this->_config = config;
 }
 
 void ft::Server::init(void)
@@ -13,7 +13,7 @@ void ft::Server::init(void)
 	ft::bind(serverFD, &Address);
 	ft::listen(serverFD, 128);
 	fcntl(serverFD, F_SETFL, O_NONBLOCK); //macos sucks so have to set serverfd to be nonblocking
-	
+
 	nfds = 0;
 	maxClients = 5; //this should be gotten from config
 	numFds = 1;
@@ -36,7 +36,7 @@ void ft::Server::newSocket(void)
 			const char* error = "HTTP/1.1 503 Service Unavailabe\nContent-Type: text/plain\nContent-Length: 12\n\n503 error";
 			char buffer[30000] = {0};
 			recv(pollfds->fd, buffer, 30000, 0);
-			ft::send(clientSocket, error, strlen(error), 0); // send Response						
+			ft::send(clientSocket, error, strlen(error), 0); // send Response
 			close(clientSocket); // End of Exchange
 		}
 		else
@@ -61,7 +61,7 @@ void ft::Server::newSocket(void)
 	catch(const ft::Exception& e)
 	{
 		ft::exceptionExit(e, EXIT_FAILURE);
-	}	
+	}
 }
 
 //TODO: implement proper request parsing
@@ -76,7 +76,7 @@ void ft::Server::pollInEvent(int i)
 			std::cout << "Connection closed\n";
 			close((pollfds + i)->fd); // End of Exchange
 			(pollfds + i)->fd = -1;
-		}	
+		}
 		else
 		{
 			ft::Request req(buffer);
@@ -89,7 +89,7 @@ void ft::Server::pollInEvent(int i)
 	catch(const ft::Exception& e)
 	{
 		ft::exceptionExit(e, EXIT_FAILURE);
-	}	
+	}
 }
 
 //TODO: implement proper response
