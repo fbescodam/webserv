@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:43:14 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/05/30 19:28:05 by fbes          ########   odam.nl         */
+/*   Updated: 2022/05/30 19:37:26 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 # define GlobalConfig_HPP
 # include "Common.hpp"
 # include "Config.hpp"
-# include "../Server/Server.hpp"
+# include "Server.hpp"
 # include <vector>
 # define BUFFER_SIZE 128
 FT_BEGIN

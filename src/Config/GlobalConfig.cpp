@@ -6,13 +6,13 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:44:03 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/05/30 19:35:55 by fbes          ########   odam.nl         */
+/*   Updated: 2022/05/30 19:36:45 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Common.hpp"
 #include "GlobalConfig.hpp"
-#include "../Server/Server.hpp"
+#include "Server.hpp"
 
 static std::string* readConfig(const std::string& filePath)
 {
