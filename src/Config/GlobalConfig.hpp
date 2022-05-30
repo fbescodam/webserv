@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:43:14 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/05/30 14:08:34 by fbes          ########   odam.nl         */
+/*   Updated: 2022/05/30 19:28:05 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,26 +17,28 @@
 # include "Common.hpp"
 # include "Config.hpp"
 # include "../Server/Server.hpp"
-# include <list>
+# include <vector>
+# define BUFFER_SIZE 128
 FT_BEGIN
 
 // A GlobalConfig singleton object that reads and stores the server information.
 class GlobalConfig
 {
-protected: // Ctor ~ Dtor
-	GlobalConfig(const std::string& filepath);
-
-public:
+public: // Ctor ~ Dtor
+	GlobalConfig(const std::string& filePath);
 	GlobalConfig(GlobalConfig &other) = delete;
+	~GlobalConfig();
 	void operator=(const GlobalConfig&) = delete;
 
 public: // Functions
-	Server getServer(const std::string& host, const uint16_t port);
+	const ft::Server& getServer(const std::string& host, const uint16_t port) const;
+private:
+	const ft::Server* createServer();
 
 public: // Attributes
 private:
 	Config _config;
-	std::list<Server> _servers;
+	std::vector<Server*> _servers;
 };
 
 FT_END
