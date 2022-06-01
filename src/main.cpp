@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 17:39:03 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/01 15:50:49 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/06/01 16:45:27 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,13 +22,6 @@
  */
 int32_t main(int32_t argc, const char* argv[])
 {
-	// Handle Interrupt signals
-	signal(SIGINT, [](int32_t val) 
-	{
-		std::cout << "Webserv: Signal catched, shutting down" << std::endl;
-		exit (EXIT_FAILURE);
-	});
-
 	// Check arguments
 	if (argc != 2)
 	{
@@ -37,13 +30,36 @@ int32_t main(int32_t argc, const char* argv[])
 		return (EXIT_FAILURE);
 	}
 
+	// Handle Interrupt signals
+	signal(SIGINT, [](int32_t val) 
+	{
+		std::cout << "Webserv: Signal catched, shutting down" << std::endl;
+		exit (EXIT_FAILURE);
+	});
+
 	// Read config file ...
 	ft::GlobalConfig config;
 	if (!config.readFile(argv[2]))
 	{
-		std::cerr << "Webserv: Invalid config file." << std::endl;
+		std::cerr << "Webserv: Invalid failed to read config file." << std::endl;
 		return (EXIT_FAILURE);
 	}
+
+	try
+	{
+		while (true)
+		{
+			for (auto& server : config.getServers())
+			{
+				
+			}
+		}
+	}
+	catch(const std::exception& e)
+	{
+		std::cerr << e.what() << '\n';
+	}
+	
 
 	std::cout << "Webserv: Shutting down" << std::endl;
 	return (EXIT_SUCCESS);

@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/25 19:34:04 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/05/30 17:33:57 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/06/01 16:25:18 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,9 +15,9 @@
 
 //////////////////////////////////////////
 
-[[noreturn]] void ft::exceptionExit(const ft::Exception& exception, int32_t code = EXIT_FAILURE)
+[[noreturn]] void ft::exceptionExit(const std::exception& e, int32_t code = EXIT_FAILURE)
 {
-    std::cerr << "Webserv: " << exception.what() << std::endl;
+    std::cerr << "Webserv: " << e.what() << std::endl;
 	exit(code);
 }
 
