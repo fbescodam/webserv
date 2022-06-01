@@ -6,20 +6,20 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/25 19:34:04 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/05/26 16:05:50 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/05/30 17:33:57 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Common.hpp"
 #include "Exceptions.hpp"
 
+//////////////////////////////////////////
+
 [[noreturn]] void ft::exceptionExit(const ft::Exception& exception, int32_t code = EXIT_FAILURE)
 {
     std::cerr << "Webserv: " << exception.what() << std::endl;
 	exit(code);
 }
-
-/////
 
 void ft::split(const std::string& string, char delim, std::vector<std::string>& output)
 {
@@ -42,3 +42,4 @@ void ft::slice(const std::string& string, char delim, std::pair<std::string, std
 	output.second = string.substr(start + 1);
 }
 
+//////////////////////////////////////////

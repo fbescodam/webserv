@@ -7,17 +7,24 @@ ft::Server::Server(Config& config)
 
 void ft::Server::init(void)
 {
-	Address = ft::SocketAddress(AF_INET, htons(8080), INADDR_ANY); //needs config values
-	serverFD = ft::socket(IPV4, TCP, NONE);
-	ft::setSocketOption(serverFD, SOL_SOCKET, SO_REUSEADDR, true, sizeof(int32_t)); //make kernel release socket after exit
-	ft::bind(serverFD, &Address);
-	ft::listen(serverFD, 128);
-	fcntl(serverFD, F_SETFL, O_NONBLOCK); //macos sucks so have to set serverfd to be nonblocking
-
+	try
+	{
+		Address = ft::SocketAddress(AF_INET, htons(8080), INADDR_ANY); // needs config values
+		serverFD = ft::socket(IPV4, TCP, NONE);
+		ft::setSocketOption(serverFD, SOL_SOCKET, SO_REUSEADDR, true, sizeof(bool)); // make kernel release socket after exit
+		ft::bind(serverFD, &Address);
+		ft::listen(serverFD, 128);
+		fcntl(serverFD, F_SETFL, O_NONBLOCK); // macos sucks so have to set serverfd to be nonblocking
+	}
+	catch(const ft::Exception& e)
+	{
+		std::cerr << e.what() << std::endl;
+	}
+	
 	nfds = 0;
-	maxClients = 5; //this should be gotten from config
+	maxClients = 5; // this should be gotten from config
 	numFds = 1;
-    pollfds = (pollfd *)malloc(maxClients * sizeof(struct pollfd));
+	pollfds = new pollfd[maxClients];
 	pollfds->fd = serverFD;
 	pollfds->events = POLLIN;
 
