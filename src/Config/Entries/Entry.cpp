@@ -1,31 +1,35 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        ::::::::            */
-/*   Config.cpp                                         :+:    :+:            */
+/*   Entry.cpp                                          :+:    :+:            */
 /*                                                     +:+                    */
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
-/*   Created: 2022/05/23 19:44:03 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/05/30 15:38:08 by fbes          ########   odam.nl         */
+/*   Created: 2022/06/01 15:39:35 by lde-la-h      #+#    #+#                 */
+/*   Updated: 2022/06/01 15:47:36 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Config.hpp"
+#include "Entry.hpp"
 
-const std::string* ft::Config::getValue(std::string& key) const
+//////////////////////////////////////////
+
+bool ft::Entry::keyExists(const std::string& key) const
+{
+	return (this->fields.find(key) != this->fields.end());
+}
+
+const std::string* ft::Entry::getValue(const std::string& key) const
 {
 	auto it = this->fields.find(key);
 
 	return (it != this->fields.end() ? &it->second : nullptr);
 }
 
-bool ft::Config::keyExists(std::string& key) const
+void ft::Entry::setValue(const std::string& key, const std::string& value)
 {
-	return (this->fields.count(key) > 0);
+	// NOTE: According to docs if key does not exist, it will be added.
+	this->fields[key] = value;
 }
 
-bool ft::Config::setValue(std::string& key, std::string &value)
-{
-	std::__1::pair ret = this->fields.insert({key, value});
-	return (ret.second);
-}
+//////////////////////////////////////////

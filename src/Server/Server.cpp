@@ -30,8 +30,12 @@ void ft::Server::init(void)
 
 }
 
+auto main() -> int {
+
+}
+
 //TODO: proper error responses
-void ft::Server::newSocket(void)
+auto ft::Server::newSocket(void) -> void 
 {
 	std::cout << "\n//=/ ...Accepting connection... /=//\n" << std::endl;
 	try
@@ -110,25 +114,22 @@ void ft::Server::pollOutEvent(int i)
 
 void ft::Server::run(void)
 {
-    while(true)
-    {
-		nfds = numFds;
-		ft::poll(pollfds, nfds, 0); //check our open fds for events
+	nfds = numFds;
+	ft::poll(pollfds, nfds, 0); //check our open fds for events
 
-		for (int i = 0; i < numFds; i++)
+	for (int i = 0; i < numFds; i++)
+	{
+		if (!i)
 		{
-			if (!i)
-			{
-				if (pollfds[0].revents & POLLIN)
-					this->newSocket();
-			}
-			else
-			{
-				if ((pollfds + i)->revents & POLLIN) //pollfd is ready for reading
-					this->pollInEvent(i);
-				else if ((pollfds + i)->revents & POLLOUT) //pollfd is ready for writing
-					this->pollOutEvent(i);
-			}
+			if (pollfds[0].revents & POLLIN)
+				this->newSocket();
 		}
-    }
+		else
+		{
+			if ((pollfds + i)->revents & POLLIN) //pollfd is ready for reading
+				this->pollInEvent(i);
+			else if ((pollfds + i)->revents & POLLOUT) //pollfd is ready for writing
+				this->pollOutEvent(i);
+		}
+	}
 }

@@ -5,62 +5,42 @@
 /*                                                     +:+                    */
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
-/*   Created: 2022/05/23 19:44:03 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/05/30 19:36:45 by fbes          ########   odam.nl         */
+/*   Created: 2022/06/01 14:59:11 by lde-la-h      #+#    #+#                 */
+/*   Updated: 2022/06/01 15:58:39 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Common.hpp"
 #include "GlobalConfig.hpp"
-#include "Server.hpp"
 
-static std::string* readConfig(const std::string& filePath)
+//////////////////////////////////////////
+
+bool ft::GlobalConfig::readFile(const std::string& filePath)
 {
-	std::ifstream stream;
-	std::string* contents = new std::string("");
-	char buffer[BUFFER_SIZE + 1];
+	/** 
+	 * 1. Any found entries should be added to global
+	 * 
+	 * 2. Until a new tag is found.
+	 * 
+	 * 3. That tag is added to the vector of entries
+	 * any subtags get added to the parent tag.
+	 * 
+	 * 4. Repeat 2 until eof or error.
+	 */
 
-	stream.open(filePath, std::ifstream::in);
-	while (true)
-	{
-		try
-		{
-			bzero(buffer, BUFFER_SIZE + 1);
-			stream.read(buffer, BUFFER_SIZE);
-			contents->append(buffer);
-			if (stream.eof())
-				break;
-		}
-		catch ( ... )
-		{
-			delete contents;
-			return (nullptr);
-		}
-	}
-	return (nullptr);
+
+	// (Wtf is this func name)
+	std::ifstream fstream(filePath);
+	if (!fstream.good())
+		return (false);
+	
+	// Empty into string stream instead.
+	std::stringstream sstream;
+	sstream << fstream.rdbuf();
+	fstream.close();
+
+	// TODO: @Fbes Do the parsing :P
+
+	return (true);
 }
 
-ft::GlobalConfig::GlobalConfig(const std::string& filePath)
-{
-	// TODO: STRINGSTREAM
-	std::string* aaaaaa = readConfig(filePath);
-}
-
-ft::GlobalConfig::~GlobalConfig()
-{
-	// delete all virtual servers
-	for (const auto* server : this->_servers)
-		delete (server);
-}
-
-/**
- * @brief Create a virtual server and return a pointer to it
- *
- * @return const ft::Server*
- */
-const ft::Server* ft::GlobalConfig::createServer()
-{
-	ft::Server* server = new ft::Server(this->_config);
-	this->_servers.insert(this->_servers.end(), server);
-	return (server);
-}
+//////////////////////////////////////////

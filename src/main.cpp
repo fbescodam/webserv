@@ -6,32 +6,60 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 17:39:03 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/05/30 13:14:42 by fbes          ########   odam.nl         */
+/*   Updated: 2022/06/01 15:50:49 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server/Server.hpp"
-#include "Config/Config.hpp"
+#include "Config/GlobalConfig.hpp"
 
-#define CLIENT_BODY_SIZE 30000
-
-void ft_exit(int lol)
+/**
+ * Program entry point.
+ * 
+ * @param argc Argument count.
+ * @param argv Argument value.
+ * @return Either EXIT_SUCCESS or EXIT_FAILURE
+ */
+int32_t main(int32_t argc, const char* argv[])
 {
-	std::cout << "Bye Bye!" << std::endl;
-	exit(EXIT_SUCCESS);
-}
+	// Handle Interrupt signals
+	signal(SIGINT, [](int32_t val) 
+	{
+		std::cout << "Webserv: Signal catched, shutting down" << std::endl;
+		exit (EXIT_FAILURE);
+	});
 
-int main(int argc, char const *argv[])
-{
-	signal(SIGINT, ft_exit);
+	// Check arguments
+	if (argc != 2)
+	{
+		std::cerr << "\nWebserv: Invalid arguments\n" << std::endl;
+		std::cerr << "Usage: ./Webserv <Configuration Filepath>\n" << std::endl;
+		return (EXIT_FAILURE);
+	}
 
-	ft::Config config;
-	ft::Server server(config);
+	// Read config file ...
+	ft::GlobalConfig config;
+	if (!config.readFile(argv[2]))
+	{
+		std::cerr << "Webserv: Invalid config file." << std::endl;
+		return (EXIT_FAILURE);
+	}
+
+	std::cout << "Webserv: Shutting down" << std::endl;
+	return (EXIT_SUCCESS);
+
+	// Bullshit below //
+
+	/*
+	ft::Config dummy;
+	ft::Server server(dummy);
 
 	server.init();
-	server.run();
-
-	return (EXIT_SUCCESS);
+	while (true)
+	{
+		server.run();
+	}
+	*/
 }
 
 // curl --verbose http://localhost:8080/
