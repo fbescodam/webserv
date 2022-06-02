@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 13:54:52 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/01 15:53:50 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/06/02 14:30:26 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,10 +37,19 @@ public: // Functions
 	 */
 	bool readFile(const std::string& filePath);
 
+	/**
+	 * Inits all servers 
+	 * 
+	 */
+	void runServers(void);
+
 public: // Attributes
 
 	// Global entry at the start.
 	ft::Entry globalEntry;
+
+	// The current running servers.
+	std::vector<ft::Server> servers;
 
 	// Server entries.
 	std::vector<ft::ServerEntry> serverEntries; // TODO: Server class should hold a reference to an entry as its 'config'
