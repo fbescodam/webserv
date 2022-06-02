@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 17:39:03 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/01 16:45:27 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/06/02 14:07:36 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,10 +31,10 @@ int32_t main(int32_t argc, const char* argv[])
 	}
 
 	// Handle Interrupt signals
-	signal(SIGINT, [](int32_t val) 
+	signal(SIGINT, [](int32_t)
 	{
 		std::cout << "Webserv: Signal catched, shutting down" << std::endl;
-		exit (EXIT_FAILURE);
+		exit (EXIT_FAILURE); // We need to exit as we are in a lambda.
 	});
 
 	// Read config file ...
@@ -45,37 +45,22 @@ int32_t main(int32_t argc, const char* argv[])
 		return (EXIT_FAILURE);
 	}
 
+	ft::Server server(config.serverEntries[0]);
+	server.init();
+
+	// Main loop
 	try
 	{
 		while (true)
-		{
-			for (auto& server : config.getServers())
-			{
-				
-			}
-		}
+			server.run();
 	}
 	catch(const std::exception& e)
 	{
-		std::cerr << e.what() << '\n';
+		ft::exceptionExit(e, EXIT_FAILURE);
 	}
-	
 
 	std::cout << "Webserv: Shutting down" << std::endl;
 	return (EXIT_SUCCESS);
-
-	// Bullshit below //
-
-	/*
-	ft::Config dummy;
-	ft::Server server(dummy);
-
-	server.init();
-	while (true)
-	{
-		server.run();
-	}
-	*/
 }
 
 // curl --verbose http://localhost:8080/

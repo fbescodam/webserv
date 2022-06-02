@@ -1,47 +1,53 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        ::::::::            */
+/*   Server.hpp                                         :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2022/06/02 12:25:53 by lde-la-h      #+#    #+#                 */
+/*   Updated: 2022/06/02 14:11:32 by lde-la-h      ########   odam.nl         */
+/*                                                                            */
+/* ************************************************************************** */
+
 #pragma once
 
 #ifndef SERVER_HPP
 # define SERVER_HPP
-
-#include "Request.hpp"
-#include "Response.hpp"
-#include "Config.hpp"
-#include <poll.h>
-
-
+# include "Request.hpp"
+# include "Response.hpp"
+# include "ServerEntry.hpp"
+# include "CommonNetwork.hpp"
 FT_BEGIN
 
-
-class Server
+// A single server that listens on a port and handles incoming requests.
+class Server final
 {
-public:
-	Server(Config& config);
+public: // Ctor ~ Dtor
+	Server(ft::ServerEntry& inConfig);
+
+public: // Functions
 
 	void init(void);
 	void run(void);
 
-	void newSocket(void);
-	void pollInEvent(int32_t i);
-	void pollOutEvent(int32_t i);
+public: // Attributes
 
-	Config _config;
+	// The servers current configuration. TODO: Const ?
+	ft::ServerEntry& config;
 
-	//listening socket
-	int32_t serverFD, clientSocket, ValRead;
-	ft::SocketAddress Address;
+private:
 
-	//running part
+	// Network part
+	int32_t serverFD, clientSocket, valRead;
+	ft::SocketAddress address;
+
+	// Running part
 	int32_t maxClients;
 	int32_t numFds;
 	pollfd* pollfds;
 	nfds_t nfds;
-
-	std::map<int, ft::Request> requests; //idk if this is the best solution yet
-
-	//tempory standard sendback message
-	const char* hello = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
 };
 
 FT_END
-
 #endif

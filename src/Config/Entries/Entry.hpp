@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 13:54:52 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/01 15:50:28 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/06/02 09:48:24 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 # include "Common.hpp"
 FT_BEGIN
 
-// An entry consistes of a name along with a map of key and values that can be retrieved.
+// An entry consists of a name along with a map of key and values that can be retrieved.
 class Entry
 {
 public: // Ctor ~ Dtor
