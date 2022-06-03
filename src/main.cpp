@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 17:39:03 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/05/30 13:14:42 by fbes          ########   odam.nl         */
+/*   Updated: 2022/05/31 14:04:44 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,8 +28,17 @@ int main(int argc, char const *argv[])
 	ft::Config config;
 	ft::Server server(config);
 
-	server.init();
-	server.run();
+	try
+	{
+		server.init();
+		server.run();		
+	}
+	catch(const std::exception &e)
+	{
+		std::cerr << e.what() << '\n';
+	}
+	
+
 
 	return (EXIT_SUCCESS);
 }

@@ -83,7 +83,6 @@ void ft::Server::pollInEvent(int i)
 			//requests[(pollfds + i)->fd] = req; this doesnt work and im retarded
 			req.display();
 			(pollfds + i)->events = POLLOUT;
-			std::cout << "//=/ Sent Response /=//" << std::endl;
 		}
 	}
 	catch(const ft::Exception& e)
@@ -95,7 +94,7 @@ void ft::Server::pollInEvent(int i)
 //TODO: implement proper response
 void ft::Server::pollOutEvent(int i)
 {
-	std::cout << "sending shit" << std::endl;
+	std::cout << "//=/ Sent Response /=//" << std::endl;
 	//requests[(pollfds + i)->fd].display();
 	ft::send((pollfds + i)->fd, hello, strlen(hello), 0); // send Response
 	(pollfds + i)->events = POLLIN;
