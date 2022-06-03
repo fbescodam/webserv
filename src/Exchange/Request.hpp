@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:13:27 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/05/30 17:26:39 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/06/01 13:09:42 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,13 +26,12 @@ public: // Ctor ~ Dtor
 public: // Methods
 	void display(void) const;
 
-	// Get the newest request from the socket.
-	static Request getFirst(int32_t Socket);
-
 private:
 	void setMethod(const std::string& method);
 
 public: // Attributes
+
+	// The request method, GET, POST, DELETE
 	ft::ExchangeMethod method;
 	std::string path;
 	std::string version;

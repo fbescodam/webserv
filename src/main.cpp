@@ -6,40 +6,63 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 17:39:03 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/05/31 14:04:44 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/06/03 14:43:46 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server/Server.hpp"
-#include "Config/Config.hpp"
+#include "Config/GlobalConfig.hpp"
 
-#define CLIENT_BODY_SIZE 30000
-
-void ft_exit(int lol)
+/**
+ * Program entry point.
+ * 
+ * @param argc Argument count.
+ * @param argv Argument value.
+ * @return Either EXIT_SUCCESS or EXIT_FAILURE
+ */
+int32_t main(int32_t argc, const char* argv[])
 {
-	std::cout << "Bye Bye!" << std::endl;
-	exit(EXIT_SUCCESS);
-}
+	// Check arguments
+	if (argc != 2)
+	{
+		std::cerr << "\nWebserv: Invalid arguments\n" << std::endl;
+		std::cerr << "Usage: ./Webserv <Configuration Filepath>\n" << std::endl;
+		return (EXIT_FAILURE);
+	}
 
-int main(int argc, char const *argv[])
-{
-	signal(SIGINT, ft_exit);
+	// Handle Interrupt signals
+	signal(SIGINT, [](int32_t)
+	{
+		std::cout << "Webserv: Signal catched, shutting down" << std::endl;
+		exit (EXIT_FAILURE); // We need to exit as we are in a lambda.
+	});
 
-	ft::Config config;
-	ft::Server server(config);
+	// Read config file ...
+	ft::GlobalConfig config;
+	if (!config.readFile(argv[2]))
+	{
+		std::cerr << "Webserv: Invalid failed to read config file." << std::endl;
+		return (EXIT_FAILURE);
+	}
 
+	// Instead the config should have a method, start servers that inits and runs all the servers.
+	// TODO: Should each server run in a for loop or instead in a thread.
+
+	ft::Server server(config.serverEntries[0]);
+	server.init();
+
+	// Main loop
 	try
 	{
-		server.init();
-		server.run();		
+		while (true)
+			server.run();
 	}
-	catch(const std::exception &e)
+	catch(const std::exception& e)
 	{
-		std::cerr << e.what() << '\n';
+		ft::exceptionExit(e, EXIT_FAILURE);
 	}
-	
 
-
+	std::cout << "Webserv: Shutting down" << std::endl;
 	return (EXIT_SUCCESS);
 }
 
