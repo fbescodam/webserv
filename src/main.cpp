@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 17:39:03 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/02 14:32:41 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/06/06 10:05:39 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ int32_t main(int32_t argc, const char* argv[])
 
 	// Read config file ...
 	ft::GlobalConfig config;
-	if (!config.readFile(argv[2]))
+	if (!config.readFile(argv[1]))
 	{
 		std::cerr << "Webserv: Invalid failed to read config file." << std::endl;
 		return (EXIT_FAILURE);
@@ -59,6 +59,7 @@ int32_t main(int32_t argc, const char* argv[])
 	}
 	catch(const std::exception& e)
 	{
+		// TODO: Don't actually die
 		ft::exceptionExit(e, EXIT_FAILURE);
 	}
 
