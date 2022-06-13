@@ -6,12 +6,11 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/25 19:34:04 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/13 17:08:48 by fbes          ########   odam.nl         */
+/*   Updated: 2022/06/13 17:53:11 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Common.hpp"
-#include "Exceptions.hpp"
 
 //////////////////////////////////////////
 
@@ -38,6 +37,8 @@ void ft::slice(const std::string& string, char delim, std::pair<std::string, std
 {
 	size_t start, end = 0;
 	start = string.find_first_of(delim, end);
+	if (start == std::string::npos)
+		throw ft::DelimiterNotFoundException();
 	output.first = string.substr(0, start);
 	output.second = string.substr(start + 1);
 }

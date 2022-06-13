@@ -6,13 +6,13 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/02 12:34:20 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/06 10:09:13 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/06/13 18:27:31 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server.hpp"
 
-ft::Server::Server(ft::ServerEntry& inConfig) : config(inConfig) { }
+ft::Server::Server(ft::ServerSection& inConfig) : config(inConfig) { }
 
 //////////////////////////////////////////
 
