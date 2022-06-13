@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 17:39:22 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/13 17:08:32 by fbes          ########   odam.nl         */
+/*   Updated: 2022/06/13 17:56:17 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,9 @@
 
 #ifndef COMMON_HPP
 # define COMMON_HPP
+// To avoid ugly idents
+# define FT_BEGIN namespace ft {
+# define FT_END }
 # include <iostream>
 # include <fstream>
 # include <vector>
@@ -26,13 +29,10 @@
 # include <sstream>
 # include <iterator>
 # include <utility>
+# include "Exceptions.hpp"
 
 # define NONE 0
 # define WHITESPACE " \t\n\t\f\v"
-
-// To avoid ugly idents
-# define FT_BEGIN namespace ft {
-# define FT_END }
 
 FT_BEGIN
 
