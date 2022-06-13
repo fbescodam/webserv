@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 17:39:03 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/13 17:12:09 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/06/13 18:50:33 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 
 /**
  * Program entry point.
- * 
+ *
  * @param argc Argument count.
  * @param argv Argument value.
  * @return Either EXIT_SUCCESS or EXIT_FAILURE
@@ -48,7 +48,7 @@ int32_t main(int32_t argc, const char* argv[])
 	// Instead the config should have a method, start servers that inits and runs all the servers.
 	// TODO: Should each server run in a for loop or instead in a thread.
 
-	ft::Server server(config.serverEntries[0]);
+	ft::Server server(config.serverSections[0]);
 	server.init();
 
 	// Main loop

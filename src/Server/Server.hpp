@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/02 12:25:53 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/06 10:04:27 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/06/13 18:27:42 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 # define SERVER_HPP
 # include "Request.hpp"
 # include "Response.hpp"
-# include "ServerEntry.hpp"
+# include "ServerSection.hpp"
 # include "CommonNetwork.hpp"
 FT_BEGIN
 
@@ -24,7 +24,7 @@ FT_BEGIN
 class Server final
 {
 public: // Ctor ~ Dtor
-	Server(ft::ServerEntry& inConfig);
+	Server(ft::ServerSection& inConfig);
 
 public: // Functions
 
@@ -38,7 +38,7 @@ public: // Functions
 public: // Attributes
 
 	// The servers current configuration. TODO: Const ?
-	ft::ServerEntry& config;
+	ft::ServerSection& config;
 
 private:
 
