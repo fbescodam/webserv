@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 17:39:22 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/01 12:37:03 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/06/13 18:21:42 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,15 +28,25 @@
 # include <utility>
 
 # define NONE 0
+# define WRITE 1
+# define READ 0
 
 // To avoid ugly idents
 # define FT_BEGIN namespace ft {
 # define FT_END }
 
+
 FT_BEGIN
 
 // Common Functions
 //////////////////////////////////////////
+
+/**
+ * @brief 
+ * 
+ * @return char** 
+ */
+char** ft::getEnviron(void);
 
 /**
  * Splits a string and stores the result in Output.

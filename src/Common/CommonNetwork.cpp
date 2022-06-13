@@ -6,11 +6,13 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/25 19:34:04 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/05/26 16:03:51 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/06/13 17:15:42 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "CommonNetwork.hpp"
+
+//////////////////////////////////////////
 
 // Socket creates an endpoint for communication and returns a descriptor.
 int32_t ft::socket(int32_t Domain, int32_t Type, int32_t Protocol)
@@ -83,8 +85,6 @@ int32_t ft::setSocketOption(int32_t socket, int32_t level, int32_t optionName, b
 		throw ft::GenericErrnoExecption();
 	return (Value);	
 }
-
-////
 
 const std::map<uint16_t, std::string>& getStatusCodes()
 {
@@ -165,3 +165,5 @@ const std::map<uint16_t, std::string>& getStatusCodes()
 
 	return (list);
 }
+
+//////////////////////////////////////////

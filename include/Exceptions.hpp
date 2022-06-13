@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 18:05:00 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/01 16:25:05 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/06/13 17:56:10 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,12 +18,19 @@
 # include <exception>
 FT_BEGIN
 
-
 // Simple strerror exception wrapper.
 struct GenericErrnoExecption : public std::exception
 {
 	const char* what() const throw() override {
         return (strerror(errno));
+	}
+};
+
+// File cannot be located.
+struct FileNotFoundExecption : public std::exception
+{
+	const char* what() const throw() override {
+        return ("File could not be located");
 	}
 };
 

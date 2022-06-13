@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:13:27 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/01 12:00:13 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/06/13 18:14:06 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,8 @@ public: // Functions
 	 * @return if sending was successful.
 	 */
 	void send(int32_t socket, const std::string& buffer);
+
+	static ft::Response getError(int32_t code);
 
 private:
 	void writeHeader(std::vector<uint8_t>& buffer);
