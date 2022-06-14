@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:34:00 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/14 15:34:36 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/06/14 15:45:38 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@
 void ft::Response::writeHeader(void)
 {
 	// HTTP/1.1 503 Service Unavailabe\n
-	data += ft::format("HTTP/1.1 %u %s\n", status, ft::getStatusCodes().at(status));
+	data += ft::format("HTTP/1.1 %u %s\n", status, ft::getStatusCodes().at(status).c_str());
 	fields["Server"] = "Breadserv";
 }
 
