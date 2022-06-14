@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 17:39:22 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/13 18:50:08 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/06/14 13:41:21 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,13 +42,6 @@ FT_BEGIN
 //////////////////////////////////////////
 
 /**
- * @brief 
- * 
- * @return char** 
- */
-char** ft::getEnviron(void);
-
-/**
  * Splits a string and stores the result in Output.
  *
  * @param string The string to split.
@@ -72,6 +65,35 @@ void slice(const std::string& string, char delim, std::pair<std::string, std::st
  * @param string The string to trim. Warning: gets modified
  */
 void trim(std::string& string);
+
+/**
+ * Creates a new string from the format.
+ * 
+ * Use normal printf args such as %d or %s.
+ * 
+ * @tparam Args va_args
+ * @param format The format string
+ * @param args The arguments to pass to the string.
+ * @return std::string 
+ */
+template<typename ... Args>
+std::string format(const std::string& format, Args ... args)
+{
+	// Get size of the formated string
+	int32_t size = std::snprintf(nullptr, 0, format.c_str(), args ...) + 1;
+	if (size <= 0)
+		throw std::runtime_error("Formatting error!");
+
+	// Make temp buff to put in formatted result.
+	char* buff = new char[size];
+    std::snprintf(buff, size, format.c_str(), args ...);
+
+	// Pass to string
+	std::string out(buff, buff + size - 1);
+	delete[] buff;
+
+	return (out);
+}
 
 FT_END
 #endif

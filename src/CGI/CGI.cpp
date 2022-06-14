@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 11:51:45 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/13 18:48:35 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/06/14 11:59:01 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,6 @@
 
 ft::Response ft::CGI::runCGI(const ft::Request& request, const std::string& path)
 {
-	pid_t pid;
 	int32_t fds[2];
 	ft::Response outResponse;
 
@@ -25,17 +24,25 @@ ft::Response ft::CGI::runCGI(const ft::Request& request, const std::string& path
 	try
 	{
 		ft::pipe(fds);
-		if (pid = ft::fork() == 0) // Child
+
+		pid_t pid;
+		if ((pid = ft::fork()) == 0)
 		{
-			// TODO: Write wrapper
-			if (dup2(fds[READ], STDIN_FILENO) == -1 || \
-				dup2(fds[WRITE], STDIN_FILENO) == -1)
-				throw ft::GenericErrnoExecption();
-			ft::execve(path.c_str(), nullptr, ft::getEnviron());
+			// Child
+			ft::dup2(fds[READ], STDIN_FILENO);
+			ft::dup2(fds[WRITE], STDOUT_FILENO);
+			ft::dup2(fds[WRITE], STDERR_FILENO);
+
+			// TODO: Feed correct argv and envp values
+			// Execve will abandon proccess or throw
+			ft::execve(path.c_str(), nullptr, nullptr);
 		}
-		else // Parent
+		else
 		{
-			// TODO: Wait for execve, what do here ?
+			// Parent TODO: Most likely not allowed
+			int32_t status = 0;
+			if (waitpid(pid, &status, 0) == -1 || !WIFEXITED(status))
+				throw ft::GenericErrnoExecption();
 		}
 	}
 	catch(const std::exception& e)

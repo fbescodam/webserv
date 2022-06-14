@@ -6,20 +6,13 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/25 19:34:04 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/13 18:50:38 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/06/14 13:26:52 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Common.hpp"
 
 //////////////////////////////////////////
-
-char** ft::getEnviron(void)
-{
-    extern char **environ;
-
-    return (environ);
-}
 
 [[noreturn]] void ft::exceptionExit(const std::exception& e, int32_t code = EXIT_FAILURE)
 {

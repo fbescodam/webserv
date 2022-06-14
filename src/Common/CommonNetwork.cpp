@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/25 19:34:04 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/13 17:15:42 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/06/14 13:10:55 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,7 @@ int32_t ft::poll(struct pollfd fds[], size_t size, int32_t timeout)
 	return (FDs);
 }
 
-// Send a message from a socket.
+// Send a message to a socket.
 ssize_t ft::send(int32_t socket, const void* buffer, size_t length, int32_t flags)
 {
 	ssize_t Value = ::send(socket, buffer, length, flags);
@@ -86,7 +86,7 @@ int32_t ft::setSocketOption(int32_t socket, int32_t level, int32_t optionName, b
 	return (Value);	
 }
 
-const std::map<uint16_t, std::string>& getStatusCodes()
+const std::map<uint16_t, std::string>& ft::getStatusCodes()
 {
 	static std::map<uint16_t, std::string> list = {
 		// 1xx Informational

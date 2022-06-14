@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:34:12 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/13 18:47:15 by fbes          ########   odam.nl         */
+/*   Updated: 2022/06/14 13:10:15 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,11 +49,11 @@ void ft::Request::display(void) const
 void ft::Request::setMethod(const std::string& inMethod)
 {
 	if (inMethod == "GET")
-		method = ft::ExchangeMethod::GET;
+		method = ft::Method::GET;
 	else if (inMethod == "POST")
-		method = ft::ExchangeMethod::POST;
+		method = ft::Method::POST;
 	else if (inMethod == "DELETE")
-		method = ft::ExchangeMethod::DELETE;
+		method = ft::Method::DELETE;
 }
 
 //////////////////////////////////////////

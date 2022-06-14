@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:13:27 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/01 13:09:42 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/06/14 12:24:42 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,16 @@
 # include "Exchange.hpp"
 FT_BEGIN
 
-// A Request is from the incoming client.
+/**
+ * Request
+ * A Request is from the incoming client.
+ * 
+ * GET /reference/string/to_string/ HTTP/1.1\n
+ * Content-Type: text/plain\n
+ * Content-Length: 12\n
+ * \n
+ * bla bla bla
+ */
 class Request final : public Exchange
 {
 public: // Ctor ~ Dtor
@@ -32,7 +41,7 @@ private:
 public: // Attributes
 
 	// The request method, GET, POST, DELETE
-	ft::ExchangeMethod method;
+	ft::Method method;
 	std::string path;
 	std::string version;
 };

@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:13:27 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/13 18:14:06 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/06/14 15:34:41 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,36 +17,74 @@
 # include "Exchange.hpp"
 FT_BEGIN
 
-/** As one giant shit strings
- * CODE - STATUS
- * <HEADER>
- * \n\n 
- * <BODY>
+/**
+ * A Response is from the outgoing server.
+ * 
+ * E.g:
+ * HTTP/1.1 503 Service Unavailabe\n
+ * Content-Type: text/plain\n
+ * Content-Length: 12\n
+ * \n
+ * 503 error
  */
-
-// A Response is from the outgoing server.
 class Response final : public Exchange
 {
 public: // Ctor ~ Dtor
+	Response() = default;
+	Response(uint32_t inStatus) : status(inStatus) { }
 
 public: // Functions
 
 	/**
-	 * Sends the response over HTTP to the socket.
+	 * Packages the response object and sends it over the socket.
+	 * On failure will throw.
 	 * 
-	 * @param socket The socket to send the response to.
-	 * @param buffer The body of the response.
-	 * @return if sending was successful.
+	 * @param socket The socket over which to send the response.
 	 */
-	void send(int32_t socket, const std::string& buffer);
+	void send(int32_t socket);
 
-	static ft::Response getError(int32_t code);
+	/**
+	 * Constructs an error response based on the status code.
+	 * 
+	 * @param code The status code.
+	 * @return The appropriate response based
+	 */
+	static ft::Response getError(uint32_t code)
+	{
+		ft::Response outResponse(code);
+		const std::string content = ft::getStatusCodes().at(code);
+
+		// Build header and fields
+		outResponse.writeHeader();
+		outResponse.fields["Content-length"] = std::to_string(content.length());
+		outResponse.writeFields();
+		outResponse.writeEnd();
+		outResponse.writeEnd();
+
+		// Build content
+		outResponse.data += content;
+
+		return (outResponse);
+	}
 
 private:
-	void writeHeader(std::vector<uint8_t>& buffer);
+
+	// Write the header, meaning version, status into data.
+	void writeHeader(void);
+
+	// Write the fields into data.
+	void writeFields(void);
+
+	// Writes the ending of a header.
+	void writeEnd(void);
 
 public: // Attributes
 
+	// The response status code and meaning.
+	uint32_t status;
+
+	// The raw data of the response, e.g: file, text, script, ...
+	std::string data;
 };
 
 FT_END
