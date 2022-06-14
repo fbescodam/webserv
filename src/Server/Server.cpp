@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/02 12:34:20 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/14 17:33:09 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/06/14 20:51:34 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,21 +75,36 @@ void ft::Server::pollInEvent(int32_t i)
 	}
 	else
 	{
-		ft::Request req(buffer);
-		//requests[(pollfds + i)->fd] = req; this doesnt work and im retarded
-		req.display();
+		try
+		{
+			requests[(pollfds + i)->fd] = new ft::Request(buffer);
+			requests[(pollfds + i)->fd]->display();
+		}
+		catch(ft::InvalidCharacterInBuffer &e) //TODO:implement this error for bad input
+		{
+			requests[(pollfds + i)->fd] = NULL;
+			std::cout << e.what() << std::endl;
+		}
 		(pollfds + i)->events = POLLOUT;
-		std::cout << "//=/ Sent Response /=//" << std::endl;
 	}
 }
 
 void ft::Server::pollOutEvent(int i)
 {
-	std::cout << "sending shit" << std::endl;
-
-	auto res = ft::Response::getError(500);
-	res.send((pollfds + i)->fd);
+	if (!requests[(pollfds + i)->fd])
+	{
+		auto res = ft::Response::getError(400);
+		res.send((pollfds + i)->fd);
+		close((pollfds + i)->fd);
+	}
+	else
+	{
+		ft::Response res(*requests[(pollfds+i)->fd]);
+		res.send((pollfds+i)->fd);	
+	}
 	(pollfds + i)->events = POLLIN;
+	std::cout << "//=/ Sent Response /=//" << std::endl;
+
 }
 
 void ft::Server::run(void)

@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 18:05:00 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/13 18:50:24 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/06/14 19:53:40 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,13 @@ struct UnknownFieldKeyException : public std::exception
 {
 	const char* what() const throw() override {
 		return ("Unknown field key");
+	}
+};
+
+struct InvalidCharacterInBuffer : public std::exception
+{
+	const char* what() const throw() override {
+		return ("Non-ascii character found");
 	}
 };
 

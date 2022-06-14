@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:13:27 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/14 17:29:26 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/06/14 20:16:41 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,8 @@
 #ifndef RESPONSE_HPP
 # define RESPONSE_HPP
 # include "Exchange.hpp"
+# include "Request.hpp"
+
 FT_BEGIN
 
 /**
@@ -32,6 +34,7 @@ class Response final : public Exchange
 public: // Ctor ~ Dtor
 	Response() = default;
 	Response(uint32_t inStatus) : status(inStatus) { }
+	Response(ft::Request req);
 
 public: // Functions
 
@@ -83,9 +86,6 @@ public: // Attributes
 
 	// The response status code and meaning.
 	uint32_t status;
-
-	// The raw data of the response, e.g: file, text, script, ...
-	std::string data;
 };
 
 FT_END

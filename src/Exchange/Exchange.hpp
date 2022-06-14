@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:13:27 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/14 12:30:32 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/06/14 19:34:36 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,9 @@ public: // Attributes
 
 	// The exchange make-up and parameters.
 	std::map<std::string, std::string> fields;
+
+	// The raw data of the exchange method, e.g: file, text, script, ...
+	std::string data;
 };
 
 FT_END

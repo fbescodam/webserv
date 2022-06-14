@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/02 12:25:53 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/14 16:53:02 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/06/14 19:42:23 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,8 @@ public: // Attributes
 
 	// The servers current configuration. TODO: Const ?
 	ft::ServerSection& config;
+
+	std::map<int32_t, ft::Request *> requests;
 
 private:
 

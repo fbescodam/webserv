@@ -6,14 +6,20 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:34:00 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/14 17:31:19 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/06/14 20:16:17 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Response.hpp"
+#include "Request.hpp"
 
 //////////////////////////////////////////
 
+ft::Response::Response(Request req)
+{
+	//this should properly construct a response based on the earlier received request
+	data = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
+}
 
 //////////////////////////////////////////
 

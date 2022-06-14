@@ -6,16 +6,20 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:34:12 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/14 13:10:15 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/06/14 20:48:59 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Request.hpp"
 
-ft::Request::Request(const char* Buffer)
+//all valid header field characters
+// "!#$%&'*+-.^_`|~0123456789abdefghijklmnopqrstuvwxyzABCDEFGHJIKLMNOPQRSTUVWVXYZ";
+
+ft::Request::Request(const char* buffer)
 {
     std::string item;
-    std::istringstream iss(Buffer);
+    std::istringstream iss(buffer);
+
 
     std::getline(iss, item, ' ');
 	setMethod(item);
@@ -28,7 +32,7 @@ ft::Request::Request(const char* Buffer)
     	item.erase(remove_if(item.begin(), item.end(), [](char c){return !(c>=32);}), item.end());
 		if (!item.empty())
 		{
-			ft::slice(item, ':', output); // TODO: put in try catch
+			ft::slice(item, ':', output);
 			fields[output.first] = output.second;
 		}
 	}
