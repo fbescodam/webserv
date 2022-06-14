@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 10:13:49 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/01 12:12:58 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/06/13 18:51:46 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 #ifndef CGI_HPP
 # define CGI_HPP
 # include <strstream>
-# include "Common.hpp"
+# include "CommonUnix.hpp"
 # include "Request.hpp"
 # include "Response.hpp"
 FT_BEGIN
@@ -31,13 +31,13 @@ FT_BEGIN
 namespace CGI
 {
 	/**
-	 * Generates the appropriate response from the incoming
-	 * request such as an image or a script.
+	 * @brief 
 	 * 
 	 * @param request 
-	 * @return ft::Response 
+	 * @param path 
 	 */
-	ft::Response getResponse(const ft::Request& request);
+	ft::Response runCGI(const ft::Request& request, const std::string& path);
+
 }
 
 FT_END

@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:13:27 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/01 14:17:22 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/06/14 12:30:32 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,14 +18,14 @@
 FT_BEGIN
 
 // Supported exchange methods for the webserver.
-enum class ExchangeMethod : uint8_t
+enum class Method : uint8_t
 {
 	GET,
 	POST,
 	DELETE
 };
 
-// An exchange is both a response and a request via http
+// An exchange is both a response and a request via http.
 class Exchange
 {
 public: // Ctor ~ Dtor
@@ -33,7 +33,7 @@ public: // Ctor ~ Dtor
 
 public: // Attributes
 
-	// The actual content an exchange header.
+	// The exchange make-up and parameters.
 	std::map<std::string, std::string> fields;
 };
 

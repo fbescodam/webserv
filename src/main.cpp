@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 17:39:03 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/03 14:43:46 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/06/14 15:46:34 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 
 /**
  * Program entry point.
- * 
+ *
  * @param argc Argument count.
  * @param argv Argument value.
  * @return Either EXIT_SUCCESS or EXIT_FAILURE
@@ -33,13 +33,13 @@ int32_t main(int32_t argc, const char* argv[])
 	// Handle Interrupt signals
 	signal(SIGINT, [](int32_t)
 	{
-		std::cout << "Webserv: Signal catched, shutting down" << std::endl;
+		std::cout << "\n\nWebserv: Signal catched, shutting down" << std::endl;
 		exit (EXIT_FAILURE); // We need to exit as we are in a lambda.
 	});
 
 	// Read config file ...
 	ft::GlobalConfig config;
-	if (!config.readFile(argv[2]))
+	if (!config.readFile(argv[1]))
 	{
 		std::cerr << "Webserv: Invalid failed to read config file." << std::endl;
 		return (EXIT_FAILURE);
@@ -48,7 +48,7 @@ int32_t main(int32_t argc, const char* argv[])
 	// Instead the config should have a method, start servers that inits and runs all the servers.
 	// TODO: Should each server run in a for loop or instead in a thread.
 
-	ft::Server server(config.serverEntries[0]);
+	ft::Server server(config.serverSections[0]);
 	server.init();
 
 	// Main loop
@@ -59,6 +59,7 @@ int32_t main(int32_t argc, const char* argv[])
 	}
 	catch(const std::exception& e)
 	{
+		// TODO: Don't actually die
 		ft::exceptionExit(e, EXIT_FAILURE);
 	}
 

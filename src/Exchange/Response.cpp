@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:34:00 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/01 12:00:03 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/06/14 15:45:38 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,29 +22,34 @@
  * <HEADER>
  * \n\n 
  * <BODY>
+ * 
+ * HTTP/1.1 503 Service Unavailabe\n
+ * Content-Type: text/plain\n
+ * Content-Length: 12\n
+ * \n
+ * 503 error
  */
 
-void ft::Response::send(int32_t socket, const std::string& buffer)
+// Writes the header object
+void ft::Response::writeHeader(void)
 {
-	std::vector<uint8_t> rawResponse;
-	
-	// Build Header
-	writeHeader(rawResponse);
-
-	// Build data
-	rawResponse.insert(rawResponse.end(), buffer.begin(), buffer.end());
-	ft::send(socket, rawResponse.data(), rawResponse.size(), 0);
+	// HTTP/1.1 503 Service Unavailabe\n
+	data += ft::format("HTTP/1.1 %u %s\n", status, ft::getStatusCodes().at(status).c_str());
+	fields["Server"] = "Breadserv";
 }
 
-void ft::Response::writeHeader(std::vector<uint8_t>& buffer)
+void ft::Response::writeFields(void)
 {
-	std::string temp;
 	for (const auto [key, value] : this->fields)
-	{
-		temp = key + " : " + value + '\n';
+		data += key + " : " + value + '\n';
+}
 
-		for (size_t i = 0; i < temp.length(); i++)
-			buffer.push_back(temp[i]);		
-	}
-	buffer.push_back('\n');
+void ft::Response::writeEnd(void)
+{
+	data += "\r\n";
+}
+
+void ft::Response::send(int32_t socket)
+{
+	ft::send(socket, this->data.data(), this->data.length(), 0);
 }

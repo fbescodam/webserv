@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 11:51:45 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/02 12:34:39 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/06/14 11:59:01 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,16 +14,50 @@
 
 //////////////////////////////////////////
 
-ft::Response ft::CGI::getResponse(const ft::Request& request)
+ft::Response ft::CGI::runCGI(const ft::Request& request, const std::string& path)
 {
-	// If request is an image, response is the image data
-	// with correct header
-	
-	// If request is a script that is also allowed to execute under the
-	// config file, we call exec on it, and store the output which is the
-	// response header
+	int32_t fds[2];
+	ft::Response outResponse;
 
-	return ft::Response();
+	if (!ft::fileExists(path))
+		return ft::Response::getError(404);
+	try
+	{
+		ft::pipe(fds);
+
+		pid_t pid;
+		if ((pid = ft::fork()) == 0)
+		{
+			// Child
+			ft::dup2(fds[READ], STDIN_FILENO);
+			ft::dup2(fds[WRITE], STDOUT_FILENO);
+			ft::dup2(fds[WRITE], STDERR_FILENO);
+
+			// TODO: Feed correct argv and envp values
+			// Execve will abandon proccess or throw
+			ft::execve(path.c_str(), nullptr, nullptr);
+		}
+		else
+		{
+			// Parent TODO: Most likely not allowed
+			int32_t status = 0;
+			if (waitpid(pid, &status, 0) == -1 || !WIFEXITED(status))
+				throw ft::GenericErrnoExecption();
+		}
+	}
+	catch(const std::exception& e)
+	{
+		std::cerr << e.what() << std::endl;
+		outResponse = ft::Response::getError(500);
+	}
+	
+	close(fds[READ]);
+	close(fds[WRITE]);
+
+	// TODO: Write child output to response.
+	// TODO: Check if outResponse was set, if not return 200.
+
+	return (outResponse);
 }
 
 //////////////////////////////////////////

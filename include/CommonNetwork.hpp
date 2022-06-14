@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 17:40:38 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/05/26 16:03:44 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/06/14 12:44:29 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,6 @@
 #ifndef NETWORK_HPP
 # define NETWORK_HPP
 # include "Common.hpp"
-# include "Exceptions.hpp"
 # include <netinet/in.h>
 # include <arpa/inet.h>
 # include <sys/socket.h>
@@ -35,7 +34,7 @@ FT_BEGIN
 
 /**
  * Socket address, internet style.
- * 
+ *
  * Wrapper for struct sockaddr_in.
  */
 struct SocketAddress
@@ -121,7 +120,7 @@ int32_t setSocketOption(int32_t socket, int32_t level, int32_t optionName, bool 
 
 /**
  * HTTP status codes with their definitions
- * 
+ *
  * @see https://bit.ly/3No2GDN
  */
 const std::map<uint16_t, std::string>& getStatusCodes();
