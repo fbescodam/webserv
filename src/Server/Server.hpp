@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/02 12:25:53 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/13 18:27:42 by fbes          ########   odam.nl         */
+/*   Updated: 2022/06/14 16:53:02 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ public: // Attributes
 private:
 
 	// Network part
-	int32_t serverFD, clientSocket;
+	int32_t serverFD;
 	ft::SocketAddress address;
 
 	// Running part
@@ -51,8 +51,6 @@ private:
 	int32_t numFds;
 	pollfd* pollfds;
 	nfds_t nfds;
-
-	const char* hello = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
 };
 
 FT_END

@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/02 12:34:20 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/14 15:46:36 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/06/14 16:53:11 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,34 +44,23 @@ void ft::Server::init(void)
 void ft::Server::pollListen(void)
 {
 	std::cout << "\n//=/ ...Accepting connection... /=//\n" << std::endl;
-	clientSocket = ft::accept(serverFD, &address);
+	int32_t clientSocket = ft::accept(serverFD, &address);
 
-	if (numFds == maxClients)
+	for (int j = 0; j < numFds; j++)
 	{
-		const char* error = "HTTP/1.1 503 Service Unavailabe\nContent-Type: text/plain\nContent-Length: 12\n\n503 error";
-		char buffer[30000] = {0};
-		ft::receive(pollfds->fd, buffer, 30000, 0);
-		ft::send(clientSocket, error, strlen(error), 0); // send Response
-		close(clientSocket); // End of Exchange
-	}
-	else
-	{
-		for (int j = 0; j < numFds; j++)
+		if ((pollfds + j)->fd == -1)
 		{
-			if ((pollfds + j)->fd == -1)
-			{
-				(pollfds + j)->fd = clientSocket;
-				(pollfds + j)->events = POLLIN;
-				(pollfds + j)->revents = 0;
-				goto label;
-			}
+			(pollfds + j)->fd = clientSocket;
+			(pollfds + j)->events = POLLIN;
+			(pollfds + j)->revents = 0;
+			goto label;
 		}
-		numFds++;
-		(pollfds + numFds - 1)->fd = clientSocket;
-		(pollfds + numFds - 1)->events = POLLIN;
-		(pollfds + numFds - 1)->revents = 0;
-	label:;
 	}
+	numFds++;
+	(pollfds + numFds - 1)->fd = clientSocket;
+	(pollfds + numFds - 1)->events = POLLIN;
+	(pollfds + numFds - 1)->revents = 0;
+label:;
 }
 
 void ft::Server::pollInEvent(int32_t i)
@@ -97,8 +86,13 @@ void ft::Server::pollInEvent(int32_t i)
 void ft::Server::pollOutEvent(int i)
 {
 	std::cout << "sending shit" << std::endl;
+	// const char* hello = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
+
+	auto res = ft::Response::getError(500);
+	res.send((pollfds + i)->fd);
+
 	//requests[(pollfds + i)->fd].display();
-	ft::send((pollfds + i)->fd, hello, strlen(hello), 0); // send Response
+	// ft::send((pollfds + i)->fd, hello, strlen(hello), 0); // send Response
 	(pollfds + i)->events = POLLIN;
 }
 
