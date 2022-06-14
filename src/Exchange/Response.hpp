@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:13:27 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/14 16:55:42 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/06/14 17:29:26 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,12 +56,14 @@ public: // Functions
 
 		// Build header and fields
 		outResponse.writeHeader();
-		outResponse.fields["Content-length"] = std::to_string(content.length());
+		outResponse.fields["Content-Length"] = std::to_string(content.length());
+		outResponse.fields["Content-Type"] = "text/plain";
 		outResponse.writeFields();
 		outResponse.writeEnd();
 
 		// Build content
 		outResponse.data += content;
+		outResponse.data += "\0";
 
 		return (outResponse);
 	}

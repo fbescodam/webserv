@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/02 12:34:20 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/14 16:53:11 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/06/14 17:33:09 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,13 +86,9 @@ void ft::Server::pollInEvent(int32_t i)
 void ft::Server::pollOutEvent(int i)
 {
 	std::cout << "sending shit" << std::endl;
-	// const char* hello = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
 
 	auto res = ft::Response::getError(500);
 	res.send((pollfds + i)->fd);
-
-	//requests[(pollfds + i)->fd].display();
-	// ft::send((pollfds + i)->fd, hello, strlen(hello), 0); // send Response
 	(pollfds + i)->events = POLLIN;
 }
 
