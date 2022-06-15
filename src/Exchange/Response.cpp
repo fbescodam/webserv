@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:34:00 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/14 20:16:17 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/06/15 10:05:38 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@ void ft::Response::writeHeader(void)
 void ft::Response::writeFields(void)
 {
 	for (const auto [key, value] : this->fields)
-		data += key + ": " + value + '\n';
+		data += key + " : " + value + '\n';
 }
 
 void ft::Response::writeEnd(void)

@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/02 12:25:53 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/14 19:42:23 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/06/15 10:22:10 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@
 FT_BEGIN
 
 // A single server that listens on a port and handles incoming requests.
-class Server final
+class Server
 {
 public: // Ctor ~ Dtor
 	Server(ft::ServerSection& inConfig);

@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:13:27 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/14 20:16:41 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/06/15 10:08:17 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,7 @@ public: // Functions
 	static ft::Response getError(uint32_t code)
 	{
 		ft::Response outResponse(code);
-		const std::string content = ft::getStatusCodes().at(code);
+		const std::string& content = ft::getStatusCodes().at(code);
 
 		// Build header and fields
 		outResponse.writeHeader();
@@ -66,7 +66,6 @@ public: // Functions
 
 		// Build content
 		outResponse.data += content;
-		outResponse.data += "\0";
 
 		return (outResponse);
 	}
