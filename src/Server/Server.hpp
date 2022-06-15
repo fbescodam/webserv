@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/02 12:25:53 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/15 10:50:40 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/06/15 17:24:12 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,8 @@ public: // Functions
 	void pollListen(void);
 	void pollInEvent(pollfd* poll);
 	void pollOutEvent(pollfd* poll);
+	void cleanSocket(pollfd *poll);
+	bool checkTimeout(pollfd *poll);
 
 public: // Attributes
 
@@ -53,6 +55,7 @@ private:
 	int32_t numFds;
 	pollfd* pollfds;
 	nfds_t nfds;
+	std::map<int32_t, time_t> timeout;
 };
 
 FT_END
