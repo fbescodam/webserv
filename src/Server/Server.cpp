@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/02 12:34:20 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/15 10:44:37 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/06/15 10:56:48 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,46 +72,46 @@ void ft::Server::pollListen(void)
 	this->numFds++;
 }
 
-void ft::Server::pollInEvent(int32_t i)
+void ft::Server::pollInEvent(pollfd* poll)
 {
 	char buffer[30000] = {0};
-	ssize_t bytesrec = ft::receive(this->pollfds[i].fd, buffer, 30000, 0);
+	ssize_t bytesrec = ft::receive(poll->fd, buffer, 30000, 0);
 	if (bytesrec == 0)
 	{
 		std::cout << "Connection closed\n";
-		close(this->pollfds[i].fd); // End of Exchange
-		this->pollfds[i].fd = -1;
+		close(poll->fd); // End of Exchange
+		poll->fd = -1;
 	}
 	else
 	{
 		try
 		{
-			this->requests[this->pollfds[i].fd] = new ft::Request(buffer);
-			this->requests[this->pollfds[i].fd]->display();
+			this->requests[poll->fd] = new ft::Request(buffer);
+			this->requests[poll->fd]->display();
 		}
 		catch(const ft::InvalidCharException& e) // TODO: Implement this error for bad input
 		{
-			this->requests[this->pollfds[i].fd] = NULL;
+			this->requests[poll->fd] = nullptr;
 			std::cout << e.what() << std::endl;
 		}
-		this->pollfds[i].events = POLLOUT;
+		poll->events = POLLOUT;
 	}
 }
 
-void ft::Server::pollOutEvent(int i)
+void ft::Server::pollOutEvent(pollfd* poll)
 {
-	if (!this->requests[this->pollfds[i].fd])
+	if (!this->requests[poll->fd])
 	{
 		auto res = ft::Response::getError(400);
-		res.send(this->pollfds[i].fd);
-		close(this->pollfds[i].fd);
+		res.send(poll->fd);
+		close(poll->fd);
 	}
 	else
 	{
-		ft::Response res(*this->requests[this->pollfds[i].fd]);
-		res.send(this->pollfds[i].fd);
+		ft::Response res(*this->requests[poll->fd]);
+		res.send(poll->fd);
 	}
-	this->pollfds[i].events = POLLIN;
+	poll->events = POLLIN;
 	std::cout << "//=/ Sent Response /=//" << std::endl;
 
 }
@@ -124,17 +124,19 @@ void ft::Server::run(void)
 	ft::poll(this->pollfds, this->nfds, 0);
 	for (int i = 0; i < this->numFds; i++)
 	{
+		pollfd* poll = &this->pollfds[i];
+
 		// Pollfd is ready for listening
 		if (!i && (this->pollfds[0].revents & POLLIN))
 			this->pollListen();
-		
+
 		// Pollfd is ready for reading
-		else if (this->pollfds[i].revents & POLLIN)
-			this->pollInEvent(i);
+		else if (poll->revents & POLLIN)
+			this->pollInEvent(poll);
 
 		// Pollfd is ready for writing
-		else if (this->pollfds[i].revents & POLLOUT)
-			this->pollOutEvent(i);
+		else if (poll->revents & POLLOUT)
+			this->pollOutEvent(poll);
 	}
 }
 

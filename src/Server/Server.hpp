@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/02 12:25:53 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/15 10:22:10 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/06/15 10:50:40 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,8 +32,8 @@ public: // Functions
 	void run(void);
 
 	void pollListen(void);
-	void pollInEvent(int32_t i);
-	void pollOutEvent(int32_t i);
+	void pollInEvent(pollfd* poll);
+	void pollOutEvent(pollfd* poll);
 
 public: // Attributes
 
