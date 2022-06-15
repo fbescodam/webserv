@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/02 12:34:20 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/15 10:56:48 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/06/15 17:28:27 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ void ft::Server::init(void)
 	this->pollfds->events = POLLIN;
 }
 
-void ft::Server::pollListen(void)
+void ft::Server::pollListen()
 {
 	std::cout << "\n//=/ ...Accepting connection... /=//\n" << std::endl;
 
@@ -62,6 +62,7 @@ void ft::Server::pollListen(void)
 			this->pollfds[j].fd = clientSocket;
 			this->pollfds[j].events = POLLIN;
 			this->pollfds[j].revents = 0;
+			this->timeout[this->pollfds[j].fd] = std::time(0);
 			return;
 		}
 	}
@@ -69,16 +70,24 @@ void ft::Server::pollListen(void)
 	this->pollfds[numFds].fd = clientSocket;
 	this->pollfds[numFds].events = POLLIN;
 	this->pollfds[numFds].revents = 0;
+	this->timeout[this->pollfds[numFds].fd] = std::time(0);
 	this->numFds++;
 }
 
 void ft::Server::pollInEvent(pollfd* poll)
 {
+	ssize_t bytesrec;
+	std::string req;
 	char buffer[30000] = {0};
-	ssize_t bytesrec = ft::receive(poll->fd, buffer, 30000, 0);
+	this->timeout[poll->fd] = std::time(0);
+
+	while ((bytesrec = ft::receive(poll->fd, buffer, 30000, 0)) > 0)
+		req += buffer;
+
 	if (bytesrec == 0)
 	{
-		std::cout << "Connection closed\n";
+		std::cout << "Connection closed-in\n";
+		this->timeout.erase(poll->fd);
 		close(poll->fd); // End of Exchange
 		poll->fd = -1;
 	}
@@ -86,7 +95,7 @@ void ft::Server::pollInEvent(pollfd* poll)
 	{
 		try
 		{
-			this->requests[poll->fd] = new ft::Request(buffer);
+			this->requests[poll->fd] = new ft::Request(req);
 			this->requests[poll->fd]->display();
 		}
 		catch(const ft::InvalidCharException& e) // TODO: Implement this error for bad input
@@ -110,10 +119,25 @@ void ft::Server::pollOutEvent(pollfd* poll)
 	{
 		ft::Response res(*this->requests[poll->fd]);
 		res.send(poll->fd);
+		delete this->requests[poll->fd];
 	}
 	poll->events = POLLIN;
 	std::cout << "//=/ Sent Response /=//" << std::endl;
 
+}
+
+void ft::Server::cleanSocket(pollfd *poll)
+{
+	std::cout << "Connection closed-clean\n";
+	this->timeout.erase(poll->fd);
+	close(poll->fd);
+	poll->fd = -1;
+}
+
+bool ft::Server::checkTimeout(pollfd *poll)
+{
+	return (this->timeout.find(poll->fd) != this->timeout.end() && \
+	std::time(0) - this->timeout[poll->fd] > S_TIMEOUT);
 }
 
 void ft::Server::run(void)
@@ -125,7 +149,8 @@ void ft::Server::run(void)
 	for (int i = 0; i < this->numFds; i++)
 	{
 		pollfd* poll = &this->pollfds[i];
-
+		if (poll->fd < 0)
+			continue;
 		// Pollfd is ready for listening
 		if (!i && (this->pollfds[0].revents & POLLIN))
 			this->pollListen();
@@ -137,6 +162,10 @@ void ft::Server::run(void)
 		// Pollfd is ready for writing
 		else if (poll->revents & POLLOUT)
 			this->pollOutEvent(poll);
+
+		//connection timed out: 60 seconds
+		if (i > 0 && this->checkTimeout(poll))
+			this->cleanSocket(poll);
 	}
 }
 
