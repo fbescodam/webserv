@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 17:40:38 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/14 12:44:29 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/06/15 14:42:59 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,7 @@ FT_BEGIN
 // More sensible naming ... Thanks cstdlib :)
 # define IPV4 PF_INET
 # define TCP SOCK_STREAM
+# define MASTER_SOCKET 0
 
 // C Network function & type wrappers
 //////////////////////////////////////////

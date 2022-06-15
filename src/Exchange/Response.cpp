@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:34:00 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/15 10:05:38 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/06/15 12:32:42 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 
 ft::Response::Response(Request req)
 {
-	//this should properly construct a response based on the earlier received request
+	// TODO: This should properly construct a response based on the earlier received request
 	data = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
 }
 
@@ -58,4 +58,21 @@ void ft::Response::writeEnd(void)
 void ft::Response::send(int32_t socket)
 {
 	ft::send(socket, this->data.data(), this->data.length(), 0);
+}
+
+ft::Response ft::Response::getError(uint32_t code)
+{
+	ft::Response outResponse(code);
+	const std::string& content = ft::getStatusCodes().at(code);
+
+	// Build header and fields
+	outResponse.writeHeader();
+	outResponse.fields["Content-Length"] = std::to_string(content.length());
+	outResponse.fields["Content-Type"] = "text/plain";
+	outResponse.writeFields();
+	outResponse.writeEnd();
+
+	// Build content
+	outResponse.data += content;
+	return (outResponse);
 }

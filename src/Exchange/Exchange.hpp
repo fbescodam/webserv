@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:13:27 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/14 19:34:36 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/06/15 15:08:43 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,9 @@ public: // Attributes
 
 	// The raw data of the exchange method, e.g: file, text, script, ...
 	std::string data;
+
+	// The either incoming or outgoing socket of the exchange.
+	int32_t socket;
 };
 
 FT_END
