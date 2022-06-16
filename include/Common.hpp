@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 17:39:22 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/15 17:25:18 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/06/16 21:08:56 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,13 +71,13 @@ void trim(std::string& string);
 
 /**
  * Creates a new string from the format.
- * 
+ *
  * Use normal printf args such as %d or %s.
- * 
+ *
  * @tparam Args va_args
  * @param format The format string
  * @param args The arguments to pass to the string.
- * @return std::string 
+ * @return std::string
  */
 template<typename... Args>
 std::string format(const std::string& format, Args ... args)
@@ -89,7 +89,7 @@ std::string format(const std::string& format, Args ... args)
 
 	// Make temp buff to put in formatted result.
 	char* buff = new char[size];
-    std::snprintf(buff, size, format.c_str(), args ...);
+	std::snprintf(buff, size, format.c_str(), args ...);
 
 	// Pass to string
 	std::string out(buff, buff + size - 1);

@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 17:39:03 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/14 15:48:48 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/06/16 22:03:13 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,11 +39,15 @@ int32_t main(int32_t argc, const char* argv[])
 
 	// Read config file ...
 	ft::GlobalConfig config;
-	// if (!config.readFile(argv[1]))
-	// {
-	// 	std::cerr << "Webserv: Invalid failed to read config file." << std::endl;
-	// 	return (EXIT_FAILURE);
-	// }
+	try
+	{
+		config.readFile(argv[1]);
+	}
+	catch (const ft::DelimiterNotFoundException& e)
+	{
+		ft::exceptionExit(e, EXIT_FAILURE);
+		return (false);
+	}
 
 	// Instead the config should have a method, start servers that inits and runs all the servers.
 	// TODO: Should each server run in a for loop or instead in a thread.

@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 14:59:11 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/13 18:45:01 by fbes          ########   odam.nl         */
+/*   Updated: 2022/06/16 22:42:56 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,28 +31,24 @@ static bool isSubSectionDef(const std::string& sectionName)
 
 static void getSectionName(const std::string& line, std::string& output)
 {
-	output = line; // remove [ and ]
+	if (line.front() != '[' || line.back() != ']')
+		throw ft::ConfigParserSyntaxException();
+	output = line;
+	output.erase(0, 1); // remove [
+	output.erase(output.size() - 1); // remove ]
+	ft::trim(output); // remove whitespace around the leftover string
+	if (output.find(' ') != std::string::npos) // do not allow strings in section names (after trimming)
+		throw ft::ConfigParserSyntaxException();
 }
 
-bool ft::GlobalConfig::readFile(const std::string& filePath)
+void ft::GlobalConfig::readFile(const std::string& filePath)
 {
-	/**
-	 * 1. Any found entries should be added to global
-	 *
-	 * 2. Until a new tag is found.
-	 *
-	 * 3. That tag is added to the vector of entries
-	 * any subtags get added to the parent tag.
-	 *
-	 * 4. Repeat 2 until eof or error.
-	 */
-
-
 	std::ifstream fstream(filePath);
 	if (!fstream.good())
-		return (false);
+		throw ft::FileNotFoundExecption();
 	std::string line;
 	std::pair<std::string, std::string> output;
+	ft::Section* currentSection = &this->globalSection;
 
 	while (std::getline(fstream, line))
 	{
@@ -60,30 +56,34 @@ bool ft::GlobalConfig::readFile(const std::string& filePath)
 		if (isComment(line) || line.length() == 0) // skip comments and empty lines
 			continue;
 
-		if (isSectionDef(line)) {
+		if (isSectionDef(line))
+		{
 			std::string sectionName;
 
 			getSectionName(line, sectionName);
-			if (isSubSectionDef(sectionName)) {
-				// TODO: define location
+			if (isSubSectionDef(sectionName)) { // is subsection (.location)
+				if (currentSection->getName() == "global")
+					throw ft::InvalidSubSectionPosition();
+				if (sectionName != ".location") // only handle .location as subsection
+					throw ft::UnknownSectionTypeException();
+				ft::Section location(sectionName); // create new location subsection
+				ft::ServerSection& currentServerSection = this->serverSections.back();
+				currentServerSection.locations.push_back(location); // add subsection to server
+				currentSection = &currentServerSection.locations.back(); // change current section to the newly generated location
 			}
-			else {
-				// TODO: define server
+			else { // is main section (server)
+				ft::ServerSection server(sectionName);
+				this->serverSections.push_back(server); // add new server to list of servers in globalconfig
+				currentSection = &this->serverSections.back(); // change current section to the newly generated server
 			}
+			continue; // continue with next line
 		}
 
-		try { // parse a field
-			ft::slice(line, '=', output);
-			ft::trim(output.first);
-			ft::trim(output.second);
-		}
-		catch (const ft::DelimiterNotFoundException) {
-			std::cout << "Error slicing shit on line " << line << std::endl;
-			return (false);
-		}
-		std::cout << line << std::endl;
+		ft::slice(line, '=', output);
+		ft::trim(output.first);
+		ft::trim(output.second);
+		currentSection->setValue(output.first, output.second);
 	}
-	return (true);
 }
 
 //////////////////////////////////////////

@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 13:54:52 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/13 18:29:37 by fbes          ########   odam.nl         */
+/*   Updated: 2022/06/16 22:10:17 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,11 +31,10 @@ public: // Ctor ~ Dtor
 public: // Functions
 
 	/**
-	 * Reads the given file and parses it.
+	 * Reads the given file and parses it. Throws exceptions on failure
 	 *
-	 * @return True if the read & parsing was a success, else false.
 	 */
-	bool readFile(const std::string& filePath);
+	void readFile(const std::string& filePath);
 
 	/**
 	 * Inits all servers
@@ -46,7 +45,7 @@ public: // Functions
 public: // Attributes
 
 	// Global configuration at the start.
-	ft::Section globalSection = ft::Section("config");
+	ft::Section globalSection = ft::Section("global");
 
 	// Server sections.
 	std::vector<ft::ServerSection> serverSections; // TODO: Server class should hold a reference to an section as its 'config'

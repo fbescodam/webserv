@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:34:00 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/15 12:32:42 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/06/16 21:08:46 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,9 +26,9 @@ ft::Response::Response(Request req)
 /** As one giant shit strings
  * CODE - STATUS
  * <HEADER>
- * \n\n 
+ * \n\n
  * <BODY>
- * 
+ *
  * HTTP/1.1 503 Service Unavailabe\n
  * Content-Type: text/plain\n
  * Content-Length: 12\n
