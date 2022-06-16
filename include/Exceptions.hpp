@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 18:05:00 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/16 21:08:54 by fbes          ########   odam.nl         */
+/*   Updated: 2022/06/16 22:11:50 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,17 +34,31 @@ struct DelimiterNotFoundException : public std::exception
 	}
 };
 
+struct ConfigParserSyntaxException : public std::exception
+{
+	const char* what() const throw() override {
+		return ("Syntax error in config");
+	}
+};
+
 struct UnknownSectionTypeException : public std::exception
 {
 	const char* what() const throw() override {
-		return ("Unknown (sub)section type");
+		return ("Unknown (sub)section type in config");
+	}
+};
+
+struct InvalidSubSectionPosition : public std::exception
+{
+	const char* what() const throw() override {
+		return ("Subsection is defined at an invalid position in config");
 	}
 };
 
 struct UnknownFieldKeyException : public std::exception
 {
 	const char* what() const throw() override {
-		return ("Unknown field key");
+		return ("Unknown field key in config");
 	}
 };
 
@@ -56,7 +70,7 @@ struct InvalidCharException : public std::exception
 };
 
 // File cannot be located.
-struct FileNotFoundExecption : public std::exception
+struct FileNotFoundExecption : public std::exception	// TODO: change to more generic File could not be located or read exception, IOException?
 {
 	const char* what() const throw() override {
 		return ("File could not be located");
