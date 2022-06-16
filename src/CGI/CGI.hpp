@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 10:13:49 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/16 21:08:55 by fbes          ########   odam.nl         */
+/*   Updated: 2022/06/16 22:55:16 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,10 +14,11 @@
 
 #ifndef CGI_HPP
 # define CGI_HPP
-# include <strstream>
-# include "CommonUnix.hpp"
 # include "Request.hpp"
 # include "Response.hpp"
+# include "CommonUnix.hpp"
+# include <strstream>
+# include <unordered_map>
 FT_BEGIN
 
 /**
@@ -31,13 +32,12 @@ FT_BEGIN
 namespace CGI
 {
 	/**
-	 * @brief
-	 *
-	 * @param request
-	 * @param path
+	 * Executes whatever the input file is.
+	 * 
+	 * @param request The incoming request.
+	 * @param path The file path to execute.
 	 */
-	ft::Response runCGI(const ft::Request& request, const std::string& path);
-
+	void runCGI(const ft::Request& request, const std::string& path);
 }
 
 FT_END

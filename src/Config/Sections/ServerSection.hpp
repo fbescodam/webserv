@@ -20,10 +20,14 @@ FT_BEGIN
 
 class ServerSection final : public ft::Section
 {
+public: // Ctor ~ Dtor
+	ServerSection(const std::string& name);
+	~ServerSection() = default;
+
 public: // Attributes
 
 	// Server locations
-	std::vector<ft::Section> Locations;
+	std::vector<ft::Section> locations;
 
 	//TODO: que
 	std::string root = "examples/www";
