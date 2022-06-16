@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 17:39:03 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/16 23:06:59 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/06/16 23:45:17 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ int32_t main(int32_t argc, const char* argv[])
 	{
 		config.readFile(argv[1]);
 	}
-	catch (const ft::DelimiterNotFoundException& e)
+	catch (const std::exception& e)
 	{
 		ft::exceptionExit(e, EXIT_FAILURE);
 		return (false);
