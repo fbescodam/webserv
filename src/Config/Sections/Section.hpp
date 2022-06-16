@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 13:54:52 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/16 21:08:52 by fbes          ########   odam.nl         */
+/*   Updated: 2022/06/16 23:00:55 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,6 +62,7 @@ public: // Attributes
 private:
 	// Name of the section.
 	std::string name;
+	
 
 	// Configurations in a key-value pair
 	std::map<std::string, std::string> fields;

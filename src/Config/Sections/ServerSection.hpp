@@ -24,6 +24,9 @@ public: // Attributes
 
 	// Server locations
 	std::vector<ft::Section> Locations;
+
+	//TODO: que
+	std::string root = "examples/www";
 };
 
 FT_END

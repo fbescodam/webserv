@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:13:27 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/16 21:08:45 by fbes          ########   odam.nl         */
+/*   Updated: 2022/06/16 22:52:50 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,7 @@ FT_BEGIN
 class Request final : public Exchange
 {
 public: // Ctor ~ Dtor
+	Request() {}
 	Request(const char* buffer);
 	Request(std::string buffer);
 

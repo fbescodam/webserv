@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/02 12:34:20 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/16 21:08:43 by fbes          ########   odam.nl         */
+/*   Updated: 2022/06/16 23:06:26 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,7 +96,7 @@ void ft::Server::pollInEvent(pollfd* poll)
 		try
 		{
 			this->requests[poll->fd] = new ft::Request(req);
-			this->requests[poll->fd]->display();
+			// this->requests[poll->fd]->display();
 		}
 		catch(const ft::InvalidCharException& e) // TODO: Implement this error for bad input
 		{
@@ -117,7 +117,7 @@ void ft::Server::pollOutEvent(pollfd* poll)
 	}
 	else
 	{
-		ft::Response res(*this->requests[poll->fd]);
+		ft::Response res(*this->requests[poll->fd], this->config.root);
 		res.send(poll->fd);
 		delete this->requests[poll->fd];
 	}

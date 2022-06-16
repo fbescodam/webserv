@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:13:27 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/16 21:08:47 by fbes          ########   odam.nl         */
+/*   Updated: 2022/06/16 22:58:41 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,8 +33,8 @@ class Response final : public Exchange
 {
 public: // Ctor ~ Dtor
 	Response() = default;
-	Response(uint32_t inStatus) : status(inStatus) { }
-	Response(ft::Request req);
+	Response(uint32_t inStatus) {status = inStatus;}
+	Response(ft::Request req, std::string rootPath);
 
 public: // Functions
 
@@ -65,10 +65,19 @@ private:
 	// Writes the ending of a header.
 	void writeEnd(void);
 
+	//open requested file and send it to the socket, should be last
+	void writeBody(int32_t socket, std::ifstream &iFile);
+
 public: // Attributes
 
 	// The response status code and meaning.
 	uint32_t status;
+
+	//the request were basing the response on
+	ft::Request req;
+
+	//root filepath
+	std::string root;
 };
 
 FT_END

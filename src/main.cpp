@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 17:39:03 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/16 21:08:48 by fbes          ########   odam.nl         */
+/*   Updated: 2022/06/16 21:13:49 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,8 +25,8 @@ int32_t main(int32_t argc, const char* argv[])
 	// Check arguments
 	if (argc != 2)
 	{
-		std::cerr << "\nWebserv: Invalid arguments\n" << std::endl;
-		std::cerr << "Usage: ./Webserv <Configuration Filepath>\n" << std::endl;
+		std::cerr << "\nwebserv: Invalid arguments\n" << std::endl;
+		std::cerr << "Usage: ./webserv <Configuration Filepath>\n" << std::endl;
 		return (EXIT_FAILURE);
 	}
 

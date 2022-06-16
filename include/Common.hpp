@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 17:39:22 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/16 21:08:56 by fbes          ########   odam.nl         */
+/*   Updated: 2022/06/16 22:53:10 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,7 @@
 # include <string>
 # include <memory>
 # include <unistd.h>
+# include <filesystem>
 # include <map>
 # include <chrono>
 # include <sstream>
@@ -36,8 +37,8 @@
 # define WRITE 1
 # define READ 0
 # define WHITESPACE " \t\n\t\f\v"
-# define S_TIMEOUT 60
-# define MS_TIMEOUT 60*1000
+# define S_TIMEOUT 5
+# define MS_TIMEOUT S_TIMEOUT*1000
 
 FT_BEGIN
 
