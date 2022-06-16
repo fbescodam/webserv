@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 11:51:45 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/15 15:03:01 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/06/16 21:08:54 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,10 +43,10 @@ ft::Response ft::CGI::runCGI(const ft::Request& request, const std::string& path
 		std::cerr << e.what() << std::endl;
 		outResponse = ft::Response::getError(500);
 	}
-	
-	// Read content of 
+
+	// Read content of
 	outResponse.data += "Bruh";
-	
+
 	close(fds[READ]);
 	close(fds[WRITE]);
 

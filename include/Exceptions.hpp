@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 18:05:00 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/15 10:11:02 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/06/16 21:08:54 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,7 @@ struct InvalidCharException : public std::exception
 struct FileNotFoundExecption : public std::exception
 {
 	const char* what() const throw() override {
-        return ("File could not be located");
+		return ("File could not be located");
 	}
 };
 

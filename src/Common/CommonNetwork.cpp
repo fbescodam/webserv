@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/25 19:34:04 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/15 16:13:37 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/06/16 21:08:51 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,7 +76,7 @@ ssize_t ft::receive(int32_t socket, void* buffer, size_t length, int32_t flags)
 	{
 		errno = 0;
 		return (-1);
-	}	
+	}
 	if (Value == -1)
 		throw ft::GenericErrnoExecption();
 	return (Value);
@@ -88,7 +88,7 @@ int32_t ft::setSocketOption(int32_t socket, int32_t level, int32_t optionName, b
 	int32_t Value = setsockopt(socket, level, optionName, &optionValue, optionLen);
 	if (Value == -1)
 		throw ft::GenericErrnoExecption();
-	return (Value);	
+	return (Value);
 }
 
 const std::map<uint16_t, std::string>& ft::getStatusCodes()
@@ -152,7 +152,7 @@ const std::map<uint16_t, std::string>& ft::getStatusCodes()
 		{444, "Connection Closed Without Response"},
 		{451, "Unavailable For Legal Reasons"},
 		{499, "Client Closed Request"},
-			
+
 		//5xx Server Error
 		{500, "Internal Server Error"},
 		{501, "Not Implemented"},

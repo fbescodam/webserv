@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/02 12:34:20 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/15 17:28:27 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/06/16 21:08:43 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ void ft::Server::init(void)
 	{
 		ft::exceptionExit(e, EXIT_FAILURE);
 	}
-	
+
 	this->pollfds->fd = serverFD;
 	this->pollfds->events = POLLIN;
 }

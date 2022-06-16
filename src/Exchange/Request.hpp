@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:13:27 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/15 17:04:54 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/06/16 21:08:45 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ FT_BEGIN
 /**
  * Request
  * A Request is from the incoming client.
- * 
+ *
  * GET /reference/string/to_string/ HTTP/1.1\n
  * Content-Type: text/plain\n
  * Content-Length: 12\n

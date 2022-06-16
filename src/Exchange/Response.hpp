@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:13:27 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/15 12:32:15 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/06/16 21:08:47 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ FT_BEGIN
 
 /**
  * A Response is from the outgoing server.
- * 
+ *
  * E.g:
  * HTTP/1.1 503 Service Unavailabe\n
  * Content-Type: text/plain\n
@@ -41,14 +41,14 @@ public: // Functions
 	/**
 	 * Packages the response object and sends it over the socket.
 	 * On failure will throw.
-	 * 
+	 *
 	 * @param socket The socket over which to send the response.
 	 */
 	void send(int32_t socket);
 
 	/**
 	 * Constructs an error response based on the status code.
-	 * 
+	 *
 	 * @param code The status code.
 	 * @return The appropriate response based
 	 */
