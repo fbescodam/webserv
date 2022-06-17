@@ -17,8 +17,11 @@
 
 ft::Response::~Response()
 {
-	fclose(this->file);
-	close(this->fileFd);
+	std::cout << this->file << std::endl;
+	if (this->file)
+		fclose(this->file);
+	if (this->fileFd > -1)
+		close(this->fileFd);
 }
 
 ft::Response::Response(ft::Request reqIn, ft::ServerSection *configIn)
@@ -31,6 +34,7 @@ ft::Response::Response(ft::Request reqIn, ft::ServerSection *configIn)
 	this->config = ft::Section(ft::basedir(reqIn.path), "response", *configIn);
 	this->sentHeader = false;
 	this->fileOffset = 0;
+	this->file = 0;
 	this->fileFd = -1;
 
 	if (this->req.keyExists("Connection") && *this->req.getValue("Connection") == "keep-alive")
@@ -82,7 +86,7 @@ void ft::Response::parseGet(void)
 	std::cout << requestedFile << std::endl;
 	if (ft::filesystem::fileExists(requestedFile))
 	{
-		this->file = fopen(requestedFile.data(), "r"); 
+		this->file = fopen(requestedFile.data(), "r");
 		this->status = 200;
 	}
 	else
@@ -92,7 +96,7 @@ void ft::Response::parseGet(void)
 		requestedFile = *this->config.getValue("path") + *this->config.getValue("error_404");
 		if (!ft::filesystem::fileExists(requestedFile))
 			return (this->parseError(404)); // custom 404 page not found (HA!), generate one on the fly
-		this->file = fopen(requestedFile.data(), "r"); 
+		this->file = fopen(requestedFile.data(), "r");
 		this->status = 404;
 	}
 	this->fileFd = fileno(this->file);
@@ -112,7 +116,7 @@ void ft::Response::parsePost(void)
 
 void ft::Response::parseDelete(void)
 {
-	
+
 }
 
 ////
@@ -142,7 +146,7 @@ ft::ResponseStatus ft::Response::send(int32_t socket)
 	if (!this->sentHeader)
 	{
 		std::cout << "//-----rep header----//\n" << this->data;
-		ft::send(socket, this->data.data(), this->data.length(), 0);	
+		ft::send(socket, this->data.data(), this->data.length(), 0);
 		this->sentHeader = true;
 		if (this->fileFd < 0)
 			return ft::DONE;
