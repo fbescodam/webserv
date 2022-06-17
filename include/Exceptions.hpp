@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 18:05:00 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/17 03:41:59 by fbes          ########   odam.nl         */
+/*   Updated: 2022/06/17 07:20:58 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,6 +59,13 @@ struct UnknownFieldKeyException : public std::exception
 {
 	const char* what() const throw() override {
 		return ("Unknown field key in config");
+	}
+};
+
+struct InvalidFieldValueException : public std::exception
+{
+	const char* what() const throw() override {
+		return ("Invalid field value in config");
 	}
 };
 

@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 13:54:52 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/17 06:51:43 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/06/17 07:59:47 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,8 +21,9 @@ FT_BEGIN
 class Section
 {
 public: // Ctor ~ Dtor
-	Section(const std::string& name);
-	Section(const std::string& name, Section& inherit);
+	Section(const std::string& cwd, const std::string& name);
+	Section(const char* cwd, const std::string& name);
+	Section(const std::string& cwd, const std::string& name, Section& inherit);
 	~Section() = default;
 
 public: // Functions
@@ -54,10 +55,11 @@ public: // Functions
 	bool getValueAsInt(const std::string& key, int& output) const;
 
 	/**
-	 * @brief 
+	 * @brief get the value of a configuration field, as an integer
+	 * @warning can throw whatever std::stoi decides to throw at you
 	 * 
-	 * @param key 
-	 * @return int 
+	 * @param key the key of a configuration field to get the value of
+	 * @return the direct value of the configuration
 	 */
 	int returnValueAsInt(const std::string& key) const;
 
@@ -71,7 +73,7 @@ public: // Functions
 	bool getValueAsList(const std::string& key, std::list<std::string>& list) const;
 
 	/**
-	 * @brief configure a configuration field
+	 * @brief set the value of a configuration field
 	 *
 	 * @param key the key of a configuration field to set
 	 * @param value the value to set the field to
@@ -98,6 +100,21 @@ public: // Functions
 	 */
 	void print(std::string prefix) const;
 
+	/**
+	 * @brief checks if a value is acceptable for the use with a certain key. Throws an error if something's wrong.
+	 *
+	 * @param key a key
+	 * @param value a value
+	 */
+	void verifyKeyValue(std::string& key, std::string& value) const;
+
+	/**
+	 * @brief get the current working directory for this section
+	 *
+	 */
+	const std::string& getcwd() const;
+	
+
 public: // Attributes
 
 private:
@@ -106,6 +123,10 @@ private:
 
 	// Configurations in a key-value pair
 	std::map<std::string, std::string> fields;
+
+	// Current working directory, used for appending paths in configs in subsections
+	std::string cwd;
+
 };
 
 FT_END

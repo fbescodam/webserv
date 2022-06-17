@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 13:54:52 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/17 03:44:15 by fbes          ########   odam.nl         */
+/*   Updated: 2022/06/17 07:52:48 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,7 @@ private:
 public: // Attributes
 
 	// Global configuration at the start.
-	ft::Section globalSection = ft::Section("global");
+	ft::Section globalSection = ft::Section(getcwd(NULL, 0), "global");
 
 	// Server sections.
 	std::vector<ft::ServerSection> serverSections; // TODO: Server class should hold a reference to an section as its 'config'

@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 14:59:11 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/17 06:58:25 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/06/17 08:16:14 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,8 @@ static void getSectionName(const std::string& line, std::string& output)
 		throw ft::ConfigParserSyntaxException();
 }
 
+//////////////////////////////////////////
+
 void ft::GlobalConfig::readFile(const std::string& filePath)
 {
 	std::ifstream fstream(filePath);
@@ -69,14 +71,14 @@ void ft::GlobalConfig::readFile(const std::string& filePath)
 				if (sectionName != ".location") // only handle .location as subsection
 					throw ft::UnknownSectionTypeException();
 				ft::ServerSection& currentServerSection = this->serverSections.back();
-				ft::Section location(sectionName, currentServerSection); // create new location subsection, inherit from server for easiness' sake
+				ft::Section location(*currentServerSection.getValue("path"), sectionName); // create new location subsection
 				currentServerSection.locations.push_back(location); // add subsection to server
 				currentSection = &currentServerSection.locations.back(); // change current section to the newly generated location
 			}
 			else { // is main section (server)
 				if (sectionName != "server")
 					throw ft::UnknownSectionTypeException();
-				ft::ServerSection server(sectionName, this->globalSection);
+				ft::ServerSection server(this->globalSection.getcwd(), sectionName, this->globalSection);
 				this->serverSections.push_back(server); // add new server to list of servers in globalconfig
 				currentSection = &this->serverSections.back(); // change current section to the newly generated server
 			}
@@ -86,6 +88,7 @@ void ft::GlobalConfig::readFile(const std::string& filePath)
 		ft::slice(line, '=', output);
 		ft::trim(output.first);
 		ft::trim(output.second);
+		currentSection->verifyKeyValue(output.first, output.second);
 		currentSection->setValue(output.first, output.second);
 	}
 

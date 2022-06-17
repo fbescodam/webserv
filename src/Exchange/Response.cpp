@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:34:00 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/17 06:56:16 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/06/17 08:27:23 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,7 +100,6 @@ void ft::Response::parseGet(void)
 	this->writeFields();
 	this->writeEnd();
 
-	std::cout << "//-----rep header----//\n" << this->data;
 }
 
 void ft::Response::parsePost(void)
@@ -139,6 +138,7 @@ ft::ResponseStatus ft::Response::send(int32_t socket)
 {
 	if (!this->sentHeader)
 	{
+		std::cout << "//-----rep header----//\n" << this->data;
 		ft::send(socket, this->data.data(), this->data.length(), 0);	
 		this->sentHeader = true;
 		if (this->fileFd < 0)

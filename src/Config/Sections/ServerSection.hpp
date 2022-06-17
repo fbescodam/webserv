@@ -21,7 +21,7 @@ FT_BEGIN
 class ServerSection final : public ft::Section
 {
 public: // Ctor ~ Dtor
-	ServerSection(const std::string& name, ft::Section& inherit);
+	ServerSection(const std::string& cwd, const std::string& name, ft::Section& inherit);
 	~ServerSection() = default;
 
 public: // Functions
@@ -30,6 +30,15 @@ public: // Functions
 	 *
 	 */
 	void printAll() const;
+
+	/**
+	 * @brief get a key from either a specified location, or, if it does not exist there, from the server
+	 * 
+	 * @param location the location configuration section to search through first
+	 * @param key the key of the configuration field to look for
+	 * @return a pointer to the value of the configuration field, or NULL if it does not exist
+	 */
+	const std::string* getKeyFromLocationOrServer(const ft::Section& location, const std::string& key) const;
 
 public: // Attributes
 
