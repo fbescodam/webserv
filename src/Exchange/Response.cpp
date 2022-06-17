@@ -6,23 +6,59 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:34:00 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/16 22:58:48 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/06/17 03:43:16 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Response.hpp"
 #include "Request.hpp"
+#include "ServerSection.hpp"
+#include "CommonUnix.hpp"
 
 //////////////////////////////////////////
 
-ft::Response::Response(Request reqIn, std::string rootPath)
+ft::Response::~Response()
+{
+	fclose(this->file);
+}
+
+ft::Response::Response(Request reqIn, ft::ServerSection *configIn)
 {
 	// TODO: This should properly construct a response based on the earlier received request
-	data = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
+	// data = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
 	reqIn.display();
 
-	req = reqIn;
-	root = rootPath;
+	this->req = reqIn;
+	this->config = configIn;
+	this->sentHeader = false;
+	this->fileOffset = 0;
+
+	if (this->req.path == "/")
+		this->req.path = "/index.html";
+
+	if (ft::filesystem::fileExists(this->config->root + this->req.path))
+	{
+		this->file = fopen((this->config->root + this->req.path).data(), "r"); 
+		this->status = 200;
+	}
+	else
+	{
+		this->file = fopen("./examples/www/custom404.html", "r"); 
+		this->status = 404;
+	}
+	this->fileFd = fileno(this->file);
+	this->fileSize = ft::filesystem::getFileSize(this->file);
+
+	this->writeHeader();
+	this->fields["Content-Length"] = std::to_string(this->fileSize);
+	this->fields["Connection"] = "keep-alive";
+	this->fields["Keep-Alive"] = "timeout=" + std::to_string(S_TIMEOUT);
+	this->writeFields();
+	this->writeEnd();
+
+	std::cout << "//---------//\n" << this->data;
+	
+
 }
 
 //////////////////////////////////////////
@@ -59,42 +95,22 @@ void ft::Response::writeEnd(void)
 	data += "\n";
 }
 
-void ft::Response::writeBody(int32_t socket, std::ifstream &iFile)
-{
-	char buffer[4096];
-	while (!iFile.eof())
-	{
-		iFile.read(buffer, 4096);
-		ft::send(socket, buffer, iFile.gcount(), 0);
-		bzero(buffer, 4096);
-	}
-}
-
 //https://www.youtube.com/watch?v=tYzMYcUty6s fucking mime types
-void ft::Response::send(int32_t socket)
+ft::ResponseStatus ft::Response::send(int32_t socket)
 {
-	if (this->req.path == "/")
-		this->req.path = "index.html";
-
-	std::ifstream iFile(root + this->req.path, std::ios::binary);
-
-	if (!iFile.good())
+	if (!this->sentHeader)
 	{
-		this->req.path = "examples/www/custom404.html";
-		this->status = 404;
-	}	
-	else
-		this->status = 200;
-	
-	this->writeHeader();
-	this->fields["Content-Length"] = std::to_string(iFile.tellg());
-	this->fields["Connection"] = "keep-alive";
-	this->fields["Keep-Alive"] = "timeout=" + std::to_string(S_TIMEOUT);
-	this->writeFields();
-	this->writeEnd();
+		ft::send(socket, this->data.data(), this->data.length(), 0);	
+		this->sentHeader = true;
+		return ft::NOT_DONE;
+	}
+	off_t len;
+	sendfile(this->fileFd, socket, this->fileOffset, &len, NULL, 0);
+	this->fileOffset += len;
 
-	ft::send(socket, this->data.data(), this->data.length(), 0);
-	this->writeBody(socket, iFile);
+	if (this->fileOffset >= this->fileSize)
+		return ft::ResponseStatus::DONE;
+	return ft::ResponseStatus::NOT_DONE;
 }
 
 ft::Response ft::Response::getError(uint32_t code)

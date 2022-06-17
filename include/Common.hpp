@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 17:39:22 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/17 00:19:34 by fbes          ########   odam.nl         */
+/*   Updated: 2022/06/17 03:42:48 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,6 @@
 # include <string>
 # include <memory>
 # include <unistd.h>
-# include <filesystem>
 # include <map>
 # include <chrono>
 # include <sstream>
@@ -98,6 +97,66 @@ std::string format(const std::string& format, Args ... args)
 	delete[] buff;
 
 	return (out);
+}
+
+// File system-ish functions (because MacOS 10.14)
+//////////////////////////////////////////
+
+namespace filesystem {
+
+/**
+ * @brief 
+ * 
+ * @param path 
+ * @return true 
+ * @return false 
+ */
+bool fileExists(const std::string& path);
+
+/**
+ * @brief Get the File Size object
+ * 
+ * @param is 
+ * @return int 
+ */
+size_t getFileSize(std::ifstream &is);
+
+/**
+ * @brief Get the File Size object
+ * 
+ * @param f 
+ * @return int 
+ */
+size_t getFileSize(FILE *f);
+
+/**
+ * Joins arguments together
+ * 
+ * @tparam Args 
+ * @param format 
+ * @param args 
+ * @return std::string 
+ */
+template <typename Arg, typename... Args>
+std::string join(Arg arg, Args... args)
+{
+	// Make sure we only use strings, crude prevention, too bad.
+	static_assert(std::is_convertible<Arg, std::string>());
+
+	/** 
+	 * @see https://stackoverflow.com/questions/27375089/what-is-the-easiest-way-to-print-a-variadic-parameter-pack-using-stdostream 
+	 * @see https://en.cppreference.com/w/cpp/language/fold
+	 */
+	std::stringstream stream;
+
+	// Insert first argument
+	stream << std::forward<Arg>(arg);
+
+	// Fold args together (Crazy feature, just why ?)
+	((stream << '/' << std::forward<Args>(args)), ...);
+
+	return (stream.str());
+}
 }
 
 FT_END

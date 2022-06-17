@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/02 12:34:20 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/16 23:06:26 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/06/17 03:28:22 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,22 +55,26 @@ void ft::Server::pollListen()
 	std::cout << "\n//=/ ...Accepting connection... /=//\n" << std::endl;
 
 	int32_t clientSocket = ft::accept(this->serverFD, &this->address);
-	for (int j = 0; j < this->numFds; j++)
+	ft::fcntl(clientSocket, F_SETFL, O_NONBLOCK);
+	for (int i = 0; i < this->numFds; i++)
 	{
-		if (this->pollfds[j].fd == -1)
-		{
-			this->pollfds[j].fd = clientSocket;
-			this->pollfds[j].events = POLLIN;
-			this->pollfds[j].revents = 0;
-			this->timeout[this->pollfds[j].fd] = std::time(0);
-			return;
-		}
+		pollfd* poll = &this->pollfds[i];
+
+		if (poll->fd != -1)
+			continue;
+
+		poll->fd = clientSocket;
+		poll->events = POLLIN;
+		poll->revents = 0;
+		this->timeout[poll->fd] = std::time(0);
+		return;
 	}
-	// TODO: What is the logic here ?
+	
 	this->pollfds[numFds].fd = clientSocket;
 	this->pollfds[numFds].events = POLLIN;
 	this->pollfds[numFds].revents = 0;
 	this->timeout[this->pollfds[numFds].fd] = std::time(0);
+	
 	this->numFds++;
 }
 
@@ -86,7 +90,7 @@ void ft::Server::pollInEvent(pollfd* poll)
 
 	if (bytesrec == 0)
 	{
-		std::cout << "Connection closed-in\n";
+		std::cout << "Connection closed-in" << std::endl;
 		this->timeout.erase(poll->fd);
 		close(poll->fd); // End of Exchange
 		poll->fd = -1;
@@ -95,12 +99,13 @@ void ft::Server::pollInEvent(pollfd* poll)
 	{
 		try
 		{
-			this->requests[poll->fd] = new ft::Request(req);
+			ft::Request temp(req);
+			this->responses[poll->fd] = new ft::Response(temp, &(this->config));
 			// this->requests[poll->fd]->display();
 		}
 		catch(const ft::InvalidCharException& e) // TODO: Implement this error for bad input
 		{
-			this->requests[poll->fd] = nullptr;
+			this->responses[poll->fd] = nullptr;
 			std::cout << e.what() << std::endl;
 		}
 		poll->events = POLLOUT;
@@ -109,26 +114,30 @@ void ft::Server::pollInEvent(pollfd* poll)
 
 void ft::Server::pollOutEvent(pollfd* poll)
 {
-	if (!this->requests[poll->fd])
+	if (!this->responses[poll->fd])
 	{
 		auto res = ft::Response::getError(400);
 		res.send(poll->fd);
 		close(poll->fd);
+		poll->fd = -1;
 	}
 	else
 	{
-		ft::Response res(*this->requests[poll->fd], this->config.root);
-		res.send(poll->fd);
-		delete this->requests[poll->fd];
+		ft::ResponseStatus ret = this->responses[poll->fd]->send(poll->fd);
+		if (ret == ft::DONE)
+		{
+			delete this->responses[poll->fd];	
+			poll->events = POLLIN;
+			std::cout << "//=/ Sent Response /=//" << std::endl;
+		}
+		this->timeout[poll->fd] = std::time(0);
 	}
-	poll->events = POLLIN;
-	std::cout << "//=/ Sent Response /=//" << std::endl;
-
 }
 
 void ft::Server::cleanSocket(pollfd *poll)
 {
-	std::cout << "Connection closed-clean\n";
+	std::cout << "Connection closed-clean" << std::endl;
+
 	this->timeout.erase(poll->fd);
 	close(poll->fd);
 	poll->fd = -1;
@@ -142,15 +151,17 @@ bool ft::Server::checkTimeout(pollfd *poll)
 
 void ft::Server::run(void)
 {
-	this->nfds = this->numFds; // TODO: Wtf?
+	this->nfds = this->numFds;
 
 	// Check our open fds for events
 	ft::poll(this->pollfds, this->nfds, 0);
 	for (int i = 0; i < this->numFds; i++)
 	{
 		pollfd* poll = &this->pollfds[i];
-		if (poll->fd < 0)
+
+		if (poll->fd < 0 || poll->revents == 0)
 			continue;
+
 		// Pollfd is ready for listening
 		if (!i && (this->pollfds[0].revents & POLLIN))
 			this->pollListen();
@@ -163,7 +174,7 @@ void ft::Server::run(void)
 		else if (poll->revents & POLLOUT)
 			this->pollOutEvent(poll);
 
-		//connection timed out: 60 seconds
+		//connection timed out: 5 seconds
 		if (i > 0 && this->checkTimeout(poll))
 			this->cleanSocket(poll);
 	}
