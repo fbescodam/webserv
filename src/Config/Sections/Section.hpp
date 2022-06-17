@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 13:54:52 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/17 03:47:57 by fbes          ########   odam.nl         */
+/*   Updated: 2022/06/17 04:19:48 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@ class Section
 {
 public: // Ctor ~ Dtor
 	Section(const std::string& name);
+	Section(const std::string& name, Section& inherit);
 	~Section() = default;
 
 public: // Functions
