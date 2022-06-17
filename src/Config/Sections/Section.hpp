@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 13:54:52 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/17 03:47:57 by fbes          ########   odam.nl         */
+/*   Updated: 2022/06/17 04:20:17 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,6 +51,14 @@ public: // Functions
 	 * @return true if the key exists, false if it does not (if false, output will not be modified)
 	 */
 	bool getValueAsInt(const std::string& key, int& output) const;
+
+	/**
+	 * @brief 
+	 * 
+	 * @param key 
+	 * @return int 
+	 */
+	int returnValueAsInt(const std::string& key) const;
 
 	/**
 	 * @brief get the value of a configuration field, as a string array

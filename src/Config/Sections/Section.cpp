@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 15:39:35 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/17 03:47:43 by fbes          ########   odam.nl         */
+/*   Updated: 2022/06/17 04:20:02 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,15 @@ bool ft::Section::getValueAsInt(const std::string& key, int& output) const
 		return (false);
 	output = std::stoi(it->second);
 	return (true);
+}
+
+int ft::Section::returnValueAsInt(const std::string& key) const
+{
+	auto it = this->fields.find(key);
+
+	if (it == this->fields.end())
+		return (-1);
+	return (std::stoi(it->second));
 }
 
 bool ft::Section::getValueAsList(const std::string& key, std::list<std::string>& list) const
