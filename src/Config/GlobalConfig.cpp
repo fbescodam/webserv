@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 14:59:11 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/17 08:16:14 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/06/17 08:35:00 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ void ft::GlobalConfig::readFile(const std::string& filePath)
 {
 	std::ifstream fstream(filePath);
 	if (!fstream.good())
-		throw ft::FileNotFoundExecption();
+		throw ft::FileNotFoundException();
 	std::string line;
 	std::pair<std::string, std::string> output;
 	ft::Section* currentSection = &this->globalSection;

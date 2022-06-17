@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 18:05:00 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/17 07:20:58 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/06/17 08:35:01 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@
 FT_BEGIN
 
 // Simple strerror exception wrapper.
-struct GenericErrnoExecption : public std::exception
+struct GenericErrnoException : public std::exception
 {
 	const char* what() const throw() override {
 		return (strerror(errno));
@@ -91,7 +91,7 @@ struct InvalidCharException : public std::exception
 };
 
 // File cannot be located.
-struct FileNotFoundExecption : public std::exception	// TODO: change to more generic File could not be located or read exception, IOException?
+struct FileNotFoundException : public std::exception	// TODO: change to more generic File could not be located or read exception, IOException?
 {
 	const char* what() const throw() override {
 		return ("File could not be located");

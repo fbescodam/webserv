@@ -6,7 +6,7 @@
 /*   By: fbes <fbes@student.codam.nl>                 +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/16 21:23:40 by fbes          #+#    #+#                 */
-/*   Updated: 2022/06/17 08:28:28 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/06/17 08:32:32 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,13 @@ const std::string* ft::ServerSection::getKeyFromLocationOrServer(const ft::Secti
 	if (ptr)
 		return (ptr);
 	return (this->getValue(key));
+}
+
+bool ft::ServerSection::keyExistsInLocationOrServer(const ft::Section& location, const std::string& key) const
+{
+	if (location.keyExists(key))
+		return (true);
+	return (this->keyExists(key));
 }
 
 //////////////////////////////////////////

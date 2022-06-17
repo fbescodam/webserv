@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 17:40:38 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/16 21:08:52 by fbes          ########   odam.nl         */
+/*   Updated: 2022/06/17 08:35:01 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,7 +103,7 @@ int32_t fcntl(int32_t fd, int32_t cmd, Args... args)
 {
 	int32_t Value = ::fcntl(fd, cmd, std::forward<Args>(args)...);
 	if (Value < 0)
-		throw ft::GenericErrnoExecption();
+		throw ft::GenericErrnoException();
 	return (Value);
 }
 

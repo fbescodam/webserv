@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/25 19:34:04 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/16 21:08:51 by fbes          ########   odam.nl         */
+/*   Updated: 2022/06/17 08:35:00 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ int32_t ft::socket(int32_t Domain, int32_t Type, int32_t Protocol)
 {
 	int32_t fd = ::socket(Domain, Type, Protocol);
 	if (fd < 0)
-		throw ft::GenericErrnoExecption();
+		throw ft::GenericErrnoException();
 	return (fd);
 }
 
@@ -29,14 +29,14 @@ void ft::bind(int32_t socketFD, ft::SocketAddress* address)
 	socklen_t length = address->getSize();
 
 	if (::bind(socketFD, reinterpret_cast<sockaddr*>(address), length) < 0)
-		throw ft::GenericErrnoExecption();
+		throw ft::GenericErrnoException();
 }
 
 // Defines the maximum length for the queue of pending connections.
 void ft::listen(int32_t socketFD, int32_t BackLog = 128)
 {
 	if (::listen(socketFD, BackLog) < 0)
-		throw ft::GenericErrnoExecption();
+		throw ft::GenericErrnoException();
 }
 
 // Extracts the first connection request on the queue of pending connections
@@ -46,7 +46,7 @@ int32_t ft::accept(int32_t socketFD, ft::SocketAddress* address)
 
 	int32_t fd = ::accept(socketFD, reinterpret_cast<sockaddr*>(address), &length);
 	if (fd < 0)
-		throw ft::GenericErrnoExecption();
+		throw ft::GenericErrnoException();
 	return (fd);
 }
 
@@ -55,7 +55,7 @@ int32_t ft::poll(struct pollfd fds[], size_t size, int32_t timeout)
 {
 	int32_t FDs = ::poll(fds, size, timeout);
 	if (FDs < 0)
-		throw ft::GenericErrnoExecption();
+		throw ft::GenericErrnoException();
 	return (FDs);
 }
 
@@ -64,7 +64,7 @@ ssize_t ft::send(int32_t socket, const void* buffer, size_t length, int32_t flag
 {
 	ssize_t Value = ::send(socket, buffer, length, flags);
 	if (Value == -1)
-		throw ft::GenericErrnoExecption();
+		throw ft::GenericErrnoException();
 	return (Value);
 }
 
@@ -78,7 +78,7 @@ ssize_t ft::receive(int32_t socket, void* buffer, size_t length, int32_t flags)
 		return (-1);
 	}
 	if (Value == -1)
-		throw ft::GenericErrnoExecption();
+		throw ft::GenericErrnoException();
 	return (Value);
 }
 
@@ -87,7 +87,7 @@ int32_t ft::setSocketOption(int32_t socket, int32_t level, int32_t optionName, b
 {
 	int32_t Value = setsockopt(socket, level, optionName, &optionValue, optionLen);
 	if (Value == -1)
-		throw ft::GenericErrnoExecption();
+		throw ft::GenericErrnoException();
 	return (Value);
 }
 

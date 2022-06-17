@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 15:39:35 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/17 08:22:00 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/06/17 08:34:22 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,9 +86,7 @@ bool ft::Section::getValueAsList(const std::string& key, std::list<std::string>&
 void ft::Section::setValue(const std::string& key, const std::string& value)
 {
 	// NOTE: According to docs if key does not exist, it will be added.
-	// TODO: check if key is valid
 	this->fields[key] = value;
-	// std::cout << "[DEBUG] key " << key << " added to section " << this->name << " with value " << value << std::endl;
 }
 
 const std::string& ft::Section::getName() const

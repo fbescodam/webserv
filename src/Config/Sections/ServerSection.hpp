@@ -40,6 +40,15 @@ public: // Functions
 	 */
 	const std::string* getKeyFromLocationOrServer(const ft::Section& location, const std::string& key) const;
 
+	/**
+	 * @brief check if a key exists in either a location or its server
+	 * 
+	 * @param location the location configuration section to search through first
+	 * @param key the key of the configuration field to look for
+	 * @return true if the key exists in either one
+	 */
+	bool keyExistsInLocationOrServer(const ft::Section& location, const std::string& key) const;
+
 public: // Attributes
 
 	// Server locations
