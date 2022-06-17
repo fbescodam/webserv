@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:13:27 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/16 21:08:47 by fbes          ########   odam.nl         */
+/*   Updated: 2022/06/17 03:15:23 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,8 +16,11 @@
 # define RESPONSE_HPP
 # include "Exchange.hpp"
 # include "Request.hpp"
+# include "ServerSection.hpp"
 
 FT_BEGIN
+
+enum ResponseStatus {DONE, NOT_DONE};
 
 /**
  * A Response is from the outgoing server.
@@ -33,8 +36,10 @@ class Response final : public Exchange
 {
 public: // Ctor ~ Dtor
 	Response() = default;
-	Response(uint32_t inStatus) : status(inStatus) { }
-	Response(ft::Request req);
+	Response(uint32_t inStatus) {status = inStatus;}
+	Response(ft::Request req, ft::ServerSection *configIn);
+	
+	~Response();
 
 public: // Functions
 
@@ -44,7 +49,7 @@ public: // Functions
 	 *
 	 * @param socket The socket over which to send the response.
 	 */
-	void send(int32_t socket);
+	ft::ResponseStatus send(int32_t socket);
 
 	/**
 	 * Constructs an error response based on the status code.
@@ -65,10 +70,29 @@ private:
 	// Writes the ending of a header.
 	void writeEnd(void);
 
+	//open requested file and send it to the socket, should be last
+	void writeBody(int32_t socket, std::ifstream &iFile);
+
 public: // Attributes
 
 	// The response status code and meaning.
 	uint32_t status;
+
+	//the request were basing the response on
+	ft::Request req;
+
+	//root filepath
+	std::string root;
+
+	//server config
+	ft::ServerSection *config;
+
+	//file fd
+	FILE *file;
+	int32_t fileFd;
+	int32_t fileSize;
+	off_t fileOffset;
+	bool sentHeader;
 };
 
 FT_END

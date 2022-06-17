@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/13 17:10:16 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/16 21:08:53 by fbes          ########   odam.nl         */
+/*   Updated: 2022/06/17 02:54:40 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,9 @@ int32_t dup2(int32_t fdsA, int32_t fdsB);
  * @return True if file exists, else false.
  */
 bool fileExists(const std::string& path);
+
+int getFileSize(std::ifstream &is);
+int get_file_size(FILE *f);
 
 FT_END
 #endif

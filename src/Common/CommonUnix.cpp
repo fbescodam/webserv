@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/13 17:05:34 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/16 21:08:51 by fbes          ########   odam.nl         */
+/*   Updated: 2022/06/17 02:56:20 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,6 +54,22 @@ bool ft::fileExists(const std::string& path)
 {
 	std::ifstream f(path.c_str());
 	return f.good();
+}
+
+int ft::getFileSize(std::ifstream &is) // path to file
+{
+    is.seekg(0, is.end);
+    int length = is.tellg();
+    is.seekg(0, is.beg);
+    return length;
+}
+
+int ft::get_file_size(FILE *f) // path to file
+{
+	fseek(f, 0, SEEK_END); // seek to end of file
+	int size = ftell(f); // get current file pointer
+	fseek(f, 0, SEEK_SET); // seek back to beginning of file
+	return size;
 }
 
 //////////////////////////////////////////

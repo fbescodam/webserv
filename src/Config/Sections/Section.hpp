@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 13:54:52 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/16 21:08:52 by fbes          ########   odam.nl         */
+/*   Updated: 2022/06/17 02:46:30 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,25 @@ public: // Functions
 	const std::string* getValue(const std::string& key) const;
 
 	/**
+	 * @brief get the value of a configuration field, as an integer
+	 * @warning can throw whatever std::stoi decides to throw at you
+	 *
+	 * @param key the key of a configuration field to get the value of
+	 * @param output a reference to where you want the integer value of the configuration field
+	 * @return true if the key exists, false if it does not (if false, output will not be modified)
+	 */
+	bool getValueAsInt(const std::string& key, int& output) const;
+
+	/**
+	 * @brief get the value of a configuration field, as a string array
+	 *
+	 * @param key the key of a configuration field to get the value of
+	 * @param list a reference to the list where you want the output to be stored. This list always gets cleared.
+	 * @return true if the key exists, false if it does not
+	 */
+	bool getValueAsList(const std::string& key, std::list<std::string>& list) const;
+
+	/**
 	 * @brief configure a configuration field
 	 *
 	 * @param key the key of a configuration field to set
@@ -55,7 +74,14 @@ public: // Functions
 	 *
 	 * @return the name
 	 */
-	const std::string& getName();
+	const std::string& getName() const;
+
+	/**
+	 * @brief used for debugging: print an entire section
+	 *
+	 * @param prefix a prefix prepended to every printed line
+	 */
+	void print(std::string prefix) const;
 
 public: // Attributes
 
