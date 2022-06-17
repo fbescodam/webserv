@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:34:00 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/17 03:15:50 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/06/17 04:10:12 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@
 ft::Response::~Response()
 {
 	fclose(this->file);
+	close(this->fileFd);
 }
 
 ft::Response::Response(Request reqIn, ft::ServerSection *configIn)
