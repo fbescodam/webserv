@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:13:27 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/16 21:08:42 by fbes          ########   odam.nl         */
+/*   Updated: 2022/06/17 06:00:23 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,8 @@ enum class Method : uint8_t
 {
 	GET,
 	POST,
-	DELETE
+	DELETE,
+	ERR
 };
 
 // An exchange is both a response and a request via http.

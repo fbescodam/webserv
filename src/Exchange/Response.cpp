@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:34:00 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/17 04:34:40 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/06/17 06:01:28 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,23 @@ ft::Response::Response(Request reqIn, ft::ServerSection *configIn)
 	this->sentHeader = false;
 	this->fileOffset = 0;
 
+	switch(this->req.method)
+	{
+		case (ft::Method::GET):
+			this->parseGet(); break;
+		case (ft::Method::POST):
+			this->parsePost(); break;
+		case (ft::Method::DELETE):
+			this->parseDelete(); break;
+		default:
+			// TODO: 405 method
+	}
+}
+
+//////////////////////////////////////////
+
+void ft::Response::parseGet(void)
+{
 	if (this->req.path == "/")
 		this->req.path = "/index.html";
 
@@ -58,11 +75,10 @@ ft::Response::Response(Request reqIn, ft::ServerSection *configIn)
 	this->writeEnd();
 
 	std::cout << "//-----rep header----//\n" << this->data;
-	
-
 }
 
-//////////////////////////////////////////
+
+////
 
 /** As one giant shit strings
  * CODE - STATUS

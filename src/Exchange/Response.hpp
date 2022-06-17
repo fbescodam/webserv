@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:13:27 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/17 03:15:23 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/06/17 05:59:09 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,7 +71,9 @@ private:
 	void writeEnd(void);
 
 	//open requested file and send it to the socket, should be last
-	void writeBody(int32_t socket, std::ifstream &iFile);
+	void parseGet(void);
+	void parsePost(void);
+	void parseDelete(void);
 
 public: // Attributes
 
