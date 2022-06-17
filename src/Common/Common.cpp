@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/25 19:34:04 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/17 03:41:18 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/06/17 09:25:39 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,13 @@ void ft::split(const std::string& string, char delim, std::vector<std::string>& 
 		end = string.find(delim, start);
 		output.push_back(string.substr(start, end - start));
 	}
+}
+
+std::string ft::basedir(const std::string& path)
+{
+	std::string base = path;
+	base.erase(path.find_last_of('/'));
+	return (base);
 }
 
 void ft::slice(const std::string& string, char delim, std::pair<std::string, std::string>& output)

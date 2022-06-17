@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:34:00 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/17 08:27:23 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/06/17 09:26:42 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,22 +15,20 @@
 #include "ServerSection.hpp"
 #include "CommonUnix.hpp"
 
-//////////////////////////////////////////
-
 ft::Response::~Response()
 {
 	fclose(this->file);
 	close(this->fileFd);
 }
 
-ft::Response::Response(Request reqIn, ft::ServerSection *configIn)
+ft::Response::Response(ft::Request reqIn, ft::ServerSection *configIn)
 {
 	// TODO: This should properly construct a response based on the earlier received request
 	// data = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
 	// reqIn.display();
 
 	this->req = reqIn;
-	this->config = configIn;
+	this->config = ft::Section(ft::basedir(reqIn.path), "response", *configIn);
 	this->sentHeader = false;
 	this->fileOffset = 0;
 	this->fileFd = -1;
@@ -80,16 +78,21 @@ void ft::Response::parseGet(void)
 	if (this->req.path == "/")
 		this->req.path = "/index.html";
 
-	if (ft::filesystem::fileExists(this->config->root + this->req.path))
+	std::string requestedFile = *this->config.getValue("path") + this->req.path;
+	std::cout << requestedFile << std::endl;
+	if (ft::filesystem::fileExists(requestedFile))
 	{
-		this->file = fopen((this->config->root + this->req.path).data(), "r"); 
+		this->file = fopen(requestedFile.data(), "r"); 
 		this->status = 200;
 	}
 	else
 	{
-		if (!this->req.config->keyExists("error_404"))
+		if (!this->config.keyExists("error_404"))
 			return (this->parseError(404)); // no custom 404 page found, generate one on the fly
-		this->file = fopen(this->req.config->getValue("error_404")->data(), "r"); 
+		requestedFile = *this->config.getValue("path") + *this->config.getValue("error_404");
+		if (!ft::filesystem::fileExists(requestedFile))
+			return (this->parseError(404)); // custom 404 page not found (HA!), generate one on the fly
+		this->file = fopen(requestedFile.data(), "r"); 
 		this->status = 404;
 	}
 	this->fileFd = fileno(this->file);

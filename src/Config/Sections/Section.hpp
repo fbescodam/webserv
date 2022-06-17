@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 13:54:52 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/17 07:59:47 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/06/17 09:14:54 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@ FT_BEGIN
 class Section
 {
 public: // Ctor ~ Dtor
+	Section() = default;
 	Section(const std::string& cwd, const std::string& name);
 	Section(const char* cwd, const std::string& name);
 	Section(const std::string& cwd, const std::string& name, Section& inherit);

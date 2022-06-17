@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 17:39:22 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/17 03:42:48 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/06/17 09:20:29 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,6 +69,14 @@ void slice(const std::string& string, char delim, std::pair<std::string, std::st
  * @param string The string to trim. Warning: gets modified
  */
 void trim(std::string& string);
+
+/**
+ * Get the directory path to a file (remove filename from a path)
+ *
+ * @param path a full path to a file
+ * @return the path to the directory the file is in
+ */
+std::string basedir(const std::string& path);
 
 /**
  * Creates a new string from the format.

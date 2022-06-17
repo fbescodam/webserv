@@ -50,12 +50,8 @@ public: // Functions
 	bool keyExistsInLocationOrServer(const ft::Section& location, const std::string& key) const;
 
 public: // Attributes
-
 	// Server locations
 	std::vector<ft::Section> locations;
-
-	//TODO: que
-	std::string root = "examples/www";
 };
 
 FT_END
