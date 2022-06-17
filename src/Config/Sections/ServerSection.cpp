@@ -6,7 +6,7 @@
 /*   By: fbes <fbes@student.codam.nl>                 +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/16 21:23:40 by fbes          #+#    #+#                 */
-/*   Updated: 2022/06/16 21:29:10 by fbes          ########   odam.nl         */
+/*   Updated: 2022/06/17 02:51:33 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,12 @@ ft::ServerSection::ServerSection(const std::string& name): ft::Section(name)
 
 //////////////////////////////////////////
 
-
+void ft::ServerSection::printAll() const
+{
+	this->print("");
+	for (const ft::Section& location : this->locations)
+		location.print("	");
+	std::cout << "[DEBUG] " << std::endl;
+}
 
 //////////////////////////////////////////

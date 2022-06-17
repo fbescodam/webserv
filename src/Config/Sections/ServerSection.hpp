@@ -24,6 +24,13 @@ public: // Ctor ~ Dtor
 	ServerSection(const std::string& name);
 	~ServerSection() = default;
 
+public: // Functions
+	/**
+	 * @brief used for debugging: print the entire config for this server + the locations
+	 *
+	 */
+	void printAll() const;
+
 public: // Attributes
 
 	// Server locations

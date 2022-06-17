@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 17:39:03 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/16 23:45:17 by fbes          ########   odam.nl         */
+/*   Updated: 2022/06/17 02:45:06 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,8 +46,11 @@ int32_t main(int32_t argc, const char* argv[])
 	catch (const std::exception& e)
 	{
 		ft::exceptionExit(e, EXIT_FAILURE);
-		return (false);
 	}
+
+	// Debug printing
+	for (ft::ServerSection& server : config.serverSections)
+		server.printAll();
 
 	// Instead the config should have a method, start servers that inits and runs all the servers.
 	// TODO: Should each server run in a for loop or instead in a thread.
