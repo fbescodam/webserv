@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 15:39:35 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/17 04:20:02 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/06/17 05:00:53 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,12 @@
 ft::Section::Section(const std::string& name)
 {
 	this->name = name;
+}
+
+ft::Section::Section(const std::string& name, ft::Section& inherit)
+{
+	this->name = name;
+	this->fields = inherit.fields;
 }
 
 //////////////////////////////////////////
