@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 11:51:45 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/16 22:55:29 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/06/17 00:10:14 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ static std::vector<std::string> get_envp(const ft::Request& request, const std::
 	};
 
 	std::vector<std::string> envp = {
-		"GATEWAY_INTERFACE=CGI/1.1",
+		"GATEWAY_INTERFACE=CGI/1.1", 
 		"SERVER_PROTOCOL=HTTP/1.1",
 		ft::format("REMOTE_ADDR=%d", -1),
 		ft::format("REQUEST_METHOD=%s", methods.find(request.method)), // 

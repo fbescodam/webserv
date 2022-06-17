@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:34:12 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/16 21:08:45 by fbes          ########   odam.nl         */
+/*   Updated: 2022/06/17 00:10:03 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,28 +16,6 @@
 // "!#$%&'*+-.^_`|~0123456789abdefghijklmnopqrstuvwxyzABCDEFGHJIKLMNOPQRSTUVWVXYZ";
 
 ft::Request::Request(std::string buffer)
-{
-	std::string item;
-	std::istringstream iss(buffer);
-
-	std::getline(iss, item, ' ');
-	setMethod(item);
-	std::getline(iss, this->path, ' ');
-	std::getline(iss, this->version);
-
-	std::pair<std::string, std::string> output;
-	while (std::getline(iss, item)) // TODO: Make this better
-	{
-		item.erase(remove_if(item.begin(), item.end(), [](char c){return !(c>=32);}), item.end());
-		if (!item.empty())
-		{
-			ft::slice(item, ':', output);
-			fields[output.first] = output.second;
-		}
-	}
-}
-
-ft::Request::Request(const char* buffer)
 {
 	std::string item;
 	std::istringstream iss(buffer);

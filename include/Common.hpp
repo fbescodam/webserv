@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 17:39:22 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/16 21:08:56 by fbes          ########   odam.nl         */
+/*   Updated: 2022/06/17 03:06:54 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,6 +96,48 @@ std::string format(const std::string& format, Args ... args)
 	delete[] buff;
 
 	return (out);
+}
+
+// File system-ish functions (because MacOS 10.14)
+//////////////////////////////////////////
+
+namespace filesystem {
+
+bool fileExists(const std::string& path)
+{
+	std::ifstream fstream(path);
+
+	return (fstream.good());
+}
+
+/**
+ * Joins arguments together
+ * 
+ * @tparam Args 
+ * @param format 
+ * @param args 
+ * @return std::string 
+ */
+template <typename Arg, typename... Args>
+std::string join(Arg arg, Args... args)
+{
+	// Make sure we only use strings, crude prevention, too bad.
+	static_assert(std::is_convertible<Arg, std::string>());
+
+	/** 
+	 * @see https://stackoverflow.com/questions/27375089/what-is-the-easiest-way-to-print-a-variadic-parameter-pack-using-stdostream 
+	 * @see https://en.cppreference.com/w/cpp/language/fold
+	 */
+	std::stringstream stream;
+
+	// Insert first argument
+	stream << std::forward<Arg>(arg);
+
+	// Fold args together (Crazy feature, just why ?)
+	((stream << '/' << std::forward<Args>(args)), ...);
+
+	return (stream.str());
+}
 }
 
 FT_END
