@@ -6,7 +6,7 @@
 #    By: lde-la-h <lde-la-h@student.codam.nl>         +#+                      #
 #                                                    +#+                       #
 #    Created: 2022/05/13 11:36:28 by lde-la-h      #+#    #+#                  #
-#    Updated: 2022/06/17 04:10:23 by pvan-dij      ########   odam.nl          #
+#    Updated: 2022/06/17 04:11:40 by pvan-dij      ########   odam.nl          #
 #                                                                              #
 # **************************************************************************** #
 
@@ -32,7 +32,7 @@ CFLAGS	:= -std=c++17 -Wextra -Wall -Werror -Wno-unreachable-code -Wno-char-subsc
 ifdef DEBUG
 	CFLAGS	+=	-g3
 else
-	CFLAGS	+=	-D NDEBUG
+	CFLAGS	+= -D NDEBUG
 endif
 SRCS	:=	$(shell find ./src -iname "*.cpp")
 OBJS	:=	${SRCS:.cpp=.o}

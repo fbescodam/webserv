@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/02 12:34:20 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/17 03:14:06 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/06/17 03:28:22 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,22 +56,25 @@ void ft::Server::pollListen()
 
 	int32_t clientSocket = ft::accept(this->serverFD, &this->address);
 	ft::fcntl(clientSocket, F_SETFL, O_NONBLOCK);
-	for (int j = 0; j < this->numFds; j++)
+	for (int i = 0; i < this->numFds; i++)
 	{
-		if (this->pollfds[j].fd == -1)
-		{
-			this->pollfds[j].fd = clientSocket;
-			this->pollfds[j].events = POLLIN;
-			this->pollfds[j].revents = 0;
-			this->timeout[this->pollfds[j].fd] = std::time(0);
-			return;
-		}
+		pollfd* poll = &this->pollfds[i];
+
+		if (poll->fd != -1)
+			continue;
+
+		poll->fd = clientSocket;
+		poll->events = POLLIN;
+		poll->revents = 0;
+		this->timeout[poll->fd] = std::time(0);
+		return;
 	}
-	// TODO: What is the logic here ?
+	
 	this->pollfds[numFds].fd = clientSocket;
 	this->pollfds[numFds].events = POLLIN;
 	this->pollfds[numFds].revents = 0;
 	this->timeout[this->pollfds[numFds].fd] = std::time(0);
+	
 	this->numFds++;
 }
 
@@ -87,7 +90,7 @@ void ft::Server::pollInEvent(pollfd* poll)
 
 	if (bytesrec == 0)
 	{
-		std::cout << "Connection closed-in\n";
+		std::cout << "Connection closed-in" << std::endl;
 		this->timeout.erase(poll->fd);
 		close(poll->fd); // End of Exchange
 		poll->fd = -1;
@@ -133,7 +136,8 @@ void ft::Server::pollOutEvent(pollfd* poll)
 
 void ft::Server::cleanSocket(pollfd *poll)
 {
-	std::cout << "Connection closed-clean\n";
+	std::cout << "Connection closed-clean" << std::endl;
+
 	this->timeout.erase(poll->fd);
 	close(poll->fd);
 	poll->fd = -1;
@@ -154,8 +158,10 @@ void ft::Server::run(void)
 	for (int i = 0; i < this->numFds; i++)
 	{
 		pollfd* poll = &this->pollfds[i];
+
 		if (poll->fd < 0 || poll->revents == 0)
 			continue;
+
 		// Pollfd is ready for listening
 		if (!i && (this->pollfds[0].revents & POLLIN))
 			this->pollListen();

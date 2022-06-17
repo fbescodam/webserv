@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/13 17:05:34 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/17 02:56:20 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/06/17 03:39:29 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,28 +48,6 @@ int32_t ft::dup2(int32_t fdsA, int32_t fdsB)
 		throw ft::GenericErrnoExecption();
 
 	return (val);
-}
-
-bool ft::fileExists(const std::string& path)
-{
-	std::ifstream f(path.c_str());
-	return f.good();
-}
-
-int ft::getFileSize(std::ifstream &is) // path to file
-{
-    is.seekg(0, is.end);
-    int length = is.tellg();
-    is.seekg(0, is.beg);
-    return length;
-}
-
-int ft::get_file_size(FILE *f) // path to file
-{
-	fseek(f, 0, SEEK_END); // seek to end of file
-	int size = ftell(f); // get current file pointer
-	fseek(f, 0, SEEK_SET); // seek back to beginning of file
-	return size;
 }
 
 //////////////////////////////////////////

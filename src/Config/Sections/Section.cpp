@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 15:39:35 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/17 02:52:23 by fbes          ########   odam.nl         */
+/*   Updated: 2022/06/17 03:47:43 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,6 +67,11 @@ void ft::Section::setValue(const std::string& key, const std::string& value)
 const std::string& ft::Section::getName() const
 {
 	return (this->name);
+}
+
+uint32_t ft::Section::getAmountOfFields() const
+{
+	return (this->fields.size());
 }
 
 void ft::Section::print(std::string prefix) const

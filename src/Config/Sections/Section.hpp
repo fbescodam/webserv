@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 13:54:52 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/17 02:46:30 by fbes          ########   odam.nl         */
+/*   Updated: 2022/06/17 03:47:57 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,6 +75,12 @@ public: // Functions
 	 * @return the name
 	 */
 	const std::string& getName() const;
+
+	/**
+	 * @brief get the amount of fields defined in this section
+	 *
+	 */
+	uint32_t getAmountOfFields() const;
 
 	/**
 	 * @brief used for debugging: print an entire section
