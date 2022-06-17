@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:13:27 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/17 06:01:47 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/06/17 06:19:15 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,6 +74,7 @@ private:
 	void parseGet(void);
 	void parsePost(void);
 	void parseDelete(void);
+	void parseError(int code);
 
 public: // Attributes
 

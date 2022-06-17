@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:34:00 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/17 06:06:13 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/06/17 06:56:16 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,15 @@ ft::Response::Response(Request reqIn, ft::ServerSection *configIn)
 	this->config = configIn;
 	this->sentHeader = false;
 	this->fileOffset = 0;
+	this->fileFd = -1;
+
+	if (this->req.keyExists("Connection") && *this->req.getValue("Connection") == "keep-alive")
+	{
+		this->fields["Connection"] = "keep-alive";
+		this->fields["Keep-Alive"] = "timeout=" + std::to_string(S_TIMEOUT);
+	}
+	else
+		this->fields["Connection"] = "close";
 
 	switch(this->req.method)
 	{
@@ -43,11 +52,28 @@ ft::Response::Response(Request reqIn, ft::ServerSection *configIn)
 		case (ft::Method::DELETE):
 			this->parseDelete(); break;
 		default:
-			// TODO: 405 method
+			this->parseError(405);
 	}
 }
 
 //////////////////////////////////////////
+
+void ft::Response::parseError(int code)
+{
+	this->status = code;
+	const std::string& statusText = ft::getStatusCodes().at(code);
+	const std::string& content = "<!DOCTYPE html><html><head><title>"+statusText+"</title></head><body><h1>"+std::to_string(code)+" "+statusText+"</h1></body></html>";
+
+	// Build header and fields
+	this->writeHeader();
+	this->fields["Content-Length"] = std::to_string(content.length());
+	this->fields["Content-Type"] = "text/html";
+	this->writeFields();
+	this->writeEnd();
+
+	// Build content
+	this->data += content;
+}
 
 void ft::Response::parseGet(void)
 {
@@ -61,7 +87,9 @@ void ft::Response::parseGet(void)
 	}
 	else
 	{
-		this->file = fopen("./examples/www/custom404.html", "r"); 
+		if (!this->req.config->keyExists("error_404"))
+			return (this->parseError(404)); // no custom 404 page found, generate one on the fly
+		this->file = fopen(this->req.config->getValue("error_404")->data(), "r"); 
 		this->status = 404;
 	}
 	this->fileFd = fileno(this->file);
@@ -69,8 +97,6 @@ void ft::Response::parseGet(void)
 
 	this->writeHeader();
 	this->fields["Content-Length"] = std::to_string(this->fileSize);
-	this->fields["Connection"] = "keep-alive";
-	this->fields["Keep-Alive"] = "timeout=" + std::to_string(S_TIMEOUT);
 	this->writeFields();
 	this->writeEnd();
 
@@ -89,36 +115,23 @@ void ft::Response::parseDelete(void)
 
 ////
 
-/** As one giant shit strings
- * CODE - STATUS
- * <HEADER>
- * \n\n
- * <BODY>
- *
- * HTTP/1.1 503 Service Unavailabe\n
- * Content-Type: text/plain\n
- * Content-Length: 12\n
- * \n
- * 503 error
- */
-
 // Writes the header object
 void ft::Response::writeHeader(void)
 {
 	// HTTP/1.1 503 Service Unavailabe\n
-	data += ft::format("HTTP/1.1 %u %s\n", status, ft::getStatusCodes().at(status).c_str());
-	fields["Server"] = "Breadserv";
+	this->data += ft::format("HTTP/1.1 %u %s\n", this->status, ft::getStatusCodes().at(this->status).c_str());
+	this->fields["Server"] = "Breadserv";
 }
 
 void ft::Response::writeFields(void)
 {
 	for (const auto [key, value] : this->fields)
-		data += key + " : " + value + '\n';
+		this->data += key + " : " + value + '\n';
 }
 
 void ft::Response::writeEnd(void)
 {
-	data += "\n";
+	this->data += "\n";
 }
 
 //https://www.youtube.com/watch?v=tYzMYcUty6s fucking mime types
@@ -128,6 +141,8 @@ ft::ResponseStatus ft::Response::send(int32_t socket)
 	{
 		ft::send(socket, this->data.data(), this->data.length(), 0);	
 		this->sentHeader = true;
+		if (this->fileFd < 0)
+			return ft::DONE;
 		return ft::NOT_DONE;
 	}
 	off_t len;
@@ -142,17 +157,6 @@ ft::ResponseStatus ft::Response::send(int32_t socket)
 ft::Response ft::Response::getError(uint32_t code)
 {
 	ft::Response outResponse(code);
-	const std::string& content = ft::getStatusCodes().at(code);
-
-	// Build header and fields
-	outResponse.writeHeader();
-	outResponse.fields["Content-Length"] = std::to_string(content.length());
-	outResponse.fields["Content-Type"] = "text/plain";
-	outResponse.fields["Connection"] = "close";
-	outResponse.writeFields();
-	outResponse.writeEnd();
-
-	// Build content
-	outResponse.data += content;
+	outResponse.parseError(code);
 	return (outResponse);
 }

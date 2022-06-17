@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/02 12:34:20 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/17 04:39:48 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/06/17 06:58:33 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,6 +113,22 @@ void ft::Server::pollInEvent(pollfd* poll)
 	}
 }
 
+void ft::Server::resolveConnection(pollfd *poll)
+{
+	if (this->responses[poll->fd]->fields["Connection"] == "keep-alive")
+	{
+		delete this->responses[poll->fd];	
+		poll->events = POLLIN;
+	}
+	else
+	{
+		int temp = poll->fd;
+		close(poll->fd);
+		poll->fd = -1;
+		delete this->responses[poll->fd];
+	}
+}
+
 void ft::Server::pollOutEvent(pollfd* poll)
 {
 	if (!this->responses[poll->fd])
@@ -127,9 +143,8 @@ void ft::Server::pollOutEvent(pollfd* poll)
 		ft::ResponseStatus ret = this->responses[poll->fd]->send(poll->fd);
 		if (ret == ft::DONE)
 		{
-			delete this->responses[poll->fd];	
-			poll->events = POLLIN;
-			std::cout << "//=/ Sent Response /=//" << std::endl;
+			this->resolveConnection(poll);
+			std::cout << "//=/ Sent Response /=//" << std::endl;	
 		}
 		this->timeout[poll->fd] = std::time(0);
 	}

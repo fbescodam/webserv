@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 14:59:11 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/17 04:22:20 by fbes          ########   odam.nl         */
+/*   Updated: 2022/06/17 06:58:25 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,8 +68,8 @@ void ft::GlobalConfig::readFile(const std::string& filePath)
 					throw ft::InvalidSubSectionPosition();
 				if (sectionName != ".location") // only handle .location as subsection
 					throw ft::UnknownSectionTypeException();
-				ft::Section location(sectionName); // create new location subsection
 				ft::ServerSection& currentServerSection = this->serverSections.back();
+				ft::Section location(sectionName, currentServerSection); // create new location subsection, inherit from server for easiness' sake
 				currentServerSection.locations.push_back(location); // add subsection to server
 				currentSection = &currentServerSection.locations.back(); // change current section to the newly generated location
 			}

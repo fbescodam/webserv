@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/02 12:25:53 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/17 04:24:55 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/06/17 06:46:10 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,7 @@ public: // Functions
 	void pollOutEvent(pollfd* poll);
 	void cleanSocket(pollfd *poll);
 	bool checkTimeout(pollfd *poll);
+	void resolveConnection(pollfd *poll);
 
 public: // Attributes
 

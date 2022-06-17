@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:34:12 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/17 04:11:27 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/06/17 06:23:16 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,6 +57,8 @@ void ft::Request::setMethod(const std::string& inMethod)
 		method = ft::Method::POST;
 	else if (inMethod == "DELETE")
 		method = ft::Method::DELETE;
+	else
+		method = ft::Method::ERR;
 }
 
 //////////////////////////////////////////

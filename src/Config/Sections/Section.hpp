@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 13:54:52 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/17 05:00:57 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/06/17 06:51:43 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ public: // Functions
 	 * @brief get the value of a configuration field
 	 *
 	 * @param key the key of a configuration field to get the value of
-	 * @return the value
+	 * @return a pointer to the value (NULL if field does not exist)
 	 */
 	const std::string* getValue(const std::string& key) const;
 

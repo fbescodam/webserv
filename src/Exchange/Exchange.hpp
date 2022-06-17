@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:13:27 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/17 06:01:40 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/06/17 06:48:47 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,23 @@ class Exchange
 {
 public: // Ctor ~ Dtor
 	virtual ~Exchange() { }
+
+public: // Functions
+	/**
+	 * @brief check if a key exists in the headers
+	 *
+	 * @param key the key to check for
+	 * @return true if the key exists
+	 */
+	bool keyExists(const std::string& key) const;
+
+	/**
+	 * @brief get the value of a header field
+	 *
+	 * @param key the key of a header field to get the value of
+	 * @return a pointer to the value (NULL if field does not exist)
+	 */
+	const std::string* getValue(const std::string& key) const;
 
 public: // Attributes
 
