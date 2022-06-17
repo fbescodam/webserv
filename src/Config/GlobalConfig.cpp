@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 14:59:11 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/16 23:44:48 by fbes          ########   odam.nl         */
+/*   Updated: 2022/06/17 03:36:56 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,6 +88,9 @@ void ft::GlobalConfig::readFile(const std::string& filePath)
 		ft::trim(output.second);
 		currentSection->setValue(output.first, output.second);
 	}
+
+	if (this->serverSections.size() == 0)
+		throw ft::NoServersException();
 }
 
 //////////////////////////////////////////

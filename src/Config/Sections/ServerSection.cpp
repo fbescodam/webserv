@@ -6,13 +6,13 @@
 /*   By: fbes <fbes@student.codam.nl>                 +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/16 21:23:40 by fbes          #+#    #+#                 */
-/*   Updated: 2022/06/17 02:51:33 by fbes          ########   odam.nl         */
+/*   Updated: 2022/06/17 03:09:56 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ServerSection.hpp"
 
-ft::ServerSection::ServerSection(const std::string& name): ft::Section(name)
+ft::ServerSection::ServerSection(const std::string& name) : ft::Section(name)
 {
 
 }
