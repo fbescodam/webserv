@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 17:39:22 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/17 03:27:12 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/06/17 03:42:48 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,6 @@
 # include <string>
 # include <memory>
 # include <unistd.h>
-# include <filesystem>
 # include <map>
 # include <chrono>
 # include <sstream>
@@ -105,12 +104,30 @@ std::string format(const std::string& format, Args ... args)
 
 namespace filesystem {
 
-bool fileExists(const std::string& path)
-{
-	std::ifstream fstream(path);
+/**
+ * @brief 
+ * 
+ * @param path 
+ * @return true 
+ * @return false 
+ */
+bool fileExists(const std::string& path);
 
-	return (fstream.good());
-}
+/**
+ * @brief Get the File Size object
+ * 
+ * @param is 
+ * @return int 
+ */
+size_t getFileSize(std::ifstream &is);
+
+/**
+ * @brief Get the File Size object
+ * 
+ * @param f 
+ * @return int 
+ */
+size_t getFileSize(FILE *f);
 
 /**
  * Joins arguments together

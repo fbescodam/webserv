@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:34:00 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/17 03:15:50 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/06/17 03:43:16 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ ft::Response::Response(Request reqIn, ft::ServerSection *configIn)
 	if (this->req.path == "/")
 		this->req.path = "/index.html";
 
-	if (ft::fileExists(this->config->root + this->req.path))
+	if (ft::filesystem::fileExists(this->config->root + this->req.path))
 	{
 		this->file = fopen((this->config->root + this->req.path).data(), "r"); 
 		this->status = 200;
@@ -47,7 +47,7 @@ ft::Response::Response(Request reqIn, ft::ServerSection *configIn)
 		this->status = 404;
 	}
 	this->fileFd = fileno(this->file);
-	this->fileSize = ft::get_file_size(this->file);
+	this->fileSize = ft::filesystem::getFileSize(this->file);
 
 	this->writeHeader();
 	this->fields["Content-Length"] = std::to_string(this->fileSize);
