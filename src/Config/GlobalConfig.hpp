@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 13:54:52 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/16 22:10:17 by fbes          ########   odam.nl         */
+/*   Updated: 2022/06/17 03:44:15 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,6 @@ public: // Ctor ~ Dtor
 	~GlobalConfig() = default;
 
 public: // Functions
-
 	/**
 	 * Reads the given file and parses it. Throws exceptions on failure
 	 *
@@ -41,6 +40,13 @@ public: // Functions
 	 *
 	 */
 	void runServers(void);
+
+private:
+	/**
+	 * Check if config is configured properly. Throws exception if not
+	 *
+	 */
+	void verifyConfig() const;
 
 public: // Attributes
 

@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/02 12:25:53 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/17 02:22:07 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/06/17 04:24:55 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,9 @@ private:
 	// Network part
 	int32_t serverFD;
 	ft::SocketAddress address;
+
+	//server info
+	std::list<std::string> serverNames;
 
 	// Running part
 	int32_t maxClients;

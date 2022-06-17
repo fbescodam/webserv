@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:34:00 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/17 03:43:16 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/06/17 04:34:40 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,13 +20,14 @@
 ft::Response::~Response()
 {
 	fclose(this->file);
+	close(this->fileFd);
 }
 
 ft::Response::Response(Request reqIn, ft::ServerSection *configIn)
 {
 	// TODO: This should properly construct a response based on the earlier received request
 	// data = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
-	reqIn.display();
+	// reqIn.display();
 
 	this->req = reqIn;
 	this->config = configIn;
@@ -56,7 +57,7 @@ ft::Response::Response(Request reqIn, ft::ServerSection *configIn)
 	this->writeFields();
 	this->writeEnd();
 
-	std::cout << "//---------//\n" << this->data;
+	std::cout << "//-----rep header----//\n" << this->data;
 	
 
 }

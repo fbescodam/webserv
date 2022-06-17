@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/02 12:34:20 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/17 03:28:22 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/06/17 04:39:48 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,8 @@ void ft::Server::init(void)
 {
 	try
 	{
-		this->address = ft::SocketAddress(AF_INET, htons(8080), INADDR_ANY); // needs config values
+		this->config.getValueAsList("server_names", serverNames);
+		this->address = ft::SocketAddress(AF_INET, htons(this->config.returnValueAsInt("listen")), INADDR_ANY); // needs config values
 		this->serverFD = ft::socket(IPV4, TCP, NONE);
 		ft::setSocketOption(this->serverFD, SOL_SOCKET, SO_REUSEADDR, true, sizeof(int32_t)); // make kernel release socket after exit
 		ft::bind(this->serverFD, &this->address);
@@ -159,7 +160,7 @@ void ft::Server::run(void)
 	{
 		pollfd* poll = &this->pollfds[i];
 
-		if (poll->fd < 0 || poll->revents == 0)
+		if (poll->fd < 0)
 			continue;
 
 		// Pollfd is ready for listening

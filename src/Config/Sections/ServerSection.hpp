@@ -21,7 +21,7 @@ FT_BEGIN
 class ServerSection final : public ft::Section
 {
 public: // Ctor ~ Dtor
-	ServerSection(const std::string& name);
+	ServerSection(const std::string& name, ft::Section& inherit);
 	~ServerSection() = default;
 
 public: // Functions

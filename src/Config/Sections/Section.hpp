@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 13:54:52 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/17 02:46:30 by fbes          ########   odam.nl         */
+/*   Updated: 2022/06/17 05:00:57 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@ class Section
 {
 public: // Ctor ~ Dtor
 	Section(const std::string& name);
+	Section(const std::string& name, Section& inherit);
 	~Section() = default;
 
 public: // Functions
@@ -53,6 +54,14 @@ public: // Functions
 	bool getValueAsInt(const std::string& key, int& output) const;
 
 	/**
+	 * @brief 
+	 * 
+	 * @param key 
+	 * @return int 
+	 */
+	int returnValueAsInt(const std::string& key) const;
+
+	/**
 	 * @brief get the value of a configuration field, as a string array
 	 *
 	 * @param key the key of a configuration field to get the value of
@@ -75,6 +84,12 @@ public: // Functions
 	 * @return the name
 	 */
 	const std::string& getName() const;
+
+	/**
+	 * @brief get the amount of fields defined in this section
+	 *
+	 */
+	uint32_t getAmountOfFields() const;
 
 	/**
 	 * @brief used for debugging: print an entire section

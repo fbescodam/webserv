@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 15:39:35 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/17 02:52:23 by fbes          ########   odam.nl         */
+/*   Updated: 2022/06/17 05:00:53 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,12 @@
 ft::Section::Section(const std::string& name)
 {
 	this->name = name;
+}
+
+ft::Section::Section(const std::string& name, ft::Section& inherit)
+{
+	this->name = name;
+	this->fields = inherit.fields;
 }
 
 //////////////////////////////////////////
@@ -39,6 +45,15 @@ bool ft::Section::getValueAsInt(const std::string& key, int& output) const
 		return (false);
 	output = std::stoi(it->second);
 	return (true);
+}
+
+int ft::Section::returnValueAsInt(const std::string& key) const
+{
+	auto it = this->fields.find(key);
+
+	if (it == this->fields.end())
+		return (-1);
+	return (std::stoi(it->second));
 }
 
 bool ft::Section::getValueAsList(const std::string& key, std::list<std::string>& list) const
@@ -67,6 +82,11 @@ void ft::Section::setValue(const std::string& key, const std::string& value)
 const std::string& ft::Section::getName() const
 {
 	return (this->name);
+}
+
+uint32_t ft::Section::getAmountOfFields() const
+{
+	return (this->fields.size());
 }
 
 void ft::Section::print(std::string prefix) const

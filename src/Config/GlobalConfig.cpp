@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 14:59:11 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/17 03:27:03 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/06/17 04:22:20 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,7 +76,7 @@ void ft::GlobalConfig::readFile(const std::string& filePath)
 			else { // is main section (server)
 				if (sectionName != "server")
 					throw ft::UnknownSectionTypeException();
-				ft::ServerSection server(sectionName);
+				ft::ServerSection server(sectionName, this->globalSection);
 				this->serverSections.push_back(server); // add new server to list of servers in globalconfig
 				currentSection = &this->serverSections.back(); // change current section to the newly generated server
 			}
@@ -87,6 +87,22 @@ void ft::GlobalConfig::readFile(const std::string& filePath)
 		ft::trim(output.first);
 		ft::trim(output.second);
 		currentSection->setValue(output.first, output.second);
+	}
+
+	verifyConfig();
+}
+
+void ft::GlobalConfig::verifyConfig() const
+{
+	if (this->serverSections.size() == 0)
+		throw ft::NoServersException();
+	for (const ft::ServerSection& server : this->serverSections)
+	{
+		if (server.getAmountOfFields() == 0)
+			throw ft::EmptySectionException();
+		for (const ft::Section& location : server.locations)
+			if (location.getAmountOfFields() == 0)
+				throw ft::EmptySectionException();
 	}
 }
 
