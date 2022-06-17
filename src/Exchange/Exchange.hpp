@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:13:27 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/16 21:08:42 by fbes          ########   odam.nl         */
+/*   Updated: 2022/06/17 04:37:17 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 #ifndef EXCHANGE_HPP
 # define EXCHANGE_HPP
 # include "CommonNetwork.hpp"
+# include "ServerSection.hpp"
 FT_BEGIN
 
 // Supported exchange methods for the webserver.
@@ -41,6 +42,9 @@ public: // Attributes
 
 	// The either incoming or outgoing socket of the exchange.
 	int32_t socket;
+
+	//server config
+	ft::ServerSection *config;
 };
 
 FT_END

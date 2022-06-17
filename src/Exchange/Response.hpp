@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:13:27 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/17 03:15:23 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/06/17 04:47:17 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,11 +81,6 @@ public: // Attributes
 	//the request were basing the response on
 	ft::Request req;
 
-	//root filepath
-	std::string root;
-
-	//server config
-	ft::ServerSection *config;
 
 	//file fd
 	FILE *file;
