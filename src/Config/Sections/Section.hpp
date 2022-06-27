@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 13:54:52 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/17 09:14:54 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/06/27 20:23:25 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@ public: // Ctor ~ Dtor
 	Section() = default;
 	Section(const std::string& cwd, const std::string& name);
 	Section(const char* cwd, const std::string& name);
+	Section(const std::string&, const std::string& name, const std::string& appliesToPath);
 	Section(const std::string& cwd, const std::string& name, Section& inherit);
 	~Section() = default;
 
@@ -58,7 +59,7 @@ public: // Functions
 	/**
 	 * @brief get the value of a configuration field, as an integer
 	 * @warning can throw whatever std::stoi decides to throw at you
-	 * 
+	 *
 	 * @param key the key of a configuration field to get the value of
 	 * @return the direct value of the configuration
 	 */
@@ -89,6 +90,13 @@ public: // Functions
 	const std::string& getName() const;
 
 	/**
+	 * @brief check if this section applies to the requested path
+	 *
+	 * @return the name
+	 */
+	bool appliesForPath(const std::string& requestedPath) const;
+
+	/**
 	 * @brief get the amount of fields defined in this section
 	 *
 	 */
@@ -114,13 +122,16 @@ public: // Functions
 	 *
 	 */
 	const std::string& getcwd() const;
-	
+
 
 public: // Attributes
 
 private:
 	// Name of the section.
 	std::string name;
+
+	// Path this section applies to (only used for .location)
+	std::string appliesToPath;
 
 	// Configurations in a key-value pair
 	std::map<std::string, std::string> fields;

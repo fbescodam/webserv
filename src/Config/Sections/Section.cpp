@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 15:39:35 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/17 08:34:22 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/06/27 20:25:59 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,8 +23,15 @@ ft::Section::Section(const char* cwd, const std::string& name)
 {
 	this->cwd = cwd;
 	this->name = name;
-	std::cout << "from pointer: " << cwd << std::endl;
 	free((void*) cwd);
+}
+
+ft::Section::Section(const std::string& cwd, const std::string& name, const std::string& appliesToPath)
+{
+	this->cwd = cwd;
+	this->name = name;
+	this->appliesToPath = appliesToPath;
+	std::cout << cwd << std::endl;
 }
 
 ft::Section::Section(const std::string& cwd, const std::string& name, ft::Section& inherit)
@@ -94,6 +101,13 @@ const std::string& ft::Section::getName() const
 	return (this->name);
 }
 
+bool ft::Section::appliesForPath(const std::string& requestedPath) const
+{
+	if (this->appliesToPath == requestedPath || requestedPath.rfind(this->appliesToPath, 0) == 0)
+		return (true);
+	return (false);
+}
+
 uint32_t ft::Section::getAmountOfFields() const
 {
 	return (this->fields.size());
@@ -112,9 +126,10 @@ const std::string& ft::Section::getcwd() const
 	return (this->cwd);
 }
 
+// TODO: change to map with string keys and function pointer values instead of this ugly switch case
 void ft::Section::verifyKeyValue(std::string& key, std::string& value) const
 {
-	// Enum of all possible keys
+	// all possible keys
 	const std::string possibleKeys[] = {
 		"limit_body_size",
 		"listen",
@@ -137,10 +152,10 @@ void ft::Section::verifyKeyValue(std::string& key, std::string& value) const
 			break;
 		}
 	}
-	
+
 	if (index == -1)
 		throw ft::UnknownFieldKeyException();
-	
+
 	long bignum;
 	switch (index)
 	{
@@ -150,7 +165,7 @@ void ft::Section::verifyKeyValue(std::string& key, std::string& value) const
 			if (bignum <= 0 || bignum > INT32_MAX)
 				throw ft::InvalidFieldValueException();
 			break;
-		
+
 		// expecting integer in range > 0 < UINT16_MAX
 		case 1: // listen
 			bignum = std::stol(value);
@@ -174,7 +189,7 @@ void ft::Section::verifyKeyValue(std::string& key, std::string& value) const
 			if (value != "yes" && value != "no")
 				throw ft::InvalidFieldValueException();
 			break;
-			
+
 		// expecting two strings, of which 1st is either "temp" or "perm" or a number (status code) and 2nd is a path
 		case 9: // redir
 			size_t space = value.find(' ');
