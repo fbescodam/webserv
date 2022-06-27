@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 13:54:52 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/17 09:14:54 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/06/27 21:07:03 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 #ifndef SECTION_HPP
 # define SECTION_HPP
 # include "Common.hpp"
+# include "Exceptions.hpp"
 FT_BEGIN
 
 // A section consists of a name along with a map of key-value pairs (called fields) that can be retrieved.

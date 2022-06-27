@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 17:40:38 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/27 17:51:36 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/06/27 21:07:39 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@
 # include <sys/poll.h>
 # include <fcntl.h>
 # include <map>
+# include "Exceptions.hpp"
 FT_BEGIN
 
 // More sensible naming ... Thanks cstdlib :)

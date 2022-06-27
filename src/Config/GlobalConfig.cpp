@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 14:59:11 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/17 08:35:00 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/06/27 21:07:11 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,15 +32,15 @@ static bool isSubSectionDef(const std::string& sectionName)
 static void getSectionName(const std::string& line, std::string& output)
 {
 	if (line.front() != '[' || line.back() != ']')
-		throw ft::ConfigParserSyntaxException();
+		throw ft::ConfigParserSyntaxException(5);
 	output = line;
 	output.erase(0, 1); // remove [
 	output.erase(output.size() - 1); // remove ]
 	ft::trim(output); // remove whitespace around the leftover string
 	if (output.find(' ') != std::string::npos) // do not allow strings in section names (after trimming)
-		throw ft::ConfigParserSyntaxException();
+		throw ft::ConfigParserSyntaxException(5);
 	if (output.find('.', 1) != std::string::npos) // do not allow dots in section names (except for first character)
-		throw ft::ConfigParserSyntaxException();
+		throw ft::ConfigParserSyntaxException(5);
 }
 
 //////////////////////////////////////////
