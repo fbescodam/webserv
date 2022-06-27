@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 14:59:11 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/27 21:15:19 by fbes          ########   odam.nl         */
+/*   Updated: 2022/06/27 21:27:19 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,9 +24,10 @@ static bool isSectionDef(const std::string& line)
 	return (line[0] == '[');
 }
 
-static bool isSubSectionDef(const std::string& sectionName)
+static bool isSubSectionDef(const std::string& line)
 {
-	return (sectionName[0] == '.');
+	size_t firstCharIndex = line.find_first_not_of(WHITESPACE, 1);
+	return (line[firstCharIndex] == '.');
 }
 
 static bool isValidSectionDef(const std::string& line)
@@ -95,12 +96,13 @@ void ft::GlobalConfig::readFile(const std::string& filePath)
 	if (!fstream.good())
 		throw ft::FileNotFoundException();
 	std::string line;
-	uint32_t lineNum = 1;
+	uint32_t lineNum = 0;
 	std::pair<std::string, std::string> output;
 	ft::Section* currentSection = &this->globalSection;
 
 	while (std::getline(fstream, line))
 	{
+		lineNum++;
 		ft::trim(line); // trim the whole line (remove whitespace at beginning and end)
 		if (isComment(line) || line.length() == 0) // skip comments and empty lines
 			continue;
@@ -110,7 +112,7 @@ void ft::GlobalConfig::readFile(const std::string& filePath)
 			std::string sectionName;
 			std::string appliesToPath;
 
-			if (isSubSectionDef(sectionName)) { // is subsection (.location)
+			if (isSubSectionDef(line)) { // is subsection (.location)
 				getSubSectionName(lineNum, line, sectionName, appliesToPath);
 				if (currentSection->getName() == "global")
 					throw ft::InvalidSubSectionPosition();
@@ -137,7 +139,6 @@ void ft::GlobalConfig::readFile(const std::string& filePath)
 		ft::trim(output.second);
 		currentSection->verifyKeyValue(output.first, output.second);
 		currentSection->setValue(output.first, output.second);
-		lineNum++;
 	}
 
 	verifyConfig();
