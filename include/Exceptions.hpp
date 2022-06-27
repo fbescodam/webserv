@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 18:05:00 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/17 08:35:01 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/06/27 20:17:36 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,28 @@ struct GenericErrnoException : public std::exception
 	const char* what() const throw() override {
 		return (strerror(errno));
 	}
+};
+
+////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Exception used for config parsing, lets you define a prefix error and a line number.
+ */
+struct ConfigException : public std::exception
+{
+	
+public:
+	ConfigException(const std::string& error, int32_t on) 
+	: prefix(error), lineNum(on) {}
+
+public:
+	const char* what() const throw() override {
+		return ((prefix + std::to_string(lineNum)).c_str());
+	}
+
+protected:
+	std::string prefix;
+	int32_t lineNum;
 };
 
 struct DelimiterNotFoundException : public std::exception
