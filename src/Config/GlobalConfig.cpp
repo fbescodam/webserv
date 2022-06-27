@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 14:59:11 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/27 21:10:23 by fbes          ########   odam.nl         */
+/*   Updated: 2022/06/27 21:15:19 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,33 +41,33 @@ static void initParsedSection(std::string& sectionDef)
 	ft::trim(sectionDef); // remove whitespace around the leftover string
 }
 
-static bool isValidSectionNameSyntax(const std::string& name)
+static bool isValidSectionNameSyntax(const uint32_t lineNum, const std::string& name)
 {
 	if (name.find(' ') != std::string::npos) // do not allow strings in section names (after trimming)
-		throw ft::ConfigParserSyntaxException();
+		throw ft::ConfigParserSyntaxException(lineNum);
 	if (name.find('.', 1) != std::string::npos) // do not allow dots in section names (except for first character)
-		throw ft::ConfigParserSyntaxException();
+		throw ft::ConfigParserSyntaxException(lineNum);
 	return (true);
 }
 
-static void getSectionName(const std::string& line, std::string& name)
+static void getSectionName(const uint32_t lineNum, const std::string& line, std::string& name)
 {
 	std::string temp = line;
 
 	if (!isValidSectionDef(temp))
-		throw ft::ConfigParserSyntaxException();
+		throw ft::ConfigParserSyntaxException(lineNum);
 	initParsedSection(temp);
-	if (!isValidSectionNameSyntax(temp))
-		throw ft::ConfigParserSyntaxException();
+	if (!isValidSectionNameSyntax(lineNum, temp))
+		throw ft::ConfigParserSyntaxException(lineNum);
 	name = temp; // copy over to output
 }
 
-static void getSubSectionName(const std::string& line, std::string& name, std::string& path)
+static void getSubSectionName(const uint32_t lineNum, const std::string& line, std::string& name, std::string& path)
 {
 	std::string temp = line;
 
 	if (!isValidSectionDef(temp))
-		throw ft::ConfigParserSyntaxException();
+		throw ft::ConfigParserSyntaxException(lineNum);
 	initParsedSection(temp);
 
 	std::stringstream stream(temp); // create a stringstream out of the temp string
@@ -80,10 +80,10 @@ static void getSubSectionName(const std::string& line, std::string& name, std::s
 			name = word;
 		count++;
 	}
-	if (!isValidSectionNameSyntax(name))
-		throw ft::ConfigParserSyntaxException();
+	if (!isValidSectionNameSyntax(lineNum, name))
+		throw ft::ConfigParserSyntaxException(lineNum);
 	if (count != 2) // only allow the definition of the subsection (.location) and the path it is defined for (without any whitespace)
-		throw ft::ConfigParserSyntaxException();
+		throw ft::ConfigParserSyntaxException(lineNum);
 	path = word; // copy the last word over as the subsection path, will not get here if it throws
 }
 
@@ -95,6 +95,7 @@ void ft::GlobalConfig::readFile(const std::string& filePath)
 	if (!fstream.good())
 		throw ft::FileNotFoundException();
 	std::string line;
+	uint32_t lineNum = 1;
 	std::pair<std::string, std::string> output;
 	ft::Section* currentSection = &this->globalSection;
 
@@ -110,7 +111,7 @@ void ft::GlobalConfig::readFile(const std::string& filePath)
 			std::string appliesToPath;
 
 			if (isSubSectionDef(sectionName)) { // is subsection (.location)
-				getSubSectionName(line, sectionName, appliesToPath);
+				getSubSectionName(lineNum, line, sectionName, appliesToPath);
 				if (currentSection->getName() == "global")
 					throw ft::InvalidSubSectionPosition();
 				if (sectionName != ".location") // only handle .location as subsection
@@ -121,7 +122,7 @@ void ft::GlobalConfig::readFile(const std::string& filePath)
 				currentSection = &currentServerSection.locations.back(); // change current section to the newly generated location
 			}
 			else { // is main section (server)
-				getSectionName(line, sectionName);
+				getSectionName(lineNum, line, sectionName);
 				if (sectionName != "server")
 					throw ft::UnknownSectionTypeException();
 				ft::ServerSection server(this->globalSection.getcwd(), sectionName, this->globalSection);
@@ -136,6 +137,7 @@ void ft::GlobalConfig::readFile(const std::string& filePath)
 		ft::trim(output.second);
 		currentSection->verifyKeyValue(output.first, output.second);
 		currentSection->setValue(output.first, output.second);
+		lineNum++;
 	}
 
 	verifyConfig();

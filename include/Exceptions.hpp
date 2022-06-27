@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 18:05:00 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/27 20:17:36 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/06/27 21:01:59 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,17 +36,15 @@ struct ConfigException : public std::exception
 {
 	
 public:
-	ConfigException(const std::string& error, int32_t on) 
-	: prefix(error), lineNum(on) {}
+	ConfigException() = default;
 
 public:
 	const char* what() const throw() override {
-		return ((prefix + std::to_string(lineNum)).c_str());
+		return (err.c_str());
 	}
 
 protected:
-	std::string prefix;
-	int32_t lineNum;
+	std::string err;
 };
 
 struct DelimiterNotFoundException : public std::exception
@@ -56,10 +54,12 @@ struct DelimiterNotFoundException : public std::exception
 	}
 };
 
-struct ConfigParserSyntaxException : public std::exception
+struct ConfigParserSyntaxException : public ft::ConfigException
 {
-	const char* what() const throw() override {
-		return ("Syntax error in config");
+public:
+	ConfigParserSyntaxException(int32_t on)
+	{
+		this->err = ft::format("Error on line %d", on);
 	}
 };
 
