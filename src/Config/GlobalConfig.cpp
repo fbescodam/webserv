@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 14:59:11 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/29 14:01:30 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/06/29 19:21:37 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,10 +24,10 @@ static bool isSectionDef(const std::string& line)
 	return (line[0] == '[');
 }
 
-static bool isSubSectionDef(const std::string& sectionName)
+static bool isSubSectionDef(const std::string& line)
 {
-	// TODO: The inner part of the section string is not trimmed!
-	return (sectionName.find_first_of('.') != std::string::npos);
+	size_t firstCharIndex = line.find_first_not_of(WHITESPACE, 1);
+	return (line[firstCharIndex] == '.');
 }
 
 static bool isValidSectionDef(const std::string& line)
@@ -96,12 +96,13 @@ void ft::GlobalConfig::readFile(const std::string& filePath)
 	if (!fstream.good())
 		throw ft::FileNotFoundException();
 	std::string line;
-	uint32_t lineNum = 1;
+	uint32_t lineNum = 0;
 	std::pair<std::string, std::string> output;
 	ft::Section* currentSection = &this->globalSection;
 
 	while (std::getline(fstream, line))
 	{
+		lineNum++;
 		ft::trim(line); // trim the whole line (remove whitespace at beginning and end)
 		if (isComment(line) || line.length() == 0) // skip comments and empty lines
 		{
@@ -117,9 +118,9 @@ void ft::GlobalConfig::readFile(const std::string& filePath)
 			if (isSubSectionDef(line)) { // is subsection (.location)
 				getSubSectionName(lineNum, line, sectionName, appliesToPath);
 				if (currentSection->getName() == "global")
-					throw ft::InvalidSubSectionPosition();
+					throw ft::InvalidSubSectionPosition(lineNum);
 				if (sectionName != ".location") // only handle .location as subsection
-					throw ft::UnknownSectionTypeException();
+					throw ft::UnknownSectionTypeException(lineNum);
 				ft::ServerSection& currentServerSection = this->serverSections.back();
 				ft::Section location(*currentServerSection.getValue("path"), sectionName, appliesToPath); // create new location subsection
 				currentServerSection.locations.push_back(location); // add subsection to server
@@ -128,7 +129,7 @@ void ft::GlobalConfig::readFile(const std::string& filePath)
 			else { // is main section (server)
 				getSectionName(lineNum, line, sectionName);
 				if (sectionName != "server")
-					throw ft::UnknownSectionTypeException();
+					throw ft::UnknownSectionTypeException(lineNum);
 				ft::ServerSection server(this->globalSection.getcwd(), sectionName, this->globalSection);
 				this->serverSections.push_back(server); // add new server to list of servers in globalconfig
 				currentSection = &this->serverSections.back(); // change current section to the newly generated server
@@ -140,9 +141,8 @@ void ft::GlobalConfig::readFile(const std::string& filePath)
 		ft::slice(line, '=', output);
 		ft::trim(output.first);
 		ft::trim(output.second);
-		currentSection->verifyKeyValue(output.first, output.second);
+		currentSection->verifyKeyValue(lineNum, output.first, output.second);
 		currentSection->setValue(output.first, output.second);
-		lineNum++;
 	}
 
 	verifyConfig();

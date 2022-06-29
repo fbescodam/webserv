@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:34:00 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/29 19:47:09 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/06/29 21:05:25 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,10 +29,13 @@ ft::Response::Response(ft::Request reqIn, ft::ServerSection *configIn)
 
 	this->req = reqIn;
 	this->config = ft::Section(ft::basedir(reqIn.path), "response", *configIn);
+	this->locations = configIn->locations;
 	this->sentHeader = false;
 	this->fileOffset = 0;
 	this->file = 0;
 	this->fileFd = -1;
+
+
 
 	if (this->req.keyExists("Connection") && *this->req.getValue("Connection") == "keep-alive")
 	{
@@ -41,6 +44,9 @@ ft::Response::Response(ft::Request reqIn, ft::ServerSection *configIn)
 	}
 	else
 		this->fields["Connection"] = "close";
+
+	if (this->applyConfig())
+		return ;
 
 	switch(this->req.method)
 	{
@@ -51,13 +57,50 @@ ft::Response::Response(ft::Request reqIn, ft::ServerSection *configIn)
 		case (ft::Method::DELETE):
 			this->parseDelete(); break;
 		default:
-			this->parseError(405);
+			this->generateStatusPage(405);
 	}
 }
 
 //////////////////////////////////////////
 
-void ft::Response::parseError(int code)
+bool ft::Response::applyConfig()
+{
+	if (this->req.path.back() == '/')
+	{
+		if (!this->config.keyExists("index"))
+			this->req.path += "index.html"; // TODO: should only do this if dir_listing is disabled, otherwise generate a list of files and directories in path
+		else
+			this->req.path += *this->config.getValue("index");
+	}
+
+	for (const auto &val: this->locations)
+	{
+		std::cout << val.appliesForPath(this->req.path) << std::endl;
+		if (val.appliesForPath(this->req.path))
+			this->config.importFields(val.exportFields());
+	}
+	this->config.print("fijwf   ");
+
+	// check if method is accepted for request
+
+	// check if access is allowed
+
+	// check if redirection is set
+	std::list<std::string> redirInfo;
+	if (this->config.getValueAsList("redir", redirInfo))
+	{
+		int code = std::atoi(redirInfo.front().c_str());
+		this->fields["Location"] = redirInfo.back();
+		this->generateStatusPage(code);
+		return (true);
+	}
+	
+	// all good, continue parsing the request (return false)
+	return (false);
+
+}
+
+void ft::Response::generateStatusPage(int code)
 {
 	this->status = code;
 	const std::string& statusText = ft::getStatusCodes().at(code);
@@ -76,11 +119,8 @@ void ft::Response::parseError(int code)
 
 void ft::Response::parseGet(void)
 {
-	if (this->req.path == "/")
-		this->req.path = "/index.html";
-
 	std::string requestedFile = *this->config.getValue("path") + this->req.path;
-	std::cout << requestedFile << std::endl;
+	// std::cout << requestedFile << std::endl;
 	if (ft::filesystem::fileExists(requestedFile))
 	{
 		this->file = fopen(requestedFile.data(), "r");
@@ -89,10 +129,10 @@ void ft::Response::parseGet(void)
 	else
 	{
 		if (!this->config.keyExists("error_404"))
-			return (this->parseError(404)); // no custom 404 page found, generate one on the fly
+			return (this->generateStatusPage(404)); // no custom 404 page found, generate one on the fly
 		requestedFile = *this->config.getValue("path") + *this->config.getValue("error_404");
 		if (!ft::filesystem::fileExists(requestedFile))
-			return (this->parseError(404)); // custom 404 page not found (HA!), generate one on the fly
+			return (this->generateStatusPage(404)); // custom 404 page not found (HA!), generate one on the fly
 		this->file = fopen(requestedFile.data(), "r");
 		this->status = 404;
 	}
@@ -162,6 +202,6 @@ ft::ResponseStatus ft::Response::send(int32_t socket)
 ft::Response ft::Response::getError(uint32_t code)
 {
 	ft::Response outResponse(code);
-	outResponse.parseError(code);
+	outResponse.generateStatusPage(code);
 	return (outResponse);
 }
