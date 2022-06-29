@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/25 19:34:04 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/29 14:27:14 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/06/29 21:16:08 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -172,7 +172,9 @@ const std::map<uint16_t, std::string>& ft::getStatusCodes()
 	return (list);
 }
 
-const std::string& getContentType(const std::string& ext)
+//what the actual fuck
+FT_BEGIN
+std::string& getContentType(std::string ext)
 {
 	static std::map<std::string, std::string> list = {
 		{"html",	"text/html"},
@@ -240,5 +242,6 @@ const std::string& getContentType(const std::string& ext)
 		return (list["html"]); // Default
 	return ((*reslt).second);
 }
+FT_END
 
 //////////////////////////////////////////
