@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/02 12:34:20 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/17 06:58:33 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/06/18 16:13:54 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,6 +86,7 @@ void ft::Server::pollInEvent(pollfd* poll)
 	char buffer[30000] = {0};
 	this->timeout[poll->fd] = std::time(0);
 
+	//TODO: same thing we do in send with returning to poll after send
 	while ((bytesrec = ft::receive(poll->fd, buffer, 30000, 0)) > 0)
 		req += buffer;
 
