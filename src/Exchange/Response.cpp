@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:34:00 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/29 21:15:20 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/06/29 21:24:01 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,6 +84,11 @@ bool ft::Response::applyConfig()
 	// check if method is accepted for request
 
 	// check if access is allowed
+	if (this->config.keyExists("access") && *this->config.getValue("access") == "no")
+	{
+		this->generateStatusPage(403);
+		return (true);
+	}
 
 	// check if redirection is set
 	std::list<std::string> redirInfo;
