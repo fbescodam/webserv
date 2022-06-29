@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 11:51:45 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/17 03:41:39 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/06/29 21:30:19 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,16 +42,15 @@ static std::vector<std::string> get_envp(const ft::Request& request, const std::
 	std::vector<std::string> envp = {
 		"GATEWAY_INTERFACE=CGI/1.1", 
 		"SERVER_PROTOCOL=HTTP/1.1",
-		ft::format("REMOTE_ADDR=%d", -1),
+		ft::format("REMOTE_ADDR=%d", -1), // TODO
 		ft::format("REQUEST_METHOD=%s", methods.find(request.method)), // 
 		ft::format("SCRIPT_NAME=%s", path.c_str()),
-		ft::format("SERVER_NAME=%s", "TODO: Fill in!"),
-		ft::format("SERVER_PORT=%s", "TODO: Fill in!"),
-		ft::format("SERVER_PORT=%s", "TODO: Fill in!"),
-		ft::format("QUERY_STRING=%s", "TODO: Fill in!"),
+		ft::format("SERVER_NAME=%s", *request.getValue("server_names")), // TODO: only get one server name (the first one)
+		ft::format("SERVER_PORT=%s", *request.getValue("listen")),
+		ft::format("QUERY_STRING=%s", "TODO: Fill in!"), // TODO: parse query string from the path (split on ? and it's the part after the ?)
 
 		// Do we need this ?
-		ft::format("CONTENT_LENGTH=%s", "TODO: Fill in!"),
+		ft::format("CONTENT_LENGTH=%s", "TODO: Fill in!"), // TODO: this is the length of the BODY in the REQUEST (NOT the response)
 	};
 
 	return (envp);
