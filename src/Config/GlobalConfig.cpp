@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 14:59:11 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/27 21:15:19 by fbes          ########   odam.nl         */
+/*   Updated: 2022/06/29 14:01:30 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,8 @@ static bool isSectionDef(const std::string& line)
 
 static bool isSubSectionDef(const std::string& sectionName)
 {
-	return (sectionName[0] == '.');
+	// TODO: The inner part of the section string is not trimmed!
+	return (sectionName.find_first_of('.') != std::string::npos);
 }
 
 static bool isValidSectionDef(const std::string& line)
@@ -103,14 +104,17 @@ void ft::GlobalConfig::readFile(const std::string& filePath)
 	{
 		ft::trim(line); // trim the whole line (remove whitespace at beginning and end)
 		if (isComment(line) || line.length() == 0) // skip comments and empty lines
+		{
+			lineNum++;
 			continue;
+		}
 
 		if (isSectionDef(line))
 		{
 			std::string sectionName;
 			std::string appliesToPath;
 
-			if (isSubSectionDef(sectionName)) { // is subsection (.location)
+			if (isSubSectionDef(line)) { // is subsection (.location)
 				getSubSectionName(lineNum, line, sectionName, appliesToPath);
 				if (currentSection->getName() == "global")
 					throw ft::InvalidSubSectionPosition();
@@ -129,6 +133,7 @@ void ft::GlobalConfig::readFile(const std::string& filePath)
 				this->serverSections.push_back(server); // add new server to list of servers in globalconfig
 				currentSection = &this->serverSections.back(); // change current section to the newly generated server
 			}
+			lineNum++;
 			continue; // continue with next line
 		}
 
