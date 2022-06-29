@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:13:27 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/17 09:14:43 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/06/29 19:53:51 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,6 +70,8 @@ private:
 	// Writes the ending of a header.
 	void writeEnd(void);
 
+	void applyConfig(void);
+
 	//open requested file and send it to the socket, should be last
 	void parseGet(void);
 	void parsePost(void);
@@ -86,6 +88,8 @@ public: // Attributes
 
 	// Configuration applied to this response
 	ft::Section config;
+
+	std::vector<ft::Section> locations;
 
 	//file fd
 	FILE *file;

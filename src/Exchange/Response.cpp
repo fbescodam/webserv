@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:34:00 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/17 09:26:42 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/06/29 19:56:49 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,11 +32,14 @@ ft::Response::Response(ft::Request reqIn, ft::ServerSection *configIn)
 
 	this->req = reqIn;
 	this->config = ft::Section(ft::basedir(reqIn.path), "response", *configIn);
+	this->locations = configIn->locations;
 	this->sentHeader = false;
 	this->fileOffset = 0;
 	this->file = 0;
 	this->fileFd = -1;
 
+	this->applyConfig();
+	
 	if (this->req.keyExists("Connection") && *this->req.getValue("Connection") == "keep-alive")
 	{
 		this->fields["Connection"] = "keep-alive";
@@ -44,6 +47,7 @@ ft::Response::Response(ft::Request reqIn, ft::ServerSection *configIn)
 	}
 	else
 		this->fields["Connection"] = "close";
+
 
 	switch(this->req.method)
 	{
@@ -59,6 +63,14 @@ ft::Response::Response(ft::Request reqIn, ft::ServerSection *configIn)
 }
 
 //////////////////////////////////////////
+
+void ft::Response::applyConfig()
+{
+	for (const auto &val: this->locations)
+	{
+		std::cout << val.getName() << std::endl;
+	}
+}
 
 void ft::Response::parseError(int code)
 {
