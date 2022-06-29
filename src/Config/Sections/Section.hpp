@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 13:54:52 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/27 21:12:16 by fbes          ########   odam.nl         */
+/*   Updated: 2022/06/29 19:20:09 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,10 +113,11 @@ public: // Functions
 	/**
 	 * @brief checks if a value is acceptable for the use with a certain key. Throws an error if something's wrong.
 	 *
+	 * @param lineNum the line number in the config file where the field is defined
 	 * @param key a key
 	 * @param value a value
 	 */
-	void verifyKeyValue(std::string& key, std::string& value) const;
+	void verifyKeyValue(uint32_t lineNum, std::string& key, std::string& value) const;
 
 	/**
 	 * @brief get the current working directory for this section

@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 15:39:35 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/27 21:28:23 by fbes          ########   odam.nl         */
+/*   Updated: 2022/06/29 19:19:26 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,7 +129,7 @@ const std::string& ft::Section::getcwd() const
 }
 
 // TODO: change to map with string keys and function pointer values instead of this ugly switch case
-void ft::Section::verifyKeyValue(std::string& key, std::string& value) const
+void ft::Section::verifyKeyValue(uint32_t lineNum, std::string& key, std::string& value) const
 {
 	// all possible keys
 	const std::string possibleKeys[] = {
@@ -156,7 +156,7 @@ void ft::Section::verifyKeyValue(std::string& key, std::string& value) const
 	}
 
 	if (index == -1)
-		throw ft::UnknownFieldKeyException();
+		throw ft::UnknownFieldKeyException(lineNum);
 
 	long bignum;
 	switch (index)
@@ -165,14 +165,14 @@ void ft::Section::verifyKeyValue(std::string& key, std::string& value) const
 		case 0: // limit_body_size
 			bignum = std::stol(value);
 			if (bignum <= 0 || bignum > INT32_MAX)
-				throw ft::InvalidFieldValueException();
+				throw ft::InvalidFieldValueException(lineNum);
 			break;
 
 		// expecting integer in range > 0 < UINT16_MAX
 		case 1: // listen
 			bignum = std::stol(value);
 			if (bignum <= 0 || bignum > UINT16_MAX)
-				throw ft::InvalidFieldValueException();
+				throw ft::InvalidFieldValueException(lineNum);
 			break;
 
 		// expecting a non-empty string
@@ -182,24 +182,24 @@ void ft::Section::verifyKeyValue(std::string& key, std::string& value) const
 		case 7: // methods
 		case 8: // path
 			if (value.size() == 0)
-				throw ft::InvalidFieldValueException();
+				throw ft::InvalidFieldValueException(lineNum);
 			break;
 
 		// expecting a boolean in the form of "yes" or "no"
 		case 4: // access
 		case 5: // dir_listing
 			if (value != "yes" && value != "no")
-				throw ft::InvalidFieldValueException();
+				throw ft::InvalidFieldValueException(lineNum);
 			break;
 
 		// expecting two strings, of which 1st is either "temp" or "perm" or a number (status code) and 2nd is a path
 		case 9: // redir
 			size_t space = value.find(' ');
 			if (space == std::string::npos)
-				throw ft::InvalidFieldValueException();
+				throw ft::InvalidFieldValueException(lineNum);
 			int statusCode = std::stoi(value.substr(0, space));
 			if (statusCode != 301 && statusCode != 302 && statusCode != 307 && statusCode != 308)
-				throw ft::InvalidFieldValueException();
+				throw ft::InvalidFieldValueException(lineNum);
 			break;
 	}
 }

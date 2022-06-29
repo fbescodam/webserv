@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 14:59:11 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/27 21:27:19 by fbes          ########   odam.nl         */
+/*   Updated: 2022/06/29 19:19:04 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -115,9 +115,9 @@ void ft::GlobalConfig::readFile(const std::string& filePath)
 			if (isSubSectionDef(line)) { // is subsection (.location)
 				getSubSectionName(lineNum, line, sectionName, appliesToPath);
 				if (currentSection->getName() == "global")
-					throw ft::InvalidSubSectionPosition();
+					throw ft::InvalidSubSectionPosition(lineNum);
 				if (sectionName != ".location") // only handle .location as subsection
-					throw ft::UnknownSectionTypeException();
+					throw ft::UnknownSectionTypeException(lineNum);
 				ft::ServerSection& currentServerSection = this->serverSections.back();
 				ft::Section location(*currentServerSection.getValue("path"), sectionName, appliesToPath); // create new location subsection
 				currentServerSection.locations.push_back(location); // add subsection to server
@@ -126,7 +126,7 @@ void ft::GlobalConfig::readFile(const std::string& filePath)
 			else { // is main section (server)
 				getSectionName(lineNum, line, sectionName);
 				if (sectionName != "server")
-					throw ft::UnknownSectionTypeException();
+					throw ft::UnknownSectionTypeException(lineNum);
 				ft::ServerSection server(this->globalSection.getcwd(), sectionName, this->globalSection);
 				this->serverSections.push_back(server); // add new server to list of servers in globalconfig
 				currentSection = &this->serverSections.back(); // change current section to the newly generated server
@@ -137,7 +137,7 @@ void ft::GlobalConfig::readFile(const std::string& filePath)
 		ft::slice(line, '=', output);
 		ft::trim(output.first);
 		ft::trim(output.second);
-		currentSection->verifyKeyValue(output.first, output.second);
+		currentSection->verifyKeyValue(lineNum, output.first, output.second);
 		currentSection->setValue(output.first, output.second);
 	}
 
