@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 13:54:52 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/29 19:20:09 by fbes          ########   odam.nl         */
+/*   Updated: 2022/06/29 20:11:30 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,6 +118,9 @@ public: // Functions
 	 * @param value a value
 	 */
 	void verifyKeyValue(uint32_t lineNum, std::string& key, std::string& value) const;
+
+	std::map<std::string, std::string> exportFields(void) const;
+	void importFields(std::map<std::string, std::string> fields);
 
 	/**
 	 * @brief get the current working directory for this section

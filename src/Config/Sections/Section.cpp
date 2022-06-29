@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 15:39:35 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/29 19:19:26 by fbes          ########   odam.nl         */
+/*   Updated: 2022/06/29 20:16:24 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,17 @@ ft::Section::Section(const std::string& cwd, const std::string& name, ft::Sectio
 }
 
 //////////////////////////////////////////
+
+std::map<std::string, std::string> ft::Section::exportFields(void) const
+{
+	return (this->fields);
+}
+
+void ft::Section::importFields(std::map<std::string, std::string> fields)
+{
+	for (const auto &vals: fields)
+		this->fields[vals.first] = vals.second;
+}
 
 bool ft::Section::keyExists(const std::string& key) const
 {

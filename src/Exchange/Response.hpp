@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:13:27 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/29 19:53:51 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/06/29 20:48:57 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,13 +70,13 @@ private:
 	// Writes the ending of a header.
 	void writeEnd(void);
 
-	void applyConfig(void);
+	bool applyConfig(void);
 
 	//open requested file and send it to the socket, should be last
 	void parseGet(void);
 	void parsePost(void);
 	void parseDelete(void);
-	void parseError(int code);
+	void generateStatusPage(int code);
 
 public: // Attributes
 
