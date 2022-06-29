@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 17:40:38 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/27 21:07:39 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/06/29 19:45:33 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -132,7 +132,7 @@ const std::map<uint16_t, std::string>& getStatusCodes();
  * 
  * @param ext The file extension, without the period.
  */
-const std::map<std::string, std::string>& getContentType(const std::string& ext);
+const std::string& getContentType(const std::string& ext);
 
 FT_END
 #endif
