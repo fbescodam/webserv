@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 14:59:11 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/29 19:19:04 by fbes          ########   odam.nl         */
+/*   Updated: 2022/06/29 19:21:37 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,7 +105,10 @@ void ft::GlobalConfig::readFile(const std::string& filePath)
 		lineNum++;
 		ft::trim(line); // trim the whole line (remove whitespace at beginning and end)
 		if (isComment(line) || line.length() == 0) // skip comments and empty lines
+		{
+			lineNum++;
 			continue;
+		}
 
 		if (isSectionDef(line))
 		{
@@ -131,6 +134,7 @@ void ft::GlobalConfig::readFile(const std::string& filePath)
 				this->serverSections.push_back(server); // add new server to list of servers in globalconfig
 				currentSection = &this->serverSections.back(); // change current section to the newly generated server
 			}
+			lineNum++;
 			continue; // continue with next line
 		}
 
