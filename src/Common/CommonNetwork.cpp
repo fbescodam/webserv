@@ -6,11 +6,12 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/25 19:34:04 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/17 08:35:00 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/06/27 21:04:29 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "CommonNetwork.hpp"
+#include "Exceptions.hpp"
 
 //////////////////////////////////////////
 
@@ -166,6 +167,70 @@ const std::map<uint16_t, std::string>& ft::getStatusCodes()
 		{510, "Not Extended"},
 		{511, "Network Authentication Required"},
 		{599, "Network Connect Timeout Error"}
+	};
+
+	return (list);
+}
+
+const std::map<std::string, std::string>& getContentType(const std::string& ext)
+{
+	static std::map<std::string, std::string> list = {
+		{"html",	"text/html"},
+		{"htm",		"text/html"},
+		{"shtml",	"text/html"},
+		{"css",		"text/css"},
+		{"xml",		"text/xml"},
+		{"mml",		"text/mathml"},
+		{"txt",		"text/plain"},
+		{"jad",		"text/vnd.sun.j2me.app-descriptor"},
+		{"wml",		"text/vnd.wap.wml"},
+		{"htc",  	"text/x-component"},
+		
+		{"js",		"application/javascript"},
+		{"atom",	"application/atom+xml"},
+		{"rss",		"application/rss+xml"},
+		{"7z",		"application/x-7z-compressed"},
+
+		{"gif",		"image/gif"},
+		{"jpeg",	"image/jpeg"},
+		{"jpg",		"image/jpeg"},
+		{"avif",	"image/avif"},
+		{"png",		"image/png"},
+		{"svg",		"image/svg+xml"},
+		{"svgz",	"image/svg+xml"},
+		{"tif",		"image/tif"},
+		{"tiff",	"image/tiff"},
+		{"wbmp",	"image/wbmp"},
+		{"webp",	"image/webp"},
+		{"ico",		"image/ico"},
+		{"jng",		"image/jng"},
+		{"bmp",		"image/bmp"},
+		
+		{"json",	"application/json"},
+
+		{"mid",		"audio/midi"},
+		{"midi",	"audio/midi"},
+		{"kar",		"audio/midi"},
+		{"mp3",		"audio/mpeg"},
+		{"ogg",		"audio/ogg"},
+		{"m4a",		"audio/x-m4a"},
+		{"ra",		"audio/x-realaudio"},
+
+		{"mid",		"audio/midi"},
+		{"midi",	"audio/midi"},
+		{"kar",		"audio/midi"},
+		{"mp3",		"audio/mpeg"},
+		{"ogg",		"audio/ogg"},
+		{"m4a",		"audio/x-m4a"},
+		{"ra",		"audio/x-realaudio"},
+
+		{"3gpp",	"video/3gpp"},
+		{"3gp",		"video/3gpp"},
+		{"mp4",		"video/mp4"},
+		{"mpeg",	"video/mpeg"},
+		{"mpg",		"video/mpeg"},
+		{"mov",		"video/mov"},
+		{"m4a",		"video/webm"},
 	};
 
 	return (list);

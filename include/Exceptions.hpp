@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 18:05:00 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/17 08:35:01 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/06/29 19:17:53 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,26 @@ struct GenericErrnoException : public std::exception
 	}
 };
 
+////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Exception used for config parsing, lets you define a prefix error and a line number.
+ */
+struct ConfigException : public std::exception
+{
+
+public:
+	ConfigException() = default;
+
+public:
+	const char* what() const throw() override {
+		return (err.c_str());
+	}
+
+protected:
+	std::string err;
+};
+
 struct DelimiterNotFoundException : public std::exception
 {
 	const char* what() const throw() override {
@@ -34,45 +54,43 @@ struct DelimiterNotFoundException : public std::exception
 	}
 };
 
-struct ConfigParserSyntaxException : public std::exception
+struct ConfigParserSyntaxException : public ft::ConfigException
 {
-	const char* what() const throw() override {
-		return ("Syntax error in config");
+public:
+	ConfigParserSyntaxException(int32_t on) {
+		this->err = ft::format("Syntax error on line %d of your configuration file", on);
 	}
 };
 
-struct UnknownSectionTypeException : public std::exception
+struct UnknownSectionTypeException : public ft::ConfigException
 {
-	const char* what() const throw() override {
-		return ("Unknown (sub)section type in config");
+public:
+	UnknownSectionTypeException(int32_t on) {
+		this->err = ft::format("Unknown (sub)section type on line %d of your configuration file", on);
 	}
 };
 
-struct InvalidSubSectionPosition : public std::exception
+struct InvalidSubSectionPosition : public ft::ConfigException
 {
-	const char* what() const throw() override {
-		return ("Subsection is defined at an invalid position in config");
+public:
+	InvalidSubSectionPosition(int32_t on) {
+		this->err = ft::format("Invalid position for subsection definition on line %d of your configuration file", on);
 	}
 };
 
-struct UnknownFieldKeyException : public std::exception
+struct UnknownFieldKeyException : public ft::ConfigException
 {
-	const char* what() const throw() override {
-		return ("Unknown field key in config");
+public:
+	UnknownFieldKeyException(int32_t on) {
+		this->err = ft::format("Unknown field key on line %d of your configuration file", on);
 	}
 };
 
-struct InvalidFieldValueException : public std::exception
+struct InvalidFieldValueException : public ft::ConfigException
 {
-	const char* what() const throw() override {
-		return ("Invalid field value in config");
-	}
-};
-
-struct NoServersException : public std::exception
-{
-	const char* what() const throw() override {
-		return ("No servers defined in config");
+public:
+	InvalidFieldValueException(int32_t on) {
+		this->err = ft::format("Invalid field value on line %d of your configuration file", on);
 	}
 };
 
@@ -87,6 +105,13 @@ struct InvalidCharException : public std::exception
 {
 	const char* what() const throw() override {
 		return ("Non-ascii character found");
+	}
+};
+
+struct NoServersException : public std::exception
+{
+	const char* what() const throw() override {
+		return ("No servers defined in config");
 	}
 };
 

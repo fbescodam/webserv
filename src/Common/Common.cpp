@@ -6,11 +6,12 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/25 19:34:04 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/17 09:25:39 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/06/27 21:08:05 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Common.hpp"
+#include "Exceptions.hpp"
 
 //////////////////////////////////////////
 
