@@ -32,3 +32,4 @@
 *.app
 webserv
 .vscode/*.log
+.DS_Store
