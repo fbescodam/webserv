@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:34:00 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/29 21:24:01 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/06/30 15:06:07 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@ ft::Response::Response(ft::Request reqIn, ft::ServerSection *configIn)
 
 	this->req = reqIn;
 	this->config = ft::Section(ft::basedir(reqIn.path), "response", *configIn);
+	this->rootPath = *configIn->getValue("path");
 	this->locations = configIn->locations;
 	this->sentHeader = false;
 	this->fileOffset = 0;
@@ -75,7 +76,6 @@ bool ft::Response::applyConfig()
 
 	for (const auto &val: this->locations)
 	{
-		std::cout << val.appliesForPath(this->req.path) << std::endl;
 		if (val.appliesForPath(this->req.path))
 			this->config.importFields(val.exportFields());
 	}
@@ -86,7 +86,8 @@ bool ft::Response::applyConfig()
 	// check if access is allowed
 	if (this->config.keyExists("access") && *this->config.getValue("access") == "no")
 	{
-		this->generateStatusPage(403);
+		if (!this->getCustomStatusPage(403))
+			this->writeFileFields();
 		return (true);
 	}
 
@@ -122,34 +123,47 @@ void ft::Response::generateStatusPage(int code)
 	this->data += content;
 }
 
-void ft::Response::parseGet(void)
+bool ft::Response::getCustomStatusPage(int code)
 {
-	std::string requestedFile = *this->config.getValue("path") + this->req.path;
-	// std::cout << requestedFile << std::endl;
-	if (ft::filesystem::fileExists(requestedFile))
-	{
-		this->file = fopen(requestedFile.data(), "r");
-		this->status = 200;
-	}
-	else
-	{
-		if (!this->config.keyExists("error_404"))
-			return (this->generateStatusPage(404)); // no custom 404 page found, generate one on the fly
-		requestedFile = *this->config.getValue("path") + *this->config.getValue("error_404");
-		if (!ft::filesystem::fileExists(requestedFile))
-			return (this->generateStatusPage(404)); // custom 404 page not found (HA!), generate one on the fly
-		this->file = fopen(requestedFile.data(), "r");
-		this->status = 404;
-	}
+	std::string errorPage = "error_" + std::to_string(code);
+
+	if (!this->config.keyExists(errorPage))
+		return (this->generateStatusPage(code), true); // no custom error page found, generate one on the fly
+	this->filePath = this->rootPath + *this->config.getValue(errorPage);
+	if (!ft::filesystem::fileExists(this->filePath))
+		return (this->generateStatusPage(code), true); // custom error page not found (HA!), generate one on the fly
+	this->file = fopen(this->filePath.data(), "r");
+	this->status = code;
+	return (false);
+}
+
+void ft::Response::writeFileFields(void)
+{
 	this->fileFd = fileno(this->file);
 	this->fileSize = ft::filesystem::getFileSize(this->file);
 
 	this->writeHeader();
 	this->fields["Content-Length"] = std::to_string(this->fileSize);
-	this->fields["Content-Type"] = ft::getContentType(requestedFile);
+	this->fields["Content-Type"] = ft::getContentType(this->filePath);
 	this->writeFields();
 	this->writeEnd();
+}
 
+void ft::Response::parseGet(void)
+{
+	this->filePath = *this->config.getValue("path") + this->req.path;
+	// std::cout << requestedFile << std::endl;
+	if (ft::filesystem::fileExists(this->filePath))
+	{
+		this->file = fopen(this->filePath.data(), "r");
+		this->status = 200;
+	}
+	else
+	{
+		if (this->getCustomStatusPage(404))
+			return ;
+	}
+	this->writeFileFields();
 }
 
 void ft::Response::parsePost(void)

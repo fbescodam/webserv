@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:13:27 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/29 21:05:24 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/06/30 15:04:47 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,13 +71,21 @@ private:
 	// Writes the ending of a header.
 	void writeEnd(void);
 
+	// Loops through all locations and applies relevant config
 	bool applyConfig(void);
 
 	//open requested file and send it to the socket, should be last
 	void parseGet(void);
 	void parsePost(void);
 	void parseDelete(void);
+
+	// generate status page on the file
 	void generateStatusPage(int code);
+
+	// look for config defined custom status page, otherwise call generateStatusPage. returns true if no error page was found
+	bool getCustomStatusPage(int code);
+
+	void writeFileFields(void);
 
 public: // Attributes
 
@@ -97,6 +105,8 @@ public: // Attributes
 	int32_t fileFd;
 	int32_t fileSize;
 	off_t fileOffset;
+	std::string filePath;
+	std::string rootPath;
 	bool sentHeader;
 };
 

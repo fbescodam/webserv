@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 15:39:35 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/29 20:16:24 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/06/30 14:30:29 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -153,7 +153,8 @@ void ft::Section::verifyKeyValue(uint32_t lineNum, std::string& key, std::string
 		"error_404", // TODO: add more custom error pages
 		"methods",
 		"path",
-		"redir"
+		"redir",
+		"error_403"
 	};
 
 	int8_t index = -1;
@@ -191,6 +192,7 @@ void ft::Section::verifyKeyValue(uint32_t lineNum, std::string& key, std::string
 		case 3: // index
 		case 6: // error_404
 		case 7: // methods
+		case 10: //error_403
 		case 8: // path
 			if (value.size() == 0)
 				throw ft::InvalidFieldValueException(lineNum);
