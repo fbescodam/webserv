@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 14:59:11 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/29 19:21:37 by fbes          ########   odam.nl         */
+/*   Updated: 2022/06/30 14:55:22 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,12 +42,21 @@ static void initParsedSection(std::string& sectionDef)
 	ft::trim(sectionDef); // remove whitespace around the leftover string
 }
 
-static bool isValidSectionNameSyntax(const uint32_t lineNum, const std::string& name)
+static bool isValidSectionNameSyntax(const std::string& name)
 {
-	if (name.find(' ') != std::string::npos) // do not allow strings in section names (after trimming)
-		throw ft::ConfigParserSyntaxException(lineNum);
-	if (name.find('.', 1) != std::string::npos) // do not allow dots in section names (except for first character)
-		throw ft::ConfigParserSyntaxException(lineNum);
+	if (name.find(' ') != std::string::npos) // no spaces in section names (after trimming)
+		return (false);
+	if (name.find('.', 1) != std::string::npos) // no dots in section names (except for first character, which defines a subsection)
+		return (false);
+	return (true);
+}
+
+static bool isValidSectionPath(const std::string& path)
+{
+	if (path.front() != '/') // path has to start with a slash (which is the root of the server)
+		return (false);
+	if (path.length() == 1) // path cannot just be a slash
+		return (false);
 	return (true);
 }
 
@@ -58,9 +67,9 @@ static void getSectionName(const uint32_t lineNum, const std::string& line, std:
 	if (!isValidSectionDef(temp))
 		throw ft::ConfigParserSyntaxException(lineNum);
 	initParsedSection(temp);
-	if (!isValidSectionNameSyntax(lineNum, temp))
-		throw ft::ConfigParserSyntaxException(lineNum);
 	name = temp; // copy over to output
+	if (!isValidSectionNameSyntax(name))
+		throw ft::ConfigParserSyntaxException(lineNum);
 }
 
 static void getSubSectionName(const uint32_t lineNum, const std::string& line, std::string& name, std::string& path)
@@ -75,17 +84,19 @@ static void getSubSectionName(const uint32_t lineNum, const std::string& line, s
 	std::string word;
 	uint8_t count = 0;
 
-	while (count < 4 && stream >> word)
+	while (count < 4 && stream >> word) // loop over max 4 words, which is already a syntax error
 	{
 		if (count == 0)
 			name = word;
 		count++;
 	}
-	if (!isValidSectionNameSyntax(lineNum, name))
-		throw ft::ConfigParserSyntaxException(lineNum);
 	if (count != 2) // only allow the definition of the subsection (.location) and the path it is defined for (without any whitespace)
 		throw ft::ConfigParserSyntaxException(lineNum);
-	path = word; // copy the last word over as the subsection path, will not get here if it throws
+	if (!isValidSectionNameSyntax(name))
+		throw ft::ConfigParserSyntaxException(lineNum);
+	path = word; // copy the last word over as the subsection path
+	if (!isValidSectionPath(path))
+		throw ft::ConfigParserSyntaxException(lineNum);
 }
 
 //////////////////////////////////////////
@@ -105,10 +116,7 @@ void ft::GlobalConfig::readFile(const std::string& filePath)
 		lineNum++;
 		ft::trim(line); // trim the whole line (remove whitespace at beginning and end)
 		if (isComment(line) || line.length() == 0) // skip comments and empty lines
-		{
-			lineNum++;
 			continue;
-		}
 
 		if (isSectionDef(line))
 		{
@@ -134,7 +142,6 @@ void ft::GlobalConfig::readFile(const std::string& filePath)
 				this->serverSections.push_back(server); // add new server to list of servers in globalconfig
 				currentSection = &this->serverSections.back(); // change current section to the newly generated server
 			}
-			lineNum++;
 			continue; // continue with next line
 		}
 
