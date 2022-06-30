@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/25 19:34:04 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/29 21:16:08 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/06/30 15:30:55 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,11 +73,6 @@ ssize_t ft::send(int32_t socket, const void* buffer, size_t length, int32_t flag
 ssize_t ft::receive(int32_t socket, void* buffer, size_t length, int32_t flags)
 {
 	ssize_t Value = ::recv(socket, buffer, length, flags);
-	if (errno == EAGAIN)
-	{
-		errno = 0;
-		return (-1);
-	}
 	if (Value == -1)
 		throw ft::GenericErrnoException();
 	return (Value);

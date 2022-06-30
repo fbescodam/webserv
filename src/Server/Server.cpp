@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/02 12:34:20 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/18 16:13:54 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/06/30 15:41:31 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,39 +79,31 @@ void ft::Server::pollListen()
 	this->numFds++;
 }
 
+#define BUFF_SIZE 4096
 void ft::Server::pollInEvent(pollfd* poll)
 {
 	ssize_t bytesrec;
-	std::string req;
-	char buffer[30000] = {0};
+	char buffer[BUFF_SIZE] = {0};
 	this->timeout[poll->fd] = std::time(0);
-
-	//TODO: same thing we do in send with returning to poll after send
-	while ((bytesrec = ft::receive(poll->fd, buffer, 30000, 0)) > 0)
-		req += buffer;
-
-	if (bytesrec == 0)
+	
+	bytesrec = ft::receive(poll->fd, buffer, BUFF_SIZE, 0);	//TODO: try catch return 400 bad req
+	
+	this->req_buf[poll->fd] += buffer;
+	if (bytesrec == BUFF_SIZE) //we assume there is more data waiting
+		return ; //TODO: 100 continue?
+	try
 	{
-		std::cout << "Connection closed-in" << std::endl;
-		this->timeout.erase(poll->fd);
-		close(poll->fd); // End of Exchange
-		poll->fd = -1;
+		ft::Request temp(this->req_buf[poll->fd]);
+		this->responses[poll->fd] = new ft::Response(temp, &(this->config));
+		this->req_buf.erase(poll->fd);
+		// this->requests[poll->fd]->display();
 	}
-	else
+	catch(const ft::InvalidCharException& e) // TODO: Implement this error for bad input
 	{
-		try
-		{
-			ft::Request temp(req);
-			this->responses[poll->fd] = new ft::Response(temp, &(this->config));
-			// this->requests[poll->fd]->display();
-		}
-		catch(const ft::InvalidCharException& e) // TODO: Implement this error for bad input
-		{
-			this->responses[poll->fd] = nullptr;
-			std::cout << e.what() << std::endl;
-		}
-		poll->events = POLLOUT;
+		this->responses[poll->fd] = nullptr;
+		std::cout << e.what() << std::endl;
 	}
+	poll->events = POLLOUT;
 }
 
 void ft::Server::resolveConnection(pollfd *poll)
@@ -151,6 +143,7 @@ void ft::Server::pollOutEvent(pollfd* poll)
 	}
 }
 
+//TODO: 408 request timeout
 void ft::Server::cleanSocket(pollfd *poll)
 {
 	std::cout << "Connection closed-clean" << std::endl;
