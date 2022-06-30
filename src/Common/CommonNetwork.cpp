@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/25 19:34:04 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/30 15:30:55 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/06/30 15:43:26 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,6 +85,17 @@ int32_t ft::setSocketOption(int32_t socket, int32_t level, int32_t optionName, b
 	if (Value == -1)
 		throw ft::GenericErrnoException();
 	return (Value);
+}
+
+std::string ft::inet_ntop(SocketAddress& address) 
+{
+	// 4 bytes, IPV4
+	static char buf[sizeof(int32_t) * 4];
+	sockaddr_in temp = address.getCStyle();
+
+	if (::inet_ntop(AF_INET, &temp, buf, sizeof(buf)) == nullptr)
+		return "";
+	return std::string(buf);
 }
 
 const std::map<uint16_t, std::string>& ft::getStatusCodes()
@@ -167,9 +178,7 @@ const std::map<uint16_t, std::string>& ft::getStatusCodes()
 	return (list);
 }
 
-//what the actual fuck
-FT_BEGIN
-std::string& getContentType(std::string ext)
+std::string& ft::getContentType(std::string ext)
 {
 	static std::map<std::string, std::string> list = {
 		{"html",	"text/html"},
@@ -237,6 +246,5 @@ std::string& getContentType(std::string ext)
 		return (list["html"]); // Default
 	return ((*reslt).second);
 }
-FT_END
 
 //////////////////////////////////////////

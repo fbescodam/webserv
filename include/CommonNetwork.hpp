@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 17:40:38 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/29 21:17:58 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/06/30 15:07:57 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,6 +116,9 @@ ssize_t receive(int32_t socket, void* buffer, size_t length, int32_t flags);
 
 // Manipulate the options associated with a socket.
 int32_t setSocketOption(int32_t socket, int32_t level, int32_t optionName, bool optionValue, size_t optionLen);
+
+// Inet_ntop
+std::string inet_ntop(SocketAddress& address);
 
 // HTTP Status codes
 //////////////////////////////////////////
