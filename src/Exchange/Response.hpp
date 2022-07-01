@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:13:27 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/30 15:04:47 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/01 14:59:23 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@
 FT_BEGIN
 
 enum ResponseStatus {DONE, NOT_DONE};
+static const char *enumStrings[] = {"GET", "POST", "DELETE", "ERR"};
 
 /**
  * A Response is from the outgoing server.
@@ -70,6 +71,9 @@ private:
 
 	// Writes the ending of a header.
 	void writeEnd(void);
+
+	//verify if method is allowed
+	bool checkMethods(std::list<std::string> methodList);
 
 	// Loops through all locations and applies relevant config
 	bool applyConfig(void);
