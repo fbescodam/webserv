@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:13:27 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/01 14:59:23 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/01 15:38:25 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ class Response final : public Exchange
 {
 public: // Ctor ~ Dtor
 	Response() = default;
-	Response(uint32_t inStatus) {status = inStatus;}
+	Response(uint32_t inStatus) {status = inStatus; this->file = 0; this->fileFd = -1;}
 	Response(ft::Request req, ft::ServerSection *configIn);
 	
 	~Response();
@@ -85,6 +85,9 @@ private:
 
 	// generate status page on the file
 	void generateStatusPage(int code);
+	// generate status page with custom content
+	void generateStatusPage(int code, std::string content);
+
 
 	// look for config defined custom status page, otherwise call generateStatusPage. returns true if no error page was found
 	bool getCustomStatusPage(int code);
