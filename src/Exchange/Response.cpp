@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:34:00 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/30 15:06:07 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/01 15:39:39 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,6 @@
 
 ft::Response::~Response()
 {
-	std::cout << this->file << std::endl;
 	if (this->file)
 		fclose(this->file);
 	if (this->fileFd > -1)
@@ -38,6 +37,7 @@ ft::Response::Response(ft::Request reqIn, ft::ServerSection *configIn)
 
 
 
+	//TODO: date in response?
 	if (this->req.keyExists("Connection") && *this->req.getValue("Connection") == "keep-alive")
 	{
 		this->fields["Connection"] = "keep-alive";
@@ -58,11 +58,28 @@ ft::Response::Response(ft::Request reqIn, ft::ServerSection *configIn)
 		case (ft::Method::DELETE):
 			this->parseDelete(); break;
 		default:
-			this->generateStatusPage(405);
+			this->generateStatusPage(405); //this will never happen anymore, 405 is checked earlier in applyconfig
 	}
 }
 
 //////////////////////////////////////////
+
+bool ft::Response::checkMethods(std::list<std::string> methodList)
+{
+	bool methodAllowed = false;
+	for (const std::string &val: methodList)
+	{
+		if (val == ft::enumStrings[static_cast<int>(this->req.method)])
+			methodAllowed = true;
+	}
+	if (methodAllowed == false)
+	{
+		if (!this->getCustomStatusPage(405))
+			this->writeFileFields();
+		return (true);
+	}
+	return (false);
+}
 
 bool ft::Response::applyConfig()
 {
@@ -82,6 +99,17 @@ bool ft::Response::applyConfig()
 	this->config.print("fijwf   ");
 
 	// check if method is accepted for request
+	std::list<std::string> methodList;
+	if (this->config.getValueAsList("methods", methodList))
+	{
+		if (this->checkMethods(methodList))
+			return (true);
+	}
+	else
+	{
+		if (this->checkMethods({"GET"}))
+			return (true);
+	}
 
 	// check if access is allowed
 	if (this->config.keyExists("access") && *this->config.getValue("access") == "no")
@@ -123,6 +151,23 @@ void ft::Response::generateStatusPage(int code)
 	this->data += content;
 }
 
+void ft::Response::generateStatusPage(int code, std::string content)
+{
+	this->status = code;
+	const std::string& statusText = ft::getStatusCodes().at(code);
+
+	// Build header and fields
+	this->writeHeader();
+	this->fields["Content-Length"] = std::to_string(content.length());
+	this->fields["Content-Type"] = "text/html";
+	this->writeFields();
+	this->writeEnd();
+
+	// Build content
+	this->data += content;
+}
+
+//returns true on status page, dont write fields after
 bool ft::Response::getCustomStatusPage(int code)
 {
 	std::string errorPage = "error_" + std::to_string(code);
@@ -171,9 +216,18 @@ void ft::Response::parsePost(void)
 
 }
 
+//curl -X DELETE http://localhost:8080/delete/deletefile
 void ft::Response::parseDelete(void)
 {
+	this->filePath = *this->config.getValue("path") + this->req.path;
 
+	if (ft::filesystem::fileExists(this->filePath))
+	{
+		std::remove(this->filePath.c_str());
+		this->generateStatusPage(200, "<!DOCTYPE html><html><body><h1>File deleted.</h1></body></html>");
+	}
+	else
+		this->generateStatusPage(204);
 }
 
 ////

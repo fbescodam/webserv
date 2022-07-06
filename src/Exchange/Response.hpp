@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:13:27 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/30 15:04:47 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/01 15:38:25 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@
 FT_BEGIN
 
 enum ResponseStatus {DONE, NOT_DONE};
+static const char *enumStrings[] = {"GET", "POST", "DELETE", "ERR"};
 
 /**
  * A Response is from the outgoing server.
@@ -37,7 +38,7 @@ class Response final : public Exchange
 {
 public: // Ctor ~ Dtor
 	Response() = default;
-	Response(uint32_t inStatus) {status = inStatus;}
+	Response(uint32_t inStatus) {status = inStatus; this->file = 0; this->fileFd = -1;}
 	Response(ft::Request req, ft::ServerSection *configIn);
 	
 	~Response();
@@ -71,6 +72,9 @@ private:
 	// Writes the ending of a header.
 	void writeEnd(void);
 
+	//verify if method is allowed
+	bool checkMethods(std::list<std::string> methodList);
+
 	// Loops through all locations and applies relevant config
 	bool applyConfig(void);
 
@@ -81,6 +85,9 @@ private:
 
 	// generate status page on the file
 	void generateStatusPage(int code);
+	// generate status page with custom content
+	void generateStatusPage(int code, std::string content);
+
 
 	// look for config defined custom status page, otherwise call generateStatusPage. returns true if no error page was found
 	bool getCustomStatusPage(int code);
