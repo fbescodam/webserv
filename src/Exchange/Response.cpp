@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:34:00 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/01 15:39:39 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/06 14:42:10 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,10 +22,6 @@ ft::Response::~Response()
 
 ft::Response::Response(ft::Request reqIn, ft::ServerSection *configIn)
 {
-	// TODO: This should properly construct a response based on the earlier received request
-	// data = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
-	// reqIn.display();
-
 	this->req = reqIn;
 	this->config = ft::Section(ft::basedir(reqIn.path), "response", *configIn);
 	this->rootPath = *configIn->getValue("path");
@@ -213,7 +209,8 @@ void ft::Response::parseGet(void)
 
 void ft::Response::parsePost(void)
 {
-
+	this->filePath = *this->config.getValue("path") + this->req.path;
+	
 }
 
 //curl -X DELETE http://localhost:8080/delete/deletefile
@@ -227,7 +224,7 @@ void ft::Response::parseDelete(void)
 		this->generateStatusPage(200, "<!DOCTYPE html><html><body><h1>File deleted.</h1></body></html>");
 	}
 	else
-		this->generateStatusPage(204);
+		this->generateStatusPage(404);
 }
 
 ////
