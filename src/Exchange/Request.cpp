@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:34:12 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/17 08:25:14 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/01 17:54:24 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,10 +15,14 @@
 //all valid header field characters
 // "!#$%&'*+-.^_`|~0123456789abdefghijklmnopqrstuvwxyzABCDEFGHJIKLMNOPQRSTUVWVXYZ";
 
+//TODO: this needs to be thrown out in its entirety almost
 ft::Request::Request(std::string buffer)
 {
 	std::string item;
-	std::istringstream iss(buffer);
+	std::vector<std::string> splitBuffer;
+	ft::split(buffer, "\n\n", splitBuffer);
+	std::istringstream iss(splitBuffer[0]);
+
 
 	std::getline(iss, item, ' ');
 	setMethod(item);
@@ -26,7 +30,7 @@ ft::Request::Request(std::string buffer)
 	std::getline(iss, this->version);
 
 	std::pair<std::string, std::string> output;
-	while (std::getline(iss, item)) // TODO: Make this better
+	while (std::getline(iss, item))
 	{
 		item.erase(remove_if(item.begin(), item.end(), [](char c){return !(c>=32);}), item.end());
 		if (!item.empty())
@@ -36,6 +40,8 @@ ft::Request::Request(std::string buffer)
 			fields[output.first] = output.second;
 		}
 	}
+
+	this->body = splitBuffer[1];
 }
 
 //////////////////////////////////////////

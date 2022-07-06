@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/25 19:34:04 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/27 21:08:05 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/07/01 17:52:21 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@
 	exit(code);
 }
 
-void ft::split(const std::string& string, char delim, std::vector<std::string>& output)
+void ft::split(const std::string& string, char *delim, std::vector<std::string>& output)
 {
 	output.clear();
 	output.reserve(std::count(string.begin(), string.end(), delim));

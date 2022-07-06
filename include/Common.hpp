@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 17:39:22 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/27 21:04:10 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/07/01 17:52:47 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,7 @@ FT_BEGIN
  * @param delim The delimiter.
  * @param output The output.
  */
-void split(const std::string& string, char Delim, std::vector<std::string>& output);
+void split(const std::string& string, char *Delim, std::vector<std::string>& output);
 
 /**
  * Slices a string into two parts at the first occurence of the delimiter.
