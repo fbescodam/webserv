@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 17:39:03 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/07 15:28:56 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/07 15:34:39 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,9 +64,13 @@ int32_t main(int32_t argc, const char* argv[])
 			try { (*it).run(); }
 			catch(const std::exception& e)
 			{
-				std::cerr << e.what() << std::endl;
-				servers.erase(it);
-				break;
+				try { (*it).run(); }
+				catch(const std::exception& e)
+				{
+					std::cerr << e.what() << std::endl;
+					servers.erase(it);
+					break;
+				}
 			}
 		}
 
