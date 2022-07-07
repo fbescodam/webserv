@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 18:05:00 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/29 19:17:53 by fbes          ########   odam.nl         */
+/*   Updated: 2022/07/07 14:12:22 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,6 +98,13 @@ struct EmptySectionException : public std::exception
 {
 	const char* what() const throw() override {
 		return ("Empty section found in config");
+	}
+};
+
+struct MissingFieldException : public std::exception
+{
+	const char* what() const throw() override {
+		return ("Missing required field in config (every server needs a path, server_names and listen field)");
 	}
 };
 
