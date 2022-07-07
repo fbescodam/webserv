@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 13:54:52 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/29 20:11:30 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/07 17:59:17 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,6 +89,13 @@ public: // Functions
 	 * @return the name
 	 */
 	const std::string& getName() const;
+
+	/**
+	 * @brief get the path this section applies to
+	 *
+	 * @return the applied path
+	 */
+	const std::string& getAppliedPath() const;
 
 	/**
 	 * @brief check if this section applies to the requested path

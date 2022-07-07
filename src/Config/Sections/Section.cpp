@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 15:39:35 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/30 14:30:29 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/07 18:34:08 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,6 +110,11 @@ void ft::Section::setValue(const std::string& key, const std::string& value)
 const std::string& ft::Section::getName() const
 {
 	return (this->name);
+}
+
+const std::string& ft::Section::getAppliedPath() const
+{
+	return (this->appliesToPath);
 }
 
 bool ft::Section::appliesForPath(const std::string& requestedPath) const

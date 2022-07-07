@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 13:54:52 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/27 21:07:25 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/07/07 18:30:30 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,8 +46,9 @@ private:
 	/**
 	 * Check if config is configured properly. Throws exception if not
 	 *
+	 * @param lineNum you probably want to use the last read line number from the config file
 	 */
-	void verifyConfig() const;
+	void verifyConfig(const uint32_t& lineNum) const;
 
 public: // Attributes
 

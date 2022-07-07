@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 18:05:00 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/07 15:16:22 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/07 18:26:30 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,6 +78,22 @@ public:
 	}
 };
 
+struct NoSubSectionLocation : public ft::ConfigException
+{
+public:
+	NoSubSectionLocation(int32_t on) {
+		this->err = ft::format("No path defined for a location on line %d of your configuration file", on);
+	}
+};
+
+struct DuplicateSubSectionLocation : public ft::ConfigException
+{
+public:
+	DuplicateSubSectionLocation(int32_t on) {
+		this->err = ft::format("Duplicate path for a location definition on line %d of your configuration file", on);
+	}
+};
+
 struct UnknownFieldKeyException : public ft::ConfigException
 {
 public:
@@ -94,17 +110,19 @@ public:
 	}
 };
 
-struct EmptySectionException : public std::exception
+struct EmptySectionException : public ft::ConfigException
 {
-	const char* what() const throw() override {
-		return ("Empty section found in config");
+public:
+	EmptySectionException(int32_t on) {
+		this->err = ft::format("Empty section found before line %d of your configuration file", on);
 	}
 };
 
-struct MissingFieldException : public std::exception
+struct MissingFieldException : public ft::ConfigException
 {
-	const char* what() const throw() override {
-		return ("Missing required field in config (every server needs a path, server_names and listen field)");
+public:
+	MissingFieldException(int32_t on) {
+		this->err = ft::format("Missing field found in config before line %d of your configuration file (every server needs a path, server_names and listen field)", on);
 	}
 };
 
