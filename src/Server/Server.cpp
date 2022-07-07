@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/02 12:34:20 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/07 15:25:17 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/07 16:15:28 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,7 +101,8 @@ void ft::Server::pollInEvent(pollfd* poll)
 	catch(const ft::BadRequest &e)
 	{
 		this->responses[poll->fd] = ft::Response::getErrorPointer(400);
-		// std::cout << e.what() << std::endl;
+		this->req_buf.erase(poll->fd);
+		std::cout << e.what() << std::endl;
 	}
 	poll->events = POLLOUT;
 }
@@ -118,7 +119,7 @@ void ft::Server::resolveConnection(pollfd *poll)
 		int temp = poll->fd;
 		close(poll->fd);
 		poll->fd = -1;
-		delete this->responses[poll->fd];
+		delete this->responses[temp];
 	}
 }
 
@@ -175,8 +176,10 @@ void ft::Server::run(void)
 			this->pollOutEvent(poll);
 
 		//connection timed out: 5 seconds
+		#ifdef NDEBUG 
 		if (i > 0 && this->checkTimeout(poll))
 			this->cleanSocket(poll);
+		#endif
 	}
 }
 

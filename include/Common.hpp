@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 17:39:22 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/01 17:52:47 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/07 15:57:40 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@
 # define NONE 0
 # define WRITE 1
 # define READ 0
-# define WHITESPACE " \t\n\t\f\v"
+# define WHITESPACE " \t\r\n\t\f\v"
 # define S_TIMEOUT 5
 # define MS_TIMEOUT S_TIMEOUT*1000
 

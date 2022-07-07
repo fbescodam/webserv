@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:34:00 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/07 15:25:07 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/07 16:09:10 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,7 +92,8 @@ bool ft::Response::applyConfig()
 		if (val.appliesForPath(this->req.path))
 			this->config.importFields(val.exportFields());
 	}
-	this->config.print("local server config:   ");
+	
+	// this->config.print("local server config:   ");
 
 	// check if method is accepted for request
 	std::list<std::string> methodList;
