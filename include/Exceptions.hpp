@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 18:05:00 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/07 14:12:22 by fbes          ########   odam.nl         */
+/*   Updated: 2022/07/07 15:16:22 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,10 +108,10 @@ struct MissingFieldException : public std::exception
 	}
 };
 
-struct InvalidCharException : public std::exception
+struct BadRequest : public std::exception
 {
 	const char* what() const throw() override {
-		return ("Non-ascii character found");
+		return ("Bad request");
 	}
 };
 

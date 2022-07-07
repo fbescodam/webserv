@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 17:39:03 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/07 14:47:20 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/07/07 15:28:56 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,16 +59,16 @@ int32_t main(int32_t argc, const char* argv[])
 
 	// Main loop
 	while (true)
-	for (auto it = servers.begin(); it != servers.end(); it)
-	{
-		try { (*it).run(); }
-		catch(const std::exception& e)
+		for (auto it = servers.begin(); it != servers.end(); it++)
 		{
-			std::cerr << e.what() << std::endl;
-			servers.erase(it);
-			break;
+			try { (*it).run(); }
+			catch(const std::exception& e)
+			{
+				std::cerr << e.what() << std::endl;
+				servers.erase(it);
+				break;
+			}
 		}
-	}
 
 	std::cout << "Webserv: Shutting down" << std::endl;
 	return (EXIT_SUCCESS);

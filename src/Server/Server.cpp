@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/02 12:34:20 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/01 15:19:51 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/07 15:25:17 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,7 +86,7 @@ void ft::Server::pollInEvent(pollfd* poll)
 	char buffer[BUFF_SIZE] = {0};
 	this->timeout[poll->fd] = std::time(0);
 	
-	bytesrec = ft::receive(poll->fd, buffer, BUFF_SIZE, 0);	//TODO: try catch return 400 bad req
+	bytesrec = ft::receive(poll->fd, buffer, BUFF_SIZE, 0);
 	
 	this->req_buf[poll->fd] += buffer;
 	if (bytesrec == BUFF_SIZE) //we assume there is more data waiting
@@ -98,10 +98,10 @@ void ft::Server::pollInEvent(pollfd* poll)
 		this->req_buf.erase(poll->fd);
 		// this->requests[poll->fd]->display();
 	}
-	catch(const ft::InvalidCharException& e) // TODO: Implement this error for bad input
+	catch(const ft::BadRequest &e)
 	{
-		this->responses[poll->fd] = nullptr;
-		std::cout << e.what() << std::endl;
+		this->responses[poll->fd] = ft::Response::getErrorPointer(400);
+		// std::cout << e.what() << std::endl;
 	}
 	poll->events = POLLOUT;
 }
@@ -124,23 +124,13 @@ void ft::Server::resolveConnection(pollfd *poll)
 
 void ft::Server::pollOutEvent(pollfd* poll)
 {
-	if (!this->responses[poll->fd])
+	ft::ResponseStatus ret = this->responses[poll->fd]->send(poll->fd);
+	if (ret == ft::DONE)
 	{
-		auto res = ft::Response::getError(400);
-		res.send(poll->fd);
-		close(poll->fd);
-		poll->fd = -1;
+		this->resolveConnection(poll);
+		std::cout << "//=/ Sent Response /=//" << std::endl;	
 	}
-	else
-	{
-		ft::ResponseStatus ret = this->responses[poll->fd]->send(poll->fd);
-		if (ret == ft::DONE)
-		{
-			this->resolveConnection(poll);
-			std::cout << "//=/ Sent Response /=//" << std::endl;	
-		}
-		this->timeout[poll->fd] = std::time(0);
-	}
+	this->timeout[poll->fd] = std::time(0);
 }
 
 //TODO: 408 request timeout

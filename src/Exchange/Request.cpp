@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:34:12 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/01 17:54:24 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/07 15:17:02 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,29 +15,42 @@
 //all valid header field characters
 // "!#$%&'*+-.^_`|~0123456789abdefghijklmnopqrstuvwxyzABCDEFGHJIKLMNOPQRSTUVWVXYZ";
 
-//TODO: this needs to be thrown out in its entirety almost
+void parseLineOne(ft::Request &req, std::string lineOne)
+{
+	std::vector<std::string> fields;
+
+	ft::split(lineOne, " ", fields);
+	if (fields.size() != 3)
+		throw ft::BadRequest();
+
+	req.setMethod(fields[0]);
+	req.path = fields[1];
+	req.version = fields[2];
+}
+
 ft::Request::Request(std::string buffer)
 {
-	std::string item;
 	std::vector<std::string> splitBuffer;
 	ft::split(buffer, "\n\n", splitBuffer);
 	std::istringstream iss(splitBuffer[0]);
 
+	std::vector<std::string> tempFields;
+	ft::split(splitBuffer[0], "\n", tempFields);
 
-	std::getline(iss, item, ' ');
-	setMethod(item);
-	std::getline(iss, this->path, ' ');
-	std::getline(iss, this->version);
+	parseLineOne(*this, tempFields[0]);
+	tempFields.erase(tempFields.begin());
 
 	std::pair<std::string, std::string> output;
-	while (std::getline(iss, item))
+	for (std::string &val : tempFields)
 	{
-		item.erase(remove_if(item.begin(), item.end(), [](char c){return !(c>=32);}), item.end());
-		if (!item.empty())
+		if (val.find(':') == std::string::npos)
+			throw ft::BadRequest();
+		val.erase(remove_if(val.begin(), val.end(), [](char c){return !(c>=32);}), val.end());
+		if (!val.empty())
 		{
-			ft::slice(item, ':', output);
+			ft::slice(val, ':', output);
 			ft::trim(output.second);
-			fields[output.first] = output.second;
+			this->fields[output.first] = output.second;
 		}
 	}
 
