@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:13:27 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/01 17:53:51 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/07 15:06:29 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,9 +35,9 @@ public: // Ctor ~ Dtor
 
 public: // Methods
 	void display(void) const;
+	void setMethod(const std::string& method);
 
 private:
-	void setMethod(const std::string& method);
 
 public: // Attributes
 

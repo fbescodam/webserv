@@ -6,7 +6,7 @@
 /*   By: fbes <fbes@student.codam.nl>                 +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/16 21:23:40 by fbes          #+#    #+#                 */
-/*   Updated: 2022/06/17 08:32:32 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/07 18:32:53 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 ft::ServerSection::ServerSection(const std::string& cwd, const std::string& name, ft::Section& inherit) : ft::Section(cwd, name, inherit)
 {
-	this->setValue("path", "examples/www"); // predefined path for in case it is missing
+
 }
 
 //////////////////////////////////////////

@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:13:27 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/01 15:38:25 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/07 15:24:15 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,6 +60,9 @@ public: // Functions
 	 * @return The appropriate response based
 	 */
 	static ft::Response getError(uint32_t code);
+
+	static ft::Response* getErrorPointer(uint32_t code);
+
 
 private:
 

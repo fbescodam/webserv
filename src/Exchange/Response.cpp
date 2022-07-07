@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:34:00 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/07 20:49:45 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/07/07 20:59:26 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,6 +93,8 @@ bool ft::Response::applyConfig()
 		if (val.appliesForPath(this->req.path))
 			this->config.importFields(val.exportFields());
 	}
+	
+	// this->config.print("local server config:   ");
 
 	// check if method is accepted for request
 	std::list<std::string> methodList;
@@ -279,6 +281,15 @@ ft::ResponseStatus ft::Response::send(int32_t socket)
 ft::Response ft::Response::getError(uint32_t code)
 {
 	ft::Response outResponse(code);
-	outResponse.generateStatusPage(code);
+	if (!outResponse.getCustomStatusPage(code))
+		outResponse.writeFileFields();
+	return (outResponse);
+}
+
+ft::Response *ft::Response::getErrorPointer(uint32_t code)
+{
+	ft::Response *outResponse = new ft::Response(code);
+	if (!outResponse->getCustomStatusPage(code))
+		outResponse->writeFileFields();
 	return (outResponse);
 }

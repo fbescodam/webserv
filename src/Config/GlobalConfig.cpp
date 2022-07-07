@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 14:59:11 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/07 14:12:48 by fbes          ########   odam.nl         */
+/*   Updated: 2022/07/07 18:33:51 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,6 +68,8 @@ static void getSectionName(const uint32_t lineNum, const std::string& line, std:
 		throw ft::ConfigParserSyntaxException(lineNum);
 	initParsedSection(temp);
 	name = temp; // copy over to output
+	if (name != "server")
+		throw ft::UnknownSectionTypeException(lineNum);
 	if (!isValidSectionNameSyntax(name))
 		throw ft::ConfigParserSyntaxException(lineNum);
 }
@@ -90,10 +92,14 @@ static void getSubSectionName(const uint32_t lineNum, const std::string& line, s
 			name = word;
 		count++;
 	}
-	if (count != 2) // only allow the definition of the subsection (.location) and the path it is defined for (without any whitespace)
+	if (count > 2) // only allow the definition of the subsection (.location) and the path it is defined for (without any whitespace)
 		throw ft::ConfigParserSyntaxException(lineNum);
 	if (!isValidSectionNameSyntax(name))
 		throw ft::ConfigParserSyntaxException(lineNum);
+	if (name != ".location") // only handle .location as subsection
+		throw ft::UnknownSectionTypeException(lineNum);
+	if (count == 1) // no path defined for subsection
+		throw ft::NoSubSectionLocation(lineNum);
 	path = word; // copy the last word over as the subsection path
 	if (!isValidSectionPath(path))
 		throw ft::ConfigParserSyntaxException(lineNum);
@@ -109,6 +115,7 @@ void ft::GlobalConfig::readFile(const std::string& filePath)
 	std::string line;
 	uint32_t lineNum = 0;
 	std::pair<std::string, std::string> output;
+	std::vector<std::string> definedPaths;
 	ft::Section* currentSection = &this->globalSection;
 
 	while (std::getline(fstream, line))
@@ -123,24 +130,36 @@ void ft::GlobalConfig::readFile(const std::string& filePath)
 			std::string sectionName;
 			std::string appliesToPath;
 
-			if (isSubSectionDef(line)) { // is subsection (.location)
+			if (currentSection->getName() != "global")
+			{
+				if (currentSection->getAmountOfFields() == 0)
+					throw ft::EmptySectionException(lineNum);
+				if (currentSection->getName() == "server")
+					if (!currentSection->keyExists("path") || !currentSection->keyExists("server_names") || !currentSection->keyExists("listen"))
+						throw ft::MissingFieldException(lineNum);
+			}
+
+			if (isSubSectionDef(line)) // is subsection (.location)
+			{
 				getSubSectionName(lineNum, line, sectionName, appliesToPath);
 				if (currentSection->getName() == "global")
 					throw ft::InvalidSubSectionPosition(lineNum);
-				if (sectionName != ".location") // only handle .location as subsection
-					throw ft::UnknownSectionTypeException(lineNum);
+				for (const auto definedPath : definedPaths)
+					if (definedPath == appliesToPath)
+						throw ft::DuplicateSubSectionLocation(lineNum);
 				ft::ServerSection& currentServerSection = this->serverSections.back();
 				ft::Section location(*currentServerSection.getValue("path"), sectionName, appliesToPath); // create new location subsection
 				currentServerSection.locations.push_back(location); // add subsection to server
+				definedPaths.push_back(appliesToPath); // add path to defined locations for this server
 				currentSection = &currentServerSection.locations.back(); // change current section to the newly generated location
 			}
-			else { // is main section (server)
+			else // is main section (server)
+			{
 				getSectionName(lineNum, line, sectionName);
-				if (sectionName != "server")
-					throw ft::UnknownSectionTypeException(lineNum);
 				ft::ServerSection server(this->globalSection.getcwd(), sectionName, this->globalSection);
 				this->serverSections.push_back(server); // add new server to list of servers in globalconfig
 				currentSection = &this->serverSections.back(); // change current section to the newly generated server
+				definedPaths.clear(); // clear the defined locations list
 			}
 			continue; // continue with next line
 		}
@@ -152,22 +171,22 @@ void ft::GlobalConfig::readFile(const std::string& filePath)
 		currentSection->setValue(output.first, output.second);
 	}
 
-	verifyConfig();
+	verifyConfig(lineNum + 1);
 }
 
-void ft::GlobalConfig::verifyConfig() const
+void ft::GlobalConfig::verifyConfig(const uint32_t& lineNum) const
 {
 	if (this->serverSections.size() == 0)
 		throw ft::NoServersException();
 	for (const ft::ServerSection& server : this->serverSections)
 	{
 		if (server.getAmountOfFields() == 0)
-			throw ft::EmptySectionException();
+			throw ft::EmptySectionException(lineNum);
 		if (!server.keyExists("path") || !server.keyExists("server_names") || !server.keyExists("listen"))
-			throw ft::MissingFieldException();
+			throw ft::MissingFieldException(lineNum);
 		for (const ft::Section& location : server.locations)
 			if (location.getAmountOfFields() == 0)
-				throw ft::EmptySectionException();
+				throw ft::EmptySectionException(lineNum);
 	}
 }
 
