@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 17:39:03 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/27 21:07:48 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/07/07 14:39:08 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,26 +49,29 @@ int32_t main(int32_t argc, const char* argv[])
 	}
 
 	// Debug printing
-	for (ft::ServerSection& server : config.serverSections)
-		server.printAll();
+	for (ft::ServerSection& serverSection : config.serverSections)
+		serverSection.printAll();
 
-	// Instead the config should have a method, start servers that inits and runs all the servers.
-	// TODO: Should each server run in a for loop or instead in a thread.
-
-	ft::Server server(config.serverSections[0]);
-	server.init();
+	static std::vector<ft::Server> servers;
+	for (auto& serverSection : config.serverSections)
+	{
+		ft::Server server(serverSection);
+		server.init();
+		servers.push_back(server);
+	}
 
 	// Main loop
-	try
-	{
-		while (true)
-			server.run();
-	}
-	catch(const std::exception& e)
-	{
-		// TODO: Don't actually die
-		ft::exceptionExit(e, EXIT_FAILURE);
-	}
+	while (true)
+		for (auto& server : servers)
+		{
+			try { server.run(); }
+			catch(const std::exception& e)
+			{
+				std::cerr << e.what() << std::endl;
+				// TODO: Remove that server
+				break;
+			}
+		}
 
 	std::cout << "Webserv: Shutting down" << std::endl;
 	return (EXIT_SUCCESS);
