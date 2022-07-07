@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/02 12:25:53 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/07 15:30:20 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/07/07 16:31:27 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 
 #ifndef SERVER_HPP
 # define SERVER_HPP
+# include "CGI.hpp"
 # include "Request.hpp"
 # include "Response.hpp"
 # include "ServerSection.hpp"
@@ -40,7 +41,6 @@ public: // Functions
 
 public: // Attributes
 
-	// The servers current configuration. TODO: Const ?
 	ft::ServerSection config;
 
 	std::map<int32_t, ft::Response *> responses;

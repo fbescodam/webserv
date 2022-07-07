@@ -6,12 +6,13 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 17:39:03 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/07 15:28:24 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/07/07 16:30:51 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server/Server.hpp"
 #include "Config/GlobalConfig.hpp"
+#include "CGI.hpp"
 
 /**
  * Program entry point.
@@ -22,6 +23,7 @@
  */
 int32_t main(int32_t argc, const char* argv[])
 {
+
 	// Check arguments
 	if (argc != 2)
 	{

@@ -6,10 +6,11 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:34:00 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/06 14:42:10 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/07 20:49:45 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "CGI.hpp"
 #include "Response.hpp"
 
 ft::Response::~Response()
@@ -92,7 +93,6 @@ bool ft::Response::applyConfig()
 		if (val.appliesForPath(this->req.path))
 			this->config.importFields(val.exportFields());
 	}
-	this->config.print("fijwf   ");
 
 	// check if method is accepted for request
 	std::list<std::string> methodList;
@@ -193,7 +193,13 @@ void ft::Response::writeFileFields(void)
 void ft::Response::parseGet(void)
 {
 	this->filePath = *this->config.getValue("path") + this->req.path;
-	// std::cout << requestedFile << std::endl;
+
+	if (true)
+	{
+		this->parsePost();
+		return ;
+	}
+	
 	if (ft::filesystem::fileExists(this->filePath))
 	{
 		this->file = fopen(this->filePath.data(), "r");
@@ -209,8 +215,9 @@ void ft::Response::parseGet(void)
 
 void ft::Response::parsePost(void)
 {
-	this->filePath = *this->config.getValue("path") + this->req.path;
-	
+	std::string out;
+	ft::CGI::runCGI(*this, this->filePath, out);
+	this->data += out;
 }
 
 //curl -X DELETE http://localhost:8080/delete/deletefile
