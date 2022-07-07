@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 17:39:03 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/07 14:39:08 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/07/07 14:47:20 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,10 +39,7 @@ int32_t main(int32_t argc, const char* argv[])
 
 	// Read config file ...
 	ft::GlobalConfig config;
-	try
-	{
-		config.readFile(argv[1]);
-	}
+	try { config.readFile(argv[1]); }
 	catch (const std::exception& e)
 	{
 		ft::exceptionExit(e, EXIT_FAILURE);
@@ -62,16 +59,16 @@ int32_t main(int32_t argc, const char* argv[])
 
 	// Main loop
 	while (true)
-		for (auto& server : servers)
+	for (auto it = servers.begin(); it != servers.end(); it)
+	{
+		try { (*it).run(); }
+		catch(const std::exception& e)
 		{
-			try { server.run(); }
-			catch(const std::exception& e)
-			{
-				std::cerr << e.what() << std::endl;
-				// TODO: Remove that server
-				break;
-			}
+			std::cerr << e.what() << std::endl;
+			servers.erase(it);
+			break;
 		}
+	}
 
 	std::cout << "Webserv: Shutting down" << std::endl;
 	return (EXIT_SUCCESS);
