@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/02 12:34:20 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/07 16:15:28 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/07 21:16:40 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ void ft::Server::init(void)
 	}
 
 	this->nfds = 0;
-	this->maxClients = 5; // this should be gotten from config
+	this->maxClients = 120; // this should be gotten from config
 	this->numFds = 1;
 
 	try
@@ -70,7 +70,6 @@ void ft::Server::pollListen()
 		this->timeout[poll->fd] = std::time(0);
 		return;
 	}
-	
 	this->pollfds[numFds].fd = clientSocket;
 	this->pollfds[numFds].events = POLLIN;
 	this->pollfds[numFds].revents = 0;
@@ -93,6 +92,8 @@ void ft::Server::pollInEvent(pollfd* poll)
 		return ; //TODO: 100 continue?
 	try
 	{
+		if (this->req_buf[poll->fd].size() == 0)
+			throw ft::BadRequest();			
 		ft::Request temp(this->req_buf[poll->fd]);
 		this->responses[poll->fd] = new ft::Response(temp, &(this->config));
 		this->req_buf.erase(poll->fd);
@@ -176,10 +177,8 @@ void ft::Server::run(void)
 			this->pollOutEvent(poll);
 
 		//connection timed out: 5 seconds
-		#ifdef NDEBUG 
 		if (i > 0 && this->checkTimeout(poll))
 			this->cleanSocket(poll);
-		#endif
 	}
 }
 
