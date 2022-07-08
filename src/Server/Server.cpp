@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/02 12:34:20 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/07 21:16:40 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/07/08 17:54:41 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,9 +78,8 @@ void ft::Server::pollListen()
 	this->numFds++;
 }
 
-#define BUFF_SIZE 4096
-void ft::Server::pollInEvent(pollfd* poll)
-{
+
+/*
 	ssize_t bytesrec;
 	char buffer[BUFF_SIZE] = {0};
 	this->timeout[poll->fd] = std::time(0);
@@ -96,6 +95,7 @@ void ft::Server::pollInEvent(pollfd* poll)
 			throw ft::BadRequest();			
 		ft::Request temp(this->req_buf[poll->fd]);
 		this->responses[poll->fd] = new ft::Response(temp, &(this->config));
+		this->responses[poll->fd]->verify();
 		this->req_buf.erase(poll->fd);
 		// this->requests[poll->fd]->display();
 	}
@@ -105,6 +105,35 @@ void ft::Server::pollInEvent(pollfd* poll)
 		this->req_buf.erase(poll->fd);
 		std::cout << e.what() << std::endl;
 	}
+	poll->events = POLLOUT;
+*/
+
+#define BUFF_SIZE 4096
+void ft::Server::pollInEvent(pollfd* poll)
+{
+	ssize_t brecv; //brecvast
+	char buff[BUFF_SIZE] = {0};
+	this->timeout[poll->fd] = std::time(nullptr);
+
+	//receive bytes and store them in our request buffer, organized per connection(poll->fd)
+	brecv = ft::receive(poll->fd, buff, BUFF_SIZE, 0);
+	this->req_buf[poll->fd] += buff;
+
+	//assume more data is coming, send 100 continue
+	if (brecv == BUFF_SIZE)
+	{
+		ft::Response cont(100, &(this->config));
+		cont.send(poll->fd);
+		return;
+	}
+
+	//construct response on store them in response buffer
+	ft::Request temp(this->req_buf[poll->fd]);
+	this->responses[poll->fd] = new ft::Response(temp, &(this->config));
+	this->responses[poll->fd]->verify();
+	this->req_buf.erase(poll->fd);
+
+	//set poll to check for pollout events, this means we can send() to the fd because the client is ready
 	poll->events = POLLOUT;
 }
 
@@ -138,7 +167,7 @@ void ft::Server::pollOutEvent(pollfd* poll)
 //TODO: 408 request timeout
 void ft::Server::cleanSocket(pollfd *poll)
 {
-	std::cout << "Connection closed-clean" << std::endl;
+	std::cout << "Connection closed-time out" << std::endl;
 
 	this->timeout.erase(poll->fd);
 	close(poll->fd);

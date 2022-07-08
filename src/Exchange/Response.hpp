@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:13:27 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/07 15:24:15 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/08 17:54:27 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,8 +38,8 @@ class Response final : public Exchange
 {
 public: // Ctor ~ Dtor
 	Response() = default;
-	Response(uint32_t inStatus) {status = inStatus; this->file = 0; this->fileFd = -1;}
-	Response(ft::Request req, ft::ServerSection *configIn);
+	Response(int32_t statusIn, ft::ServerSection* configIn);
+	Response(ft::Request requestIn, ft::ServerSection* configIn);
 	
 	~Response();
 
@@ -51,73 +51,57 @@ public: // Functions
 	 *
 	 * @param socket The socket over which to send the response.
 	 */
-	ft::ResponseStatus send(int32_t socket);
+	void verify(void);
 
 	/**
-	 * Constructs an error response based on the status code.
+	 * Packages the response object and sends it over the socket.
+	 * On failure will throw.
 	 *
-	 * @param code The status code.
-	 * @return The appropriate response based
+	 * @param socket The socket over which to send the response.
 	 */
-	static ft::Response getError(uint32_t code);
-
-	static ft::Response* getErrorPointer(uint32_t code);
-
+	ft::ResponseStatus send(int32_t socket);
 
 private:
 
 	// Write the header, meaning version, status into data.
-	void writeHeader(void);
+	void writeHeader(int32_t status);
 
 	// Write the fields into data.
 	void writeFields(void);
 
-	// Writes the ending of a header.
-	void writeEnd(void);
-
-	//verify if method is allowed
-	bool checkMethods(std::list<std::string> methodList);
-
-	// Loops through all locations and applies relevant config
-	bool applyConfig(void);
-
 	//open requested file and send it to the socket, should be last
 	void parseGet(void);
-	void parsePost(void);
+	//void parsePost(void);
 	void parseDelete(void);
 
-	// generate status page on the file
-	void generateStatusPage(int code);
-	// generate status page with custom content
-	void generateStatusPage(int code, std::string content);
+	/**
+	 * @brief 
+	 * 
+	 * @param code 
+	 */
+	void generateStatusPage(int32_t code);
 
-
-	// look for config defined custom status page, otherwise call generateStatusPage. returns true if no error page was found
-	bool getCustomStatusPage(int code);
-
-	void writeFileFields(void);
+	/**
+	 * @brief 
+	 * 
+	 * @param code 
+	 * @param content 
+	 */
+	void generateStatusPage(int32_t code, std::string content);
 
 public: // Attributes
-
-	// The response status code and meaning.
-	uint32_t status;
-
-	//the request were basing the response on
-	ft::Request req;
 
 	// Configuration applied to this response
 	ft::Section config;
 
+	// Locations of the section.
 	std::vector<ft::Section> locations;
 
-	//file fd
-	FILE *file;
-	int32_t fileFd;
-	int32_t fileSize;
-	off_t fileOffset;
-	std::string filePath;
-	std::string rootPath;
-	bool sentHeader;
+	//the request were basing the response on
+	ft::Request request;
+
+	FILE*	file;
+	int32_t	fileFd;
 };
 
 FT_END

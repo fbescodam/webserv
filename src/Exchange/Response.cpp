@@ -6,243 +6,136 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:34:00 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/07 20:59:26 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/07/08 17:54:12 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "CGI.hpp"
 #include "Response.hpp"
 
-ft::Response::~Response()
+ft::Response::Response(int32_t statusIn, ft::ServerSection *configIn)
 {
-	if (this->file)
-		fclose(this->file);
-	if (this->fileFd > -1)
-		close(this->fileFd);
+	this->config.importFields(configIn->exportFields())
+	this->generateStatusPage(statusIn);
 }
 
-ft::Response::Response(ft::Request reqIn, ft::ServerSection *configIn)
+
+ft::Response::Response(ft::Request requestIn, ft::ServerSection* configIn)
 {
-	this->req = reqIn;
-	this->config = ft::Section(ft::basedir(reqIn.path), "response", *configIn);
-	this->rootPath = *configIn->getValue("path");
+	this->request = requestIn;
+	this->config = ft::Section(ft::basedir(requestIn.path), "response", *configIn);
 	this->locations = configIn->locations;
-	this->sentHeader = false;
-	this->fileOffset = 0;
-	this->file = 0;
+	this->file = NULL;
 	this->fileFd = -1;
-
-
-
-	//TODO: date in response?
-	if (this->req.keyExists("Connection") && *this->req.getValue("Connection") == "keep-alive")
-	{
-		this->fields["Connection"] = "keep-alive";
-		this->fields["Keep-Alive"] = "timeout=" + std::to_string(S_TIMEOUT);
-	}
-	else
-		this->fields["Connection"] = "close";
-
-	if (this->applyConfig())
-		return ;
-
-	switch(this->req.method)
-	{
-		case (ft::Method::GET):
-			this->parseGet(); break;
-		case (ft::Method::POST):
-			this->parsePost(); break;
-		case (ft::Method::DELETE):
-			this->parseDelete(); break;
-		default:
-			this->generateStatusPage(405); //this will never happen anymore, 405 is checked earlier in applyconfig
-	}
 }
 
 //////////////////////////////////////////
 
-bool ft::Response::checkMethods(std::list<std::string> methodList)
+static bool checkMethods(const std::list<std::string>& methods, ft::Method requestMethod)
 {
-	bool methodAllowed = false;
-	for (const std::string &val: methodList)
-	{
-		if (val == ft::enumStrings[static_cast<int>(this->req.method)])
-			methodAllowed = true;
-	}
-	if (methodAllowed == false)
-	{
-		if (!this->getCustomStatusPage(405))
-			this->writeFileFields();
-		return (true);
-	}
+	for (const std::string &val: methods)
+		if (val == ft::enumStrings[static_cast<int32_t>(requestMethod)])
+			return (true);
 	return (false);
 }
 
-bool ft::Response::applyConfig()
+void ft::Response::verify(void)
 {
-	if (this->req.path.back() == '/')
+	if (this->request.path.back() == '/')
 	{
-		if (!this->config.keyExists("index"))
-			this->req.path += "index.html"; // TODO: should only do this if dir_listing is disabled, otherwise generate a list of files and directories in path
+		if (this->config.keyExists("index"))
+			this->request.path += *this->config.getValue("index");
 		else
-			this->req.path += *this->config.getValue("index");
+		{
+			const std::string* dir = this->config.getValue("dir_listing");
+
+			if (dir != nullptr && *dir == "no")
+				this->request.path += "index.html";
+		}
 	}
 
+	// Loops over all locations and takes the rules from them and applies it to this config
 	for (const auto &val: this->locations)
-	{
-		if (val.appliesForPath(this->req.path))
+		if (val.appliesForPath(this->request.path))
 			this->config.importFields(val.exportFields());
-	}
-	
-	// this->config.print("local server config:   ");
 
-	// check if method is accepted for request
+	// Gets the allowed methods for path
 	std::list<std::string> methodList;
-	if (this->config.getValueAsList("methods", methodList))
-	{
-		if (this->checkMethods(methodList))
-			return (true);
-	}
-	else
-	{
-		if (this->checkMethods({"GET"}))
-			return (true);
-	}
+	static std::list<std::string> methodGet = {{"GET"}};
+	bool methodRules = this->config.getValueAsList("methods", methodList);
+	
+	// Checks if request method is in allowed methods
+	if (checkMethods(methodRules ? methodList : methodGet, this->request.method))
+		this->generateStatusPage(405); return;
 
-	// check if access is allowed
-	if (this->config.keyExists("access") && *this->config.getValue("access") == "no")
-	{
-		if (!this->getCustomStatusPage(403))
-			this->writeFileFields();
-		return (true);
-	}
+	// Checks if access is allowed to request path
+	const std::string* access = this->config.getValue("access");
+	if (access != nullptr && *access == "no")
+		this->generateStatusPage(403); return;
 
-	// check if redirection is set
+	// Check for redirect
 	std::list<std::string> redirInfo;
 	if (this->config.getValueAsList("redir", redirInfo))
 	{
-		int code = std::atoi(redirInfo.front().c_str());
 		this->fields["Location"] = redirInfo.back();
-		this->generateStatusPage(code);
-		return (true);
+		this->generateStatusPage(std::stoi(redirInfo.front()));
+		return;
 	}
-	
-	// all good, continue parsing the request (return false)
-	return (false);
 
+	//no issues found
+	//TODO: actual response, and directory listing if path ends with "/"
 }
 
-void ft::Response::generateStatusPage(int code)
-{
-	this->status = code;
-	const std::string& statusText = ft::getStatusCodes().at(code);
-	const std::string& content = "<!DOCTYPE html><html><head><title>"+statusText+"</title></head><body><h1>"+std::to_string(code)+" "+statusText+"</h1></body></html>";
-
-	// Build header and fields
-	this->writeHeader();
-	this->fields["Content-Length"] = std::to_string(content.length());
-	this->fields["Content-Type"] = "text/html";
-	this->writeFields();
-	this->writeEnd();
-
-	// Build content
-	this->data += content;
-}
-
-void ft::Response::generateStatusPage(int code, std::string content)
-{
-	this->status = code;
-	const std::string& statusText = ft::getStatusCodes().at(code);
-
-	// Build header and fields
-	this->writeHeader();
-	this->fields["Content-Length"] = std::to_string(content.length());
-	this->fields["Content-Type"] = "text/html";
-	this->writeFields();
-	this->writeEnd();
-
-	// Build content
-	this->data += content;
-}
-
-//returns true on status page, dont write fields after
-bool ft::Response::getCustomStatusPage(int code)
-{
+void ft::Response::generateStatusPage(int32_t code)
+{	
+	//try to find custom error page, if it doesnt exit make one on the fly
 	std::string errorPage = "error_" + std::to_string(code);
+	if (this->config.keyExists(errorPage))
+	{
+		std::string filePath(*this->config.getValue("path") + *this->config.getValue(errorPage));
 
-	if (!this->config.keyExists(errorPage))
-		return (this->generateStatusPage(code), true); // no custom error page found, generate one on the fly
-	this->filePath = this->rootPath + *this->config.getValue(errorPage);
-	if (!ft::filesystem::fileExists(this->filePath))
-		return (this->generateStatusPage(code), true); // custom error page not found (HA!), generate one on the fly
-	this->file = fopen(this->filePath.data(), "r");
-	this->status = code;
-	return (false);
+		// Check if we can open the file, use FILE* because of content length.
+		if ((this->file = fopen(filePath.data(), "r")))
+		{
+			this->fileFd = fileno(this->file);
+			return;
+		}
+	}
+
+	const std::string& statusText = ft::getStatusCodes().at(code);
+	ft::Response::generateStatusPage(code, "<!DOCTYPE html><html><head><title>"+statusText+"</title></head><body><h1>"+std::to_string(code)+" "+statusText+"</h1></body></html>");
 }
 
-void ft::Response::writeFileFields(void)
+void ft::Response::generateStatusPage(int32_t code, std::string content)
 {
-	this->fileFd = fileno(this->file);
-	this->fileSize = ft::filesystem::getFileSize(this->file);
-
-	this->writeHeader();
-	this->fields["Content-Length"] = std::to_string(this->fileSize);
-	this->fields["Content-Type"] = ft::getContentType(this->filePath);
+	// Build header and fields
+	this->writeHeader(code);
+	this->fields["Content-Length"] = std::to_string(content.length());
+	this->fields["Content-Type"] = "text/html";
 	this->writeFields();
-	this->writeEnd();
+	
+	// Build content
+	this->data += content;
 }
 
 void ft::Response::parseGet(void)
 {
-	this->filePath = *this->config.getValue("path") + this->req.path;
-
-	if (true)
-	{
-		this->parsePost();
-		return ;
-	}
 	
-	if (ft::filesystem::fileExists(this->filePath))
-	{
-		this->file = fopen(this->filePath.data(), "r");
-		this->status = 200;
-	}
-	else
-	{
-		if (this->getCustomStatusPage(404))
-			return ;
-	}
-	this->writeFileFields();
-}
-
-void ft::Response::parsePost(void)
-{
-	std::string out;
-	ft::CGI::runCGI(*this, this->filePath, out);
-	this->data += out;
 }
 
 //curl -X DELETE http://localhost:8080/delete/deletefile
 void ft::Response::parseDelete(void)
 {
-	this->filePath = *this->config.getValue("path") + this->req.path;
-
-	if (ft::filesystem::fileExists(this->filePath))
-	{
-		std::remove(this->filePath.c_str());
-		this->generateStatusPage(200, "<!DOCTYPE html><html><body><h1>File deleted.</h1></body></html>");
-	}
-	else
-		this->generateStatusPage(404);
+	
 }
 
 ////
 
 // Writes the header object
-void ft::Response::writeHeader(void)
+void ft::Response::writeHeader(int32_t status)
 {
 	// HTTP/1.1 503 Service Unavailabe\n
-	this->data += ft::format("HTTP/1.1 %u %s\n", this->status, ft::getStatusCodes().at(this->status).c_str());
+	this->data += ft::format("HTTP/1.1 %u %s\n", status, ft::getStatusCodes().at(status).c_str());
 	this->fields["Server"] = "Breadserv";
 }
 
@@ -250,46 +143,14 @@ void ft::Response::writeFields(void)
 {
 	for (const auto [key, value] : this->fields)
 		this->data += key + " : " + value + '\n';
-}
-
-void ft::Response::writeEnd(void)
-{
 	this->data += "\n";
 }
+
+///
 
 //https://www.youtube.com/watch?v=tYzMYcUty6s fucking mime types
 ft::ResponseStatus ft::Response::send(int32_t socket)
 {
-	if (!this->sentHeader)
-	{
-		std::cout << "//-----rep header----//\n" << this->data;
-		ft::send(socket, this->data.data(), this->data.length(), 0);
-		this->sentHeader = true;
-		if (this->fileFd < 0)
-			return ft::DONE;
-		return ft::NOT_DONE;
-	}
-	off_t len;
-	sendfile(this->fileFd, socket, this->fileOffset, &len, NULL, 0);
-	this->fileOffset += len;
 
-	if (this->fileOffset >= this->fileSize)
-		return ft::ResponseStatus::DONE;
-	return ft::ResponseStatus::NOT_DONE;
 }
 
-ft::Response ft::Response::getError(uint32_t code)
-{
-	ft::Response outResponse(code);
-	if (!outResponse.getCustomStatusPage(code))
-		outResponse.writeFileFields();
-	return (outResponse);
-}
-
-ft::Response *ft::Response::getErrorPointer(uint32_t code)
-{
-	ft::Response *outResponse = new ft::Response(code);
-	if (!outResponse->getCustomStatusPage(code))
-		outResponse->writeFileFields();
-	return (outResponse);
-}
