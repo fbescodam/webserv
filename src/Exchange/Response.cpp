@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:34:00 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/12 14:54:45 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/12 14:59:35 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,8 +40,10 @@ ft::Response::~Response()
 
 static bool checkMethods(const std::list<std::string>& methods, ft::Method requestMethod)
 {
+	std::string reqMethodString = ft::enumStrings[static_cast<int32_t>(requestMethod)];
+	
 	for (const std::string &val: methods)
-		if (val == ft::enumStrings[static_cast<int32_t>(requestMethod)])
+		if (val == reqMethodString)
 			return (true);
 	return (false);
 }
@@ -74,14 +76,16 @@ bool ft::Response::verify(void)
 	// Checks if request method is in allowed methods
 	if (!checkMethods(methodRules ? methodList : methodGet, this->request.method))
 	{
-		this->generateStatusPage(405); return (false);
+		this->generateStatusPage(405); 
+		return (false);
 	}
 
 	// Checks if access is allowed to request path
 	const std::string* access = this->config.getValue("access");
 	if (access != nullptr && *access == "no")
 	{
-		this->generateStatusPage(403); return (false);
+		this->generateStatusPage(403); 
+		return (false);
 	}
 
 	// Check for redirect
@@ -148,7 +152,8 @@ void ft::Response::generateResponse()
 
 	if (this->request.method == ft::Method::DELETE)
 	{
-		this->deleteMethod(filePath); return;
+		this->deleteMethod(filePath); 
+		return;
 	}
 
 	//TODO: check if filepath is a cgi and handle a post accordingly
@@ -156,6 +161,7 @@ void ft::Response::generateResponse()
 	//TODO: check if filepath ends with /, if so do dir listing
 	// if (filePath.back() == "/")
 
+	//if file exists write appropriate fields
 	if (ft::filesystem::fileExists(filePath))
 	{
 		this->file = fopen(filePath.data(), "r");
@@ -167,7 +173,7 @@ void ft::Response::generateResponse()
 		this->fields["Connection"] = "close"; //TODO: connection: keep-alive check somewhere
 		this->writeFields();
 	}
-	else
+	else //file doesnt exist, make errorpage
 		this->generateStatusPage(404);
 	
 }
@@ -193,6 +199,7 @@ void ft::Response::writeFields(void)
 //TODO: does this need to be cleaner?
 ft::ResponseStatus ft::Response::send(int32_t socket)
 {
+	//send the header part
 	if (!this->sentHeader)
 	{
 		ft::send(socket, this->data.data(), this->data.length(), 0);
@@ -201,6 +208,8 @@ ft::ResponseStatus ft::Response::send(int32_t socket)
 			return ft::DONE;
 		return ft::NOT_DONE;
 	}
+
+	//send the file, if its done resolve the connectino
 	off_t len;
 	sendfile(this->fileFd, socket, this->fileOffset, &len, NULL, 0);
 	this->fileOffset += len;

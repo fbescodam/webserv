@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/02 12:34:20 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/12 14:43:56 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/12 14:56:48 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -194,7 +194,7 @@ void ft::Server::run(void)
 		if (poll->fd < 0)
 			continue;
 
-		// Pollfd is ready for listening
+		// Create new connection
 		if (!i && (this->pollfds[0].revents & POLLIN))
 			this->pollListen();
 
