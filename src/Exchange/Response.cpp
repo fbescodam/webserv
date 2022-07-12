@@ -6,12 +6,13 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:34:00 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/12 14:59:35 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/12 21:04:09 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "CGI.hpp"
 #include "Response.hpp"
+#include <sys/stat.h>
 
 ft::Response::Response(int32_t statusIn, ft::ServerSection *configIn)
 {
@@ -48,13 +49,32 @@ static bool checkMethods(const std::list<std::string>& methods, ft::Method reque
 	return (false);
 }
 
+#include <unistd.h>
+#include <sys/syscall.h>
+#include <sys/types.h>
+#include <signal.h>
+
 bool ft::Response::verify(void)
 {
+
+	// Loops over all locations and takes the rules from them and applies it to this config
+	for (const auto &val: this->locations)
+		if (val.appliesForPath(this->request.path))
+			this->config.importFields(val.exportFields());
+
+	struct stat stats;
+	stat((*this->config.getValue("path") + this->request.path).c_str(), &stats);
+	if (S_ISDIR(stats.st_mode) && this->request.path.back() != '/')
+	{
+		this->fields["Location"] = this->request.path + "/";
+		this->generateStatusPage(308);
+		return (false);
+	}
+
+	std::cout <<this->request.path<<std::endl;
 	if (this->request.path.back() == '/')
 	{
-		if (this->config.keyExists("index"))
-			this->request.path += *this->config.getValue("index");
-		else
+		if (!ft::filesystem::fileExists(this->request.path + *this->config.getValue("index")))
 		{
 			const std::string* dir = this->config.getValue("dir_listing");
 
@@ -63,10 +83,6 @@ bool ft::Response::verify(void)
 		}
 	}
 
-	// Loops over all locations and takes the rules from them and applies it to this config
-	for (const auto &val: this->locations)
-		if (val.appliesForPath(this->request.path))
-			this->config.importFields(val.exportFields());
 
 	// Gets the allowed methods for path
 	std::list<std::string> methodList;
@@ -113,12 +129,25 @@ void ft::Response::generateStatusPage(int32_t code)
 		if ((this->file = fopen(filePath.data(), "r")))
 		{
 			this->fileFd = fileno(this->file);
+			this->fileSize = ft::filesystem::getFileSize(this->file);
+			this->writeHeader(code);
+			this->fields["Content-Length"] = std::to_string(this->fileSize);
+			this->fields["Content-Type"] = ft::getContentType(filePath);
+			this->fields["Connection"] = "close"; //TODO: connection: keep-alive check somewhere
+			this->writeFields();
 			return;
 		}
 	}
 
 	const std::string& statusText = ft::getStatusCodes().at(code);
-	ft::Response::generateStatusPage(code, "<!DOCTYPE html><html><head><title>"+statusText+"</title></head><body><h1>"+std::to_string(code)+" "+statusText+"</h1></body></html>");
+	DIR *dir = opendir("./examples/www/imgs/pig1_files");
+	srand(time(0));
+	int rand = std::rand() % 100;
+	dirent* ent;
+	for (int i = rand; i > 0; i--)
+		ent = readdir(dir);
+	std::string name = "/imgs/pig1_files/" + std::string(ent->d_name);
+	ft::Response::generateStatusPage(code, "<!DOCTYPE html><html><head><title>"+statusText+"</title></head><body><h1>"+std::to_string(code)+" "+statusText+"</h1><img src=\""+name+"\"></body></html>");
 }
 
 void ft::Response::generateStatusPage(int32_t code, std::string content)
@@ -158,8 +187,19 @@ void ft::Response::generateResponse()
 
 	//TODO: check if filepath is a cgi and handle a post accordingly
 
-	//TODO: check if filepath ends with /, if so do dir listing
-	// if (filePath.back() == "/")
+	//check if filepath ends with /, if so, dir listing
+	if (filePath.back() == '/')
+	{
+		std::string dirListing;
+		ft::DirectoryFactory::buildContentFromDir(filePath, dirListing);
+		this->writeHeader(200);
+		this->fields["Content-Length"] = std::to_string(dirListing.size());
+		this->fields["Content-Type"] = "text/html";
+		this->fields["Connection"] = "close"; //TODO: connection: keep-alive check somewhere
+		this->writeFields();
+		this->data += dirListing;
+		return;
+	}
 
 	//if file exists write appropriate fields
 	if (ft::filesystem::fileExists(filePath))
@@ -172,10 +212,10 @@ void ft::Response::generateResponse()
 		this->fields["Content-Type"] = ft::getContentType(filePath);
 		this->fields["Connection"] = "close"; //TODO: connection: keep-alive check somewhere
 		this->writeFields();
+		return;
 	}
-	else //file doesnt exist, make errorpage
-		this->generateStatusPage(404);
-	
+	//file doesnt exist, make errorpage
+	this->generateStatusPage(404);
 }
 
 // Writes the header object

@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:13:27 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/12 14:28:52 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/12 17:23:20 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@
 # include "Request.hpp"
 # include "CommonNetwork.hpp"
 # include "ServerSection.hpp"
-
+# include "DirectoryFactory.hpp"
 FT_BEGIN
 
 enum ResponseStatus {DONE, NOT_DONE};
