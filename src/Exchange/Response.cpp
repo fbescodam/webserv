@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:34:00 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/12 21:04:09 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/07/12 21:12:19 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -147,6 +147,7 @@ void ft::Response::generateStatusPage(int32_t code)
 	for (int i = rand; i > 0; i--)
 		ent = readdir(dir);
 	std::string name = "/imgs/pig1_files/" + std::string(ent->d_name);
+	closedir(dir);
 	ft::Response::generateStatusPage(code, "<!DOCTYPE html><html><head><title>"+statusText+"</title></head><body><h1>"+std::to_string(code)+" "+statusText+"</h1><img src=\""+name+"\"></body></html>");
 }
 
