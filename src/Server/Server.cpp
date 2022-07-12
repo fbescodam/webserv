@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/02 12:34:20 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/08 17:54:41 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/07/12 14:43:56 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -130,7 +130,8 @@ void ft::Server::pollInEvent(pollfd* poll)
 	//construct response on store them in response buffer
 	ft::Request temp(this->req_buf[poll->fd]);
 	this->responses[poll->fd] = new ft::Response(temp, &(this->config));
-	this->responses[poll->fd]->verify();
+	if (this->responses[poll->fd]->verify())
+		this->responses[poll->fd]->generateResponse();
 	this->req_buf.erase(poll->fd);
 
 	//set poll to check for pollout events, this means we can send() to the fd because the client is ready

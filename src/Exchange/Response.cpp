@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:34:00 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/08 17:54:12 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/07/12 14:54:45 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 
 ft::Response::Response(int32_t statusIn, ft::ServerSection *configIn)
 {
-	this->config.importFields(configIn->exportFields())
+	this->config.importFields(configIn->exportFields());
 	this->generateStatusPage(statusIn);
 }
 
@@ -27,6 +27,13 @@ ft::Response::Response(ft::Request requestIn, ft::ServerSection* configIn)
 	this->locations = configIn->locations;
 	this->file = NULL;
 	this->fileFd = -1;
+	this->sentHeader = false;
+	this->fileOffset = 0;
+}
+
+ft::Response::~Response()
+{
+	
 }
 
 //////////////////////////////////////////
@@ -39,7 +46,7 @@ static bool checkMethods(const std::list<std::string>& methods, ft::Method reque
 	return (false);
 }
 
-void ft::Response::verify(void)
+bool ft::Response::verify(void)
 {
 	if (this->request.path.back() == '/')
 	{
@@ -65,13 +72,17 @@ void ft::Response::verify(void)
 	bool methodRules = this->config.getValueAsList("methods", methodList);
 	
 	// Checks if request method is in allowed methods
-	if (checkMethods(methodRules ? methodList : methodGet, this->request.method))
-		this->generateStatusPage(405); return;
+	if (!checkMethods(methodRules ? methodList : methodGet, this->request.method))
+	{
+		this->generateStatusPage(405); return (false);
+	}
 
 	// Checks if access is allowed to request path
 	const std::string* access = this->config.getValue("access");
 	if (access != nullptr && *access == "no")
-		this->generateStatusPage(403); return;
+	{
+		this->generateStatusPage(403); return (false);
+	}
 
 	// Check for redirect
 	std::list<std::string> redirInfo;
@@ -79,11 +90,11 @@ void ft::Response::verify(void)
 	{
 		this->fields["Location"] = redirInfo.back();
 		this->generateStatusPage(std::stoi(redirInfo.front()));
-		return;
+		return (false);
 	}
 
 	//no issues found
-	//TODO: actual response, and directory listing if path ends with "/"
+	return (true);
 }
 
 void ft::Response::generateStatusPage(int32_t code)
@@ -118,18 +129,48 @@ void ft::Response::generateStatusPage(int32_t code, std::string content)
 	this->data += content;
 }
 
-void ft::Response::parseGet(void)
-{
-	
-}
-
 //curl -X DELETE http://localhost:8080/delete/deletefile
-void ft::Response::parseDelete(void)
+void ft::Response::deleteMethod(std::string filePath)
 {
-	
+	if (ft::filesystem::fileExists(filePath))
+	{
+		std::remove(filePath.c_str());
+		this->generateStatusPage(200, "<!DOCTYPE html><html><body><h1>File deleted.</h1></body></html>");
+	}
+	else
+		this->generateStatusPage(404);
 }
 
-////
+//after verify, make up the response
+void ft::Response::generateResponse()
+{
+	std::string filePath = *this->config.getValue("path") + this->request.path;
+
+	if (this->request.method == ft::Method::DELETE)
+	{
+		this->deleteMethod(filePath); return;
+	}
+
+	//TODO: check if filepath is a cgi and handle a post accordingly
+
+	//TODO: check if filepath ends with /, if so do dir listing
+	// if (filePath.back() == "/")
+
+	if (ft::filesystem::fileExists(filePath))
+	{
+		this->file = fopen(filePath.data(), "r");
+		this->fileFd = fileno(this->file);
+		this->fileSize = ft::filesystem::getFileSize(this->file);
+		this->writeHeader(200);
+		this->fields["Content-Length"] = std::to_string(this->fileSize);
+		this->fields["Content-Type"] = ft::getContentType(filePath);
+		this->fields["Connection"] = "close"; //TODO: connection: keep-alive check somewhere
+		this->writeFields();
+	}
+	else
+		this->generateStatusPage(404);
+	
+}
 
 // Writes the header object
 void ft::Response::writeHeader(int32_t status)
@@ -139,6 +180,7 @@ void ft::Response::writeHeader(int32_t status)
 	this->fields["Server"] = "Breadserv";
 }
 
+// Writes fields to data
 void ft::Response::writeFields(void)
 {
 	for (const auto [key, value] : this->fields)
@@ -148,9 +190,23 @@ void ft::Response::writeFields(void)
 
 ///
 
-//https://www.youtube.com/watch?v=tYzMYcUty6s fucking mime types
+//TODO: does this need to be cleaner?
 ft::ResponseStatus ft::Response::send(int32_t socket)
 {
+	if (!this->sentHeader)
+	{
+		ft::send(socket, this->data.data(), this->data.length(), 0);
+		this->sentHeader = true;
+		if (this->fileFd < 0)
+			return ft::DONE;
+		return ft::NOT_DONE;
+	}
+	off_t len;
+	sendfile(this->fileFd, socket, this->fileOffset, &len, NULL, 0);
+	this->fileOffset += len;
 
+	if (this->fileOffset >= this->fileSize)
+		return ft::ResponseStatus::DONE;
+	return ft::ResponseStatus::NOT_DONE;
 }
 

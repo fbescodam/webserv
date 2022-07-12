@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 11:51:45 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/08 17:39:34 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/07/12 14:31:28 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,7 +68,7 @@ void ft::CGI::runCGI(const ft::Response& response, const std::string& path, std:
 
 	if (!ft::filesystem::fileExists(path))
 	{
-		ft::Response::getError(404).send(response.socket);
+		// ft::Response::getError(404).send(response.socket);
 		return;
 	}
 
@@ -105,7 +105,7 @@ void ft::CGI::runCGI(const ft::Response& response, const std::string& path, std:
 	catch(const std::exception& e)
 	{
 		std::cerr << e.what() << std::endl;
-		ft::Response::getError(500).send(response.socket);
+		// ft::Response::getError(500).send(response.socket);
 	}
 
 

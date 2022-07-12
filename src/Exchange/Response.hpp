@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:13:27 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/08 17:54:27 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/07/12 14:28:52 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,9 @@ public: // Functions
 	 *
 	 * @param socket The socket over which to send the response.
 	 */
-	void verify(void);
+	bool verify(void);
+
+	void generateResponse();
 
 	/**
 	 * Packages the response object and sends it over the socket.
@@ -69,11 +71,6 @@ private:
 	// Write the fields into data.
 	void writeFields(void);
 
-	//open requested file and send it to the socket, should be last
-	void parseGet(void);
-	//void parsePost(void);
-	void parseDelete(void);
-
 	/**
 	 * @brief 
 	 * 
@@ -89,6 +86,10 @@ private:
 	 */
 	void generateStatusPage(int32_t code, std::string content);
 
+	//delete method
+	void deleteMethod(std::string filePath);
+
+
 public: // Attributes
 
 	// Configuration applied to this response
@@ -102,6 +103,11 @@ public: // Attributes
 
 	FILE*	file;
 	int32_t	fileFd;
+
+	//for send function
+	bool sentHeader;
+	size_t fileOffset;
+	size_t fileSize;
 };
 
 FT_END
