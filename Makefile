@@ -6,7 +6,7 @@
 #    By: lde-la-h <lde-la-h@student.codam.nl>         +#+                      #
 #                                                    +#+                       #
 #    Created: 2022/05/13 11:36:28 by lde-la-h      #+#    #+#                  #
-#    Updated: 2022/07/12 21:13:43 by lde-la-h      ########   odam.nl          #
+#    Updated: 2022/07/13 15:49:39 by pvan-dij      ########   odam.nl          #
 #                                                                              #
 # **************************************************************************** #
 
@@ -45,7 +45,7 @@ all: # Multi threading badness because C++ is slow
 	@$(CC) $(CFLAGS) -o $@ -c $< $(HEADERS) && printf "$(GREEN)$(BOLD)\rCompiling: $(notdir $<)\r\e[35C[OK]\n$(RESET)"
 
 $(NAME): $(OBJS)
-	@$(CC) $(OBJS) -fsanitize=address -o $(NAME)
+	@$(CC) $(OBJS) -o $(NAME)
 	@printf "$(GREEN)$(BOLD)Done\n$(RESET)"
 
 clean:

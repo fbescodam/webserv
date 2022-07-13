@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:34:12 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/07 16:13:57 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/13 16:02:48 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,8 @@ ft::Request::Request(std::string buffer)
 		}
 	}
 
-	this->body = splitBuffer[1];
+	if (splitBuffer.size() > 1)
+		this->body = splitBuffer[1];
 }
 
 //////////////////////////////////////////
