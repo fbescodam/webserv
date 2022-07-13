@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/02 12:34:20 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/13 15:55:50 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/13 16:19:38 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,7 +87,7 @@ void ft::Server::pollListen()
 	
 	this->req_buf[poll->fd] += buffer;
 	if (bytesrec == BUFF_SIZE) //we assume there is more data waiting
-		return ; //TODO: 100 continue?
+		return ;
 	try
 	{
 		if (this->req_buf[poll->fd].size() == 0)

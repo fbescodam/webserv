@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:34:00 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/13 15:31:42 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/13 16:19:19 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -119,6 +119,18 @@ bool ft::Response::verify(void)
 	return (true);
 }
 
+void ft::Response::retrievePigPath(std::string &name)
+{
+	DIR *dir = opendir("./examples/www/imgs/pig1_files");
+	srand(time(0));
+	int rand = std::rand() % 100;
+	dirent* ent;
+	for (int i = rand; i > 0; i--)
+		ent = readdir(dir);
+	name = "/imgs/pig1_files/" + std::string(ent->d_name);
+	closedir(dir);
+}
+
 void ft::Response::generateStatusPage(int32_t code)
 {	
 	//try to find custom error page, if it doesnt exit make one on the fly
@@ -141,15 +153,9 @@ void ft::Response::generateStatusPage(int32_t code)
 		}
 	}
 
+	std::string name;
 	const std::string& statusText = ft::getStatusCodes().at(code);
-	DIR *dir = opendir("./examples/www/imgs/pig1_files");
-	srand(time(0));
-	int rand = std::rand() % 100;
-	dirent* ent;
-	for (int i = rand; i > 0; i--)
-		ent = readdir(dir);
-	std::string name = "/imgs/pig1_files/" + std::string(ent->d_name);
-	closedir(dir);
+	this->retrievePigPath(name);
 	ft::Response::generateStatusPage(code, "<!DOCTYPE html><html><head><title>"+statusText+"</title></head><body><h1>"+std::to_string(code)+" "+statusText+"</h1><img src=\""+name+"\"></body></html>");
 }
 
@@ -239,7 +245,7 @@ void ft::Response::writeFields(void)
 
 ///
 
-//TODO: does this need to be cleaner?
+//TODO: does this need to be cleaner? header part could be split up
 ft::ResponseStatus ft::Response::send(int32_t socket)
 {
 	//send the header part
@@ -252,7 +258,7 @@ ft::ResponseStatus ft::Response::send(int32_t socket)
 		return ft::NOT_DONE;
 	}
 
-	//send the file, if its done resolve the connectino
+	//send the file, if its done resolve the connection
 	off_t len;
 	sendfile(this->fileFd, socket, this->fileOffset, &len, NULL, 0);
 	this->fileOffset += len;
