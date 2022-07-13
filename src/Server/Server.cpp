@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/02 12:34:20 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/13 16:19:38 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/13 17:25:08 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -175,7 +175,7 @@ void ft::Server::cleanSocket(pollfd *poll)
 }
 
 bool ft::Server::checkTimeout(pollfd *poll)
-{
+{	
 	return (this->timeout.find(poll->fd) != this->timeout.end() && \
 	std::time(0) - this->timeout[poll->fd] > S_TIMEOUT);
 }

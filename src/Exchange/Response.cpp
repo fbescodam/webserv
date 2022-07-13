@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:34:00 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/13 16:19:19 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/13 17:39:51 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,13 +51,17 @@ static bool checkMethods(const std::list<std::string>& methods, ft::Method reque
 	return (false);
 }
 
-#include <unistd.h>
-#include <sys/syscall.h>
-#include <sys/types.h>
-#include <signal.h>
-
 bool ft::Response::verify(void)
 {
+	//TODO: probably not the right spot for this but idk where else to put it for now
+	if (this->request.keyExists("Connection") && *this->request.getValue("Connection") == "keep-alive")
+	{
+		this->fields["Connection"] = "keep-alive";
+		this->fields["Keep-Alive"] = "timeout=5";
+	}
+	else
+		this->fields["Connection"] = "close";
+
 
 	// Loops over all locations and takes the rules from them and applies it to this config
 	for (const auto &val: this->locations)
@@ -147,7 +151,6 @@ void ft::Response::generateStatusPage(int32_t code)
 			this->writeHeader(code);
 			this->fields["Content-Length"] = std::to_string(this->fileSize);
 			this->fields["Content-Type"] = ft::getContentType(filePath);
-			this->fields["Connection"] = "close"; //TODO: connection: keep-alive check somewhere
 			this->writeFields();
 			return;
 		}
@@ -204,7 +207,6 @@ void ft::Response::generateResponse()
 		this->writeHeader(200);
 		this->fields["Content-Length"] = std::to_string(dirListing.size());
 		this->fields["Content-Type"] = "text/html";
-		this->fields["Connection"] = "close"; //TODO: connection: keep-alive check somewhere
 		this->writeFields();
 		this->data += dirListing;
 		return;
@@ -219,7 +221,6 @@ void ft::Response::generateResponse()
 		this->writeHeader(200);
 		this->fields["Content-Length"] = std::to_string(this->fileSize);
 		this->fields["Content-Type"] = ft::getContentType(filePath);
-		this->fields["Connection"] = "close"; //TODO: connection: keep-alive check somewhere
 		this->writeFields();
 		return;
 	}
@@ -242,8 +243,6 @@ void ft::Response::writeFields(void)
 		this->data += key + " : " + value + '\n';
 	this->data += "\n";
 }
-
-///
 
 //TODO: does this need to be cleaner? header part could be split up
 ft::ResponseStatus ft::Response::send(int32_t socket)
