@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/12 16:02:40 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/12 20:29:10 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/07/13 16:33:48 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,8 +32,12 @@ void ft::DirectoryFactory::buildContentFromDir(const std::string &path, std::str
 
 			outContent += "<a href=\"";
 			outContent += ent->d_name;
+			if (ent->d_type == DT_DIR)
+				outContent += "/";
 			outContent += "\">";
 			outContent += ent->d_name;
+			if (ent->d_type == DT_DIR)
+				outContent += "/";
 			outContent += "</a>\n";
 		}
 		closedir(dir);
