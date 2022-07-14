@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 15:39:35 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/07 18:34:08 by fbes          ########   odam.nl         */
+/*   Updated: 2022/07/14 15:48:16 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -159,7 +159,8 @@ void ft::Section::verifyKeyValue(uint32_t lineNum, std::string& key, std::string
 		"methods",
 		"path",
 		"redir",
-		"error_403"
+		"error_403",
+		"cgi_bin"
 	};
 
 	int8_t index = -1;
@@ -171,6 +172,8 @@ void ft::Section::verifyKeyValue(uint32_t lineNum, std::string& key, std::string
 			break;
 		}
 	}
+	size_t space;
+	int statusCode;
 
 	if (index == -1)
 		throw ft::UnknownFieldKeyException(lineNum);
@@ -212,12 +215,19 @@ void ft::Section::verifyKeyValue(uint32_t lineNum, std::string& key, std::string
 
 		// expecting two strings, of which 1st is either "temp" or "perm" or a number (status code) and 2nd is a path
 		case 9: // redir
-			size_t space = value.find(' ');
+			space = value.find(' ');
 			if (space == std::string::npos)
 				throw ft::InvalidFieldValueException(lineNum);
-			int statusCode = std::stoi(value.substr(0, space));
+			statusCode = std::stoi(value.substr(0, space));
 			if (statusCode != 301 && statusCode != 302 && statusCode != 307 && statusCode != 308)
 				throw ft::InvalidFieldValueException(lineNum);
+			// TODO check max 2 fields
+			break;
+		case 11: // cgi_bin
+			space = value.find(' ');
+			if (space == std::string::npos)
+				throw ft::InvalidFieldValueException(lineNum);
+			// TODO check max 2 fields
 			break;
 	}
 }
