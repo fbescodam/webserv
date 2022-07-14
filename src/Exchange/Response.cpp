@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:34:00 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/13 17:39:51 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/14 14:47:59 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 ft::Response::Response(int32_t statusIn, ft::ServerSection *configIn)
 {
 	this->config.importFields(configIn->exportFields());
+	this->fields["Connection"] = "close";
 	this->generateStatusPage(statusIn);
 }
 

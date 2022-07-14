@@ -34,7 +34,9 @@ bool ft::Request::parse(void)
 		return (false);
 
 	std::vector<std::string> splitBuffer;
-	ft::split(this->buffer, "\n\n", splitBuffer);
+	ft::split(buffer, "\n\n", splitBuffer);
+	if (splitBuffer.size() == 0)
+		throw ft::BadRequest();
 	std::istringstream iss(splitBuffer[0]);
 
 	std::vector<std::string> tempFields;
