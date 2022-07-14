@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/02 12:34:20 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/13 17:25:08 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/14 19:28:08 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -119,15 +119,11 @@ void ft::Server::pollInEvent(pollfd* poll)
 	this->req_buf[poll->fd] += buff;
 
 	//assume more data is coming, send 100 continue
-	if (brecv == BUFF_SIZE)
-	{
-		ft::Response cont(100, &(this->config));
-		cont.send(poll->fd);
-		return;
-	}
+	ft::Request temp(this->req_buf[poll->fd]);
+	if (!temp.parse())
+		return ;
 
 	//construct response on store them in response buffer
-	ft::Request temp(this->req_buf[poll->fd]);
 	this->responses[poll->fd] = new ft::Response(temp, &(this->config));
 	if (this->responses[poll->fd]->verify())
 		this->responses[poll->fd]->generateResponse();

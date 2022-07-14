@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:34:12 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/13 16:02:48 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/14 19:25:43 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,10 +28,13 @@ void parseLineOne(ft::Request &req, std::string lineOne)
 	req.version = fields[2];
 }
 
-ft::Request::Request(std::string buffer)
+bool ft::Request::parse(void)
 {
+	if (this->buffer.find("\n\n") == std::string::npos)
+		return (false);
+
 	std::vector<std::string> splitBuffer;
-	ft::split(buffer, "\n\n", splitBuffer);
+	ft::split(this->buffer, "\n\n", splitBuffer);
 	std::istringstream iss(splitBuffer[0]);
 
 	std::vector<std::string> tempFields;
@@ -60,6 +63,13 @@ ft::Request::Request(std::string buffer)
 
 	if (splitBuffer.size() > 1)
 		this->body = splitBuffer[1];
+
+	return (true);
+}
+
+ft::Request::Request(std::string buffe)
+{
+	this->buffer = buffe;
 }
 
 //////////////////////////////////////////
