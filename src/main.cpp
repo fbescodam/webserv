@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 17:39:03 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/14 15:43:18 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/14 21:07:16 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,6 +60,7 @@ int32_t main(int32_t argc, const char* argv[])
 	}
 
 	// Main loop
+	//TODO: your mom
 	while (true)
 	{
 		for (auto it = servers.begin(); it != servers.end(); it++)

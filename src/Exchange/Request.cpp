@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:34:12 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/14 19:25:43 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/07/14 20:14:19 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ void parseLineOne(ft::Request &req, std::string lineOne)
 
 bool ft::Request::parse(void)
 {
-	if (this->buffer.find("\n\n") == std::string::npos)
+	if (this->buffer.find("\n\n") == std::string::npos && this->buffer.find("\r\n\r\n") == std::string::npos)
 		return (false);
 
 	std::vector<std::string> splitBuffer;
@@ -84,6 +84,8 @@ void ft::Request::display(void) const
 
 	for (const auto [key, value] : fields)
 		std::cout << key << ":" << value << std::endl;
+	
+	std::cout << body << std::endl;
 }
 
 void ft::Request::setMethod(const std::string& inMethod)
