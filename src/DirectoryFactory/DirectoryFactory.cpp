@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/12 16:02:40 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/13 16:33:48 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/14 21:07:30 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 void ft::DirectoryFactory::buildContentFromDir(const std::string &path, std::string &outContent)
 {
 	outContent.clear();
-	
+
 	// Title and header
 	outContent += "<html><head><title>Balls</title></head>";
 	outContent += "<body><h1>Index</h1><hr><pre>";
@@ -42,7 +42,7 @@ void ft::DirectoryFactory::buildContentFromDir(const std::string &path, std::str
 		}
 		closedir(dir);
 	}
-	else throw ft::FileNotFoundException();
+	else throw ft::IOException();
 
 	outContent += "</pre><hr></body></html>";
 }

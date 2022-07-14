@@ -6,10 +6,11 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 14:59:11 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/07 18:33:51 by fbes          ########   odam.nl         */
+/*   Updated: 2022/07/14 21:11:52 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <sys/stat.h>
 #include "GlobalConfig.hpp"
 
 //////////////////////////////////////////
@@ -109,9 +110,16 @@ static void getSubSectionName(const uint32_t lineNum, const std::string& line, s
 
 void ft::GlobalConfig::readFile(const std::string& filePath)
 {
+	struct stat s;
+	if (stat(filePath.c_str(), &s) == 0) {
+		if (s.st_mode & S_IFDIR)
+			throw ft::IOException(); // it's a fucking directory you twat
+	}
+	else
+		throw ft::IOException(); // generic file read error
 	std::ifstream fstream(filePath);
 	if (!fstream.good())
-		throw ft::FileNotFoundException();
+		throw ft::IOException();
 	std::string line;
 	uint32_t lineNum = 0;
 	std::pair<std::string, std::string> output;

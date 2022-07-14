@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 18:05:00 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/07 18:26:30 by fbes          ########   odam.nl         */
+/*   Updated: 2022/07/14 21:09:36 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -140,11 +140,10 @@ struct NoServersException : public std::exception
 	}
 };
 
-// File cannot be located.
-struct FileNotFoundException : public std::exception	// TODO: change to more generic File could not be located or read exception, IOException?
+struct IOException : public std::exception
 {
 	const char* what() const throw() override {
-		return ("File could not be located");
+		return ("IO Error on file. Is it actually a file? And is it reabable? Who knows...");
 	}
 };
 
