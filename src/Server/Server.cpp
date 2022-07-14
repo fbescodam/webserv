@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/02 12:34:20 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/13 17:25:08 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/14 15:40:03 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,42 +77,13 @@ void ft::Server::pollListen()
 	this->numFds++;
 }
 
-
-/*
-	ssize_t bytesrec;
-	char buffer[BUFF_SIZE] = {0};
-	this->timeout[poll->fd] = std::time(0);
-	
-	bytesrec = ft::receive(poll->fd, buffer, BUFF_SIZE, 0);
-	
-	this->req_buf[poll->fd] += buffer;
-	if (bytesrec == BUFF_SIZE) //we assume there is more data waiting
-		return ;
-	try
-	{
-		if (this->req_buf[poll->fd].size() == 0)
-			throw ft::BadRequest();			
-		ft::Request temp(this->req_buf[poll->fd]);
-		this->responses[poll->fd] = new ft::Response(temp, &(this->config));
-		this->responses[poll->fd]->verify();
-		this->req_buf.erase(poll->fd);
-		// this->requests[poll->fd]->display();
-	}
-	catch(const ft::BadRequest &e)
-	{
-		this->responses[poll->fd] = ft::Response::getErrorPointer(400);
-		this->req_buf.erase(poll->fd);
-		std::cout << e.what() << std::endl;
-	}
-	poll->events = POLLOUT;
-*/
-
 #define BUFF_SIZE 4096
 void ft::Server::pollInEvent(pollfd* poll)
 {
 	ssize_t brecv; //brecvast
 	char buff[BUFF_SIZE] = {0};
 	this->timeout[poll->fd] = std::time(nullptr);
+
 
 	//receive bytes and store them in our request buffer, organized per connection(poll->fd)
 	brecv = ft::receive(poll->fd, buff, BUFF_SIZE, 0);
@@ -121,20 +92,31 @@ void ft::Server::pollInEvent(pollfd* poll)
 	//assume more data is coming, send 100 continue
 	if (brecv == BUFF_SIZE)
 	{
-		ft::Response cont(100, &(this->config));
-		cont.send(poll->fd);
+		this->responses[poll->fd] = new ft::Response(100, &(this->config));
+		poll->events = POLLOUT;
 		return;
 	}
 
 	//construct response on store them in response buffer
-	ft::Request temp(this->req_buf[poll->fd]);
-	this->responses[poll->fd] = new ft::Response(temp, &(this->config));
-	if (this->responses[poll->fd]->verify())
-		this->responses[poll->fd]->generateResponse();
-	this->req_buf.erase(poll->fd);
+	try
+	{
+		ft::Request temp(this->req_buf[poll->fd]);
+		this->responses[poll->fd] = new ft::Response(temp, &(this->config));
+		if (this->responses[poll->fd]->verify())
+			this->responses[poll->fd]->generateResponse();
+		this->req_buf.erase(poll->fd);
+	}
+	catch (ft::BadRequest &e)
+	{
+		std::cerr<<e.what()<<std::endl; 
+		this->req_buf.erase(poll->fd);
+		this->responses[poll->fd] = new ft::Response(400, &(this->config));
+		
+	}
+	poll->events = POLLOUT;
+
 
 	//set poll to check for pollout events, this means we can send() to the fd because the client is ready
-	poll->events = POLLOUT;
 }
 
 void ft::Server::resolveConnection(pollfd *poll)
@@ -155,13 +137,13 @@ void ft::Server::resolveConnection(pollfd *poll)
 
 void ft::Server::pollOutEvent(pollfd* poll)
 {
+	this->timeout[poll->fd] = std::time(0);
 	ft::ResponseStatus ret = this->responses[poll->fd]->send(poll->fd);
 	if (ret == ft::DONE)
 	{
 		this->resolveConnection(poll);
 		std::cout << "//=/ Sent Response /=//" << std::endl;	
 	}
-	this->timeout[poll->fd] = std::time(0);
 }
 
 //TODO: 408 request timeout
@@ -174,6 +156,7 @@ void ft::Server::cleanSocket(pollfd *poll)
 	poll->fd = -1;
 }
 
+//TODO: this shit dont work
 bool ft::Server::checkTimeout(pollfd *poll)
 {	
 	return (this->timeout.find(poll->fd) != this->timeout.end() && \
@@ -206,8 +189,8 @@ void ft::Server::run(void)
 			this->pollOutEvent(poll);
 
 		//connection timed out: 5 seconds
-		if (i > 0 && this->checkTimeout(poll))
-			this->cleanSocket(poll);
+		// if (i > 0 && this->checkTimeout(poll))
+		// 	this->cleanSocket(poll);
 	}
 }
 

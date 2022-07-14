@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:34:12 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/13 16:02:48 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/14 14:33:41 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,8 @@ ft::Request::Request(std::string buffer)
 {
 	std::vector<std::string> splitBuffer;
 	ft::split(buffer, "\n\n", splitBuffer);
+	if (splitBuffer.size() == 0)
+		throw ft::BadRequest();
 	std::istringstream iss(splitBuffer[0]);
 
 	std::vector<std::string> tempFields;
