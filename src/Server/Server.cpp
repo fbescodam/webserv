@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/02 12:34:20 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/14 20:23:26 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/14 22:00:33 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,6 +77,12 @@ void ft::Server::pollListen()
 	this->numFds++;
 }
 
+void ft::Server::generateOutStatus(pollfd *poll, int code)
+{
+	this->responses[poll->fd] = new ft::Response(code, &(this->config));
+	poll->events = POLLOUT;
+}
+
 #define BUFF_SIZE 4096
 void ft::Server::pollInEvent(pollfd* poll)
 {
@@ -94,6 +100,13 @@ void ft::Server::pollInEvent(pollfd* poll)
 	{
 		this->requests[poll->fd]->body += this->req_buf[poll->fd];
 		size_t bodySize = this->requests[poll->fd]->body.size();
+		size_t maxBodySize = std::stoi(*this->config.getValue("limit_body_size"));
+		if (maxBodySize < bodySize)
+		{
+			delete this->requests[poll->fd];
+			this->generateOutStatus(poll, 413);
+			return ;
+		}
 		size_t clength = std::stoi(this->requests[poll->fd]->fields["Content-Length"]);
 		if (bodySize < clength)
 			return ;
@@ -109,10 +122,7 @@ void ft::Server::pollInEvent(pollfd* poll)
 	if (!temp->parse())
 	{
 		delete temp;
-		ft::Response cont(100, &(this->config));
-		cont.send(poll->fd);
-		this->responses[poll->fd] = new ft::Response(100, &(this->config));
-		poll->events = POLLOUT;
+		this->generateOutStatus(poll, 100);
 		return ;
 	}
 
@@ -218,4 +228,6 @@ void ft::Server::run(void)
 	}
 }
 
+
+//TODO: set all delete pointers to null
 //////////////////////////////////////////

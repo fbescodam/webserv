@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:34:00 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/14 20:15:23 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/14 21:50:34 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -263,7 +263,7 @@ ft::ResponseStatus ft::Response::send(int32_t socket)
 	}
 
 	//send the file, if its done resolve the connection
-	off_t len;
+	off_t len = 0;
 	sendfile(this->fileFd, socket, this->fileOffset, &len, NULL, 0);
 	this->fileOffset += len;
 
