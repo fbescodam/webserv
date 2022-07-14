@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/02 12:34:20 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/14 19:28:08 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/07/14 20:23:26 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,6 +82,7 @@ void ft::Server::pollInEvent(pollfd* poll)
 {
 	ssize_t brecv; //brecvast
 	char buff[BUFF_SIZE] = {0};
+	ft::Request *temp;
 	this->timeout[poll->fd] = std::time(nullptr);
 
 
@@ -89,11 +90,40 @@ void ft::Server::pollInEvent(pollfd* poll)
 	brecv = ft::receive(poll->fd, buff, BUFF_SIZE, 0);
 	this->req_buf[poll->fd] += buff;
 
-	//assume more data is coming, send 100 continue
-	ft::Request temp(this->req_buf[poll->fd]);
-	if (!temp.parse())
-		return ;
+	if (this->requests.find(poll->fd) != this->requests.end())
+	{
+		this->requests[poll->fd]->body += this->req_buf[poll->fd];
+		size_t bodySize = this->requests[poll->fd]->body.size();
+		size_t clength = std::stoi(this->requests[poll->fd]->fields["Content-Length"]);
+		if (bodySize < clength)
+			return ;
+		this->requests[poll->fd]->body.substr(0, clength);
+		this->req_buf[poll->fd].erase();
+		temp = this->requests[poll->fd];
+		this->requests.erase(poll->fd);
+		goto rep;
+	}
 
+	//assume more data is coming, send 100 continue
+	temp = new ft::Request(this->req_buf[poll->fd]);
+	if (!temp->parse())
+	{
+		delete temp;
+		ft::Response cont(100, &(this->config));
+		cont.send(poll->fd);
+		this->responses[poll->fd] = new ft::Response(100, &(this->config));
+		poll->events = POLLOUT;
+		return ;
+	}
+
+	if (temp->method == ft::Method::POST)
+	{
+		this->req_buf.erase(poll->fd);
+		this->requests[poll->fd] = temp;
+		return ;
+	}
+
+rep:
 	//construct response on store them in response buffer
 	try
 	{
@@ -107,11 +137,9 @@ void ft::Server::pollInEvent(pollfd* poll)
 		std::cerr<<e.what()<<std::endl;
 		this->req_buf.erase(poll->fd);
 		this->responses[poll->fd] = new ft::Response(400, &(this->config));
-
 	}
+
 	poll->events = POLLOUT;
-
-
 	//set poll to check for pollout events, this means we can send() to the fd because the client is ready
 }
 
@@ -185,8 +213,8 @@ void ft::Server::run(void)
 			this->pollOutEvent(poll);
 
 		//connection timed out: 5 seconds
-		// if (i > 0 && this->checkTimeout(poll))
-		// 	this->cleanSocket(poll);
+		if (i > 0 && this->checkTimeout(poll))
+			this->cleanSocket(poll);
 	}
 }
 

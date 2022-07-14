@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:34:00 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/14 14:47:59 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/14 20:15:23 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,15 +17,17 @@
 ft::Response::Response(int32_t statusIn, ft::ServerSection *configIn)
 {
 	this->config.importFields(configIn->exportFields());
+	this->request = NULL;
+	this->file = NULL;
 	this->fields["Connection"] = "close";
 	this->generateStatusPage(statusIn);
 }
 
 
-ft::Response::Response(ft::Request requestIn, ft::ServerSection* configIn)
+ft::Response::Response(ft::Request *requestIn, ft::ServerSection* configIn)
 {
 	this->request = requestIn;
-	this->config = ft::Section(ft::basedir(requestIn.path), "response", *configIn);
+	this->config = ft::Section(ft::basedir(requestIn->path), "response", *configIn);
 	this->locations = configIn->locations;
 	this->file = NULL;
 	this->fileFd = -1;
@@ -38,6 +40,8 @@ ft::Response::~Response()
 {
 	if (this->file)
 		fclose(this->file);
+	if (this->request)
+		delete this->request;
 }
 
 //////////////////////////////////////////
@@ -55,7 +59,7 @@ static bool checkMethods(const std::list<std::string>& methods, ft::Method reque
 bool ft::Response::verify(void)
 {
 	//TODO: probably not the right spot for this but idk where else to put it for now
-	if (this->request.keyExists("Connection") && *this->request.getValue("Connection") == "keep-alive")
+	if (this->request->keyExists("Connection") && *this->request->getValue("Connection") == "keep-alive")
 	{
 		this->fields["Connection"] = "keep-alive";
 		this->fields["Keep-Alive"] = "timeout=5";
@@ -66,27 +70,27 @@ bool ft::Response::verify(void)
 
 	// Loops over all locations and takes the rules from them and applies it to this config
 	for (const auto &val: this->locations)
-		if (val.appliesForPath(this->request.path))
+		if (val.appliesForPath(this->request->path))
 			this->config.importFields(val.exportFields());
 
 	struct stat stats;
-	stat((*this->config.getValue("path") + this->request.path).c_str(), &stats);
-	if (S_ISDIR(stats.st_mode) && this->request.path.back() != '/')
+	stat((*this->config.getValue("path") + this->request->path).c_str(), &stats);
+	if (S_ISDIR(stats.st_mode) && this->request->path.back() != '/')
 	{
-		this->fields["Location"] = this->request.path + "/";
+		this->fields["Location"] = this->request->path + "/";
 		this->generateStatusPage(308);
 		return (false);
 	}
 
-	std::cout <<this->request.path<<std::endl;
-	if (this->request.path.back() == '/')
+	std::cout <<this->request->path<<std::endl;
+	if (this->request->path.back() == '/')
 	{
-		if (!ft::filesystem::fileExists(this->request.path + *this->config.getValue("index")))
+		if (!ft::filesystem::fileExists(this->request->path + *this->config.getValue("index")))
 		{
 			const std::string* dir = this->config.getValue("dir_listing");
 
 			if (dir != nullptr && *dir == "no")
-				this->request.path += "index.html";
+				this->request->path += "index.html";
 		}
 	}
 
@@ -97,7 +101,7 @@ bool ft::Response::verify(void)
 	bool methodRules = this->config.getValueAsList("methods", methodList);
 	
 	// Checks if request method is in allowed methods
-	if (!checkMethods(methodRules ? methodList : methodGet, this->request.method))
+	if (!checkMethods(methodRules ? methodList : methodGet, this->request->method))
 	{
 		this->generateStatusPage(405); 
 		return (false);
@@ -190,9 +194,9 @@ void ft::Response::deleteMethod(std::string filePath)
 //after verify, make up the response
 void ft::Response::generateResponse()
 {
-	std::string filePath = *this->config.getValue("path") + this->request.path;
+	std::string filePath = *this->config.getValue("path") + this->request->path;
 
-	if (this->request.method == ft::Method::DELETE)
+	if (this->request->method == ft::Method::DELETE)
 	{
 		this->deleteMethod(filePath); 
 		return;

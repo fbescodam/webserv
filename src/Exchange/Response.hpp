@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:13:27 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/13 16:17:37 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/14 19:51:12 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ class Response final : public Exchange
 public: // Ctor ~ Dtor
 	Response() = default;
 	Response(int32_t statusIn, ft::ServerSection* configIn);
-	Response(ft::Request requestIn, ft::ServerSection* configIn);
+	Response(ft::Request *requestIn, ft::ServerSection* configIn);
 	
 	~Response();
 
@@ -102,7 +102,7 @@ public: // Attributes
 	std::vector<ft::Section> locations;
 
 	//the request were basing the response on
-	ft::Request request;
+	ft::Request *request;
 
 	FILE*	file;
 	int32_t	fileFd;
