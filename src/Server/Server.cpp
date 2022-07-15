@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/02 12:34:20 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/15 16:19:37 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/15 17:01:58 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,8 +73,9 @@ void ft::Server::pollListen()
 	this->pollfds[numFds].events = POLLIN;
 	this->pollfds[numFds].revents = 0;
 	this->timeout[this->pollfds[numFds].fd] = std::time(0);
-
 	this->numFds++;
+
+	this->clientIpv4[clientSocket] = ft::inet_ntop(this->address);
 }
 
 void ft::Server::generateOutStatus(pollfd *poll, int code)
@@ -122,7 +123,7 @@ void ft::Server::pollInEvent(pollfd* poll)
 	}
 
 	//assume more data is coming, send 100 continue
-	temp = new ft::Request(this->req_buf[poll->fd]);
+	temp = new ft::Request(this->req_buf[poll->fd], this->clientIpv4[poll->fd]);
 	if (!temp->parse())
 	{
 		delete temp;

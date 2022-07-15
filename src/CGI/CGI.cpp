@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 11:51:45 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/14 20:05:21 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/15 17:06:39 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ static std::vector<std::string> get_envp(const ft::Response& response, const std
 	std::vector<std::string> envp = {
 		"GATEWAY_INTERFACE=CGI/1.1", 
 		"SERVER_PROTOCOL=HTTP/1.1",
-		ft::format("REMOTE_ADDR=%s", "127.0.0.1"), // TODO: Where ????
+		ft::format("REMOTE_ADDR=%s", response.request->ipv4.c_str()), //TODO: could be null ig
 		ft::format("REQUEST_METHOD=%s", methods.find(response.request->method)),
 		ft::format("SCRIPT_NAME=%s", path.c_str()),
 		ft::format("SERVER_NAME=%s", response.config.getValue("server_names")->c_str()), // TODO: only get one server name (the first one)

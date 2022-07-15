@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:13:27 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/14 19:25:26 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/07/15 17:04:14 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ class Request final : public Exchange
 {
 public: // Ctor ~ Dtor
 	Request() {}
-	Request(std::string buffe);
+	Request(std::string buffe, std::string ipv4);
 
 public: // Methods
 	void display(void) const;
@@ -47,6 +47,7 @@ public: // Attributes
 	std::string path;
 	std::string version;
 	std::string body;
+	std::string ipv4;
 	std::string buffer;
 };
 

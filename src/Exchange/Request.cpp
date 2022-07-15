@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:34:12 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/15 16:26:06 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/15 17:04:10 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,8 +69,9 @@ bool ft::Request::parse(void)
 	return (true);
 }
 
-ft::Request::Request(std::string buffe)
+ft::Request::Request(std::string buffe, std::string ip)
 {
+	this->ipv4 = ip;
 	this->buffer = buffe;
 }
 
