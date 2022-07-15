@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:34:00 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/15 16:50:46 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/15 17:51:37 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -189,6 +189,26 @@ void ft::Response::deleteMethod(std::string filePath)
 		this->generateStatusPage(404);
 }
 
+struct body{
+	std::string fileName;
+	std::map<std::string, std::string> fields;
+	std::string data;
+
+};
+
+void ft::Response::postMethod(std::string filePath)
+{
+	// if (filePath == cgi)
+	// 	cgi process
+
+	if (this->request->fields["Content-Type"].find("multipart/form-data;") != std::string::npos)
+		;//suffering time
+
+	std::cout << filePath;
+
+
+}
+
 //after verify, make up the response
 void ft::Response::generateResponse()
 {
@@ -203,8 +223,7 @@ void ft::Response::generateResponse()
 	//TODO: check if filepath is a cgi and handle a post accordingly
 	if (this->request->method == ft::Method::POST)
 	{
-		std::cerr << "lol\n";
-		this->request->display();
+		this->postMethod(filePath);
 		this->generateStatusPage(404);
 		return;
 	}

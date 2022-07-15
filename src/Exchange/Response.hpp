@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:13:27 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/14 19:51:12 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/15 17:34:35 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,6 +88,9 @@ private:
 
 	//delete method
 	void deleteMethod(std::string filePath);
+
+	//post method
+	void postMethod(std::string filePath);
 
 	//yes
 	void retrievePigPath(std::string &name);
