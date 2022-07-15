@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/02 12:34:20 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/15 15:18:11 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/15 16:19:37 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,16 +91,16 @@ void ft::Server::pollInEvent(pollfd* poll)
 	ft::Request *temp;
 	this->timeout[poll->fd] = std::time(nullptr);
 
-
 	//receive bytes and store them in our request buffer, organized per connection(poll->fd)
 	brecv = ft::receive(poll->fd, buff, BUFF_SIZE, 0);
 	this->req_buf[poll->fd] += buff;
 
+	//append shit to request body if needed and make response if the body is done
 	if (this->requests.find(poll->fd) != this->requests.end())
 	{
 		this->requests[poll->fd]->body += this->req_buf[poll->fd];
 		size_t bodySize = this->requests[poll->fd]->body.size();
-		size_t maxBodySize = std::stoi(*this->config.getValue("limit_body_size"));
+		static size_t maxBodySize = std::stoi(*this->config.getValue("limit_body_size"));
 		if (maxBodySize < bodySize)
 		{
 			delete this->requests[poll->fd];
@@ -110,8 +110,11 @@ void ft::Server::pollInEvent(pollfd* poll)
 		}
 		size_t clength = std::stoi(this->requests[poll->fd]->fields["Content-Length"]);
 		if (bodySize < clength)
+		{
+			this->generateOutStatus(poll, 100);
 			return ;
-		this->requests[poll->fd]->body.substr(0, clength);
+		}
+		this->requests[poll->fd]->body.erase(bodySize - (bodySize-clength));
 		this->req_buf[poll->fd].erase();
 		temp = this->requests[poll->fd];
 		this->requests.erase(poll->fd);
@@ -127,6 +130,7 @@ void ft::Server::pollInEvent(pollfd* poll)
 		return ;
 	}
 
+	//start reading body data
 	if (temp->method == ft::Method::POST && temp->fields.find("Content-Length") != temp->fields.end())
 	{
 		this->req_buf.erase(poll->fd);
@@ -152,8 +156,8 @@ rep:
 		this->responses[poll->fd] = new ft::Response(400, &(this->config));
 	}
 
-	poll->events = POLLOUT;
 	//set poll to check for pollout events, this means we can send() to the fd because the client is ready
+	poll->events = POLLOUT;
 }
 
 void ft::Server::resolveConnection(pollfd *poll)
@@ -161,16 +165,13 @@ void ft::Server::resolveConnection(pollfd *poll)
 	int temp = poll->fd;
 
 	if (this->responses[temp]->fields["Connection"] == "keep-alive")
-	{
-		delete this->responses[temp];
 		poll->events = POLLIN;
-	}
 	else
 	{
 		close(poll->fd);
 		poll->fd = -1;
-		delete this->responses[temp];
 	}
+	delete this->responses[temp];
 	this->responses.erase(temp);
 }
 

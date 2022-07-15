@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:34:00 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/14 21:50:34 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/15 16:25:58 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,8 +81,6 @@ bool ft::Response::verify(void)
 		this->generateStatusPage(308);
 		return (false);
 	}
-
-	std::cout <<this->request->path<<std::endl;
 	if (this->request->path.back() == '/')
 	{
 		if (!ft::filesystem::fileExists(this->request->path + *this->config.getValue("index")))
@@ -203,6 +201,14 @@ void ft::Response::generateResponse()
 	}
 
 	//TODO: check if filepath is a cgi and handle a post accordingly
+	if (this->request->method == ft::Method::POST)
+	{
+		std::cerr << "lol\n";
+		this->request->display();
+		this->generateStatusPage(405);
+		return;
+	}
+
 
 	//check if filepath ends with /, if so, dir listing
 	if (filePath.back() == '/')

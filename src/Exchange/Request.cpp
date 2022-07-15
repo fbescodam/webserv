@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:34:12 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/14 20:14:19 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/15 16:26:06 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,11 +30,11 @@ void parseLineOne(ft::Request &req, std::string lineOne)
 
 bool ft::Request::parse(void)
 {
-	if (this->buffer.find("\n\n") == std::string::npos && this->buffer.find("\r\n\r\n") == std::string::npos)
+	if (this->buffer.find("\r\n\r\n") == std::string::npos)
 		return (false);
 
 	std::vector<std::string> splitBuffer;
-	ft::split(buffer, "\n\n", splitBuffer);
+	ft::split(buffer, "\r\n\r\n", splitBuffer);
 	if (splitBuffer.size() == 0)
 		throw ft::BadRequest();
 	std::istringstream iss(splitBuffer[0]);
@@ -48,7 +48,7 @@ bool ft::Request::parse(void)
 
 	std::pair<std::string, std::string> output;
 	for (std::string &val : tempFields)
-	{
+	{	
 		ft::trim(val);
 		val.erase(remove_if(val.begin(), val.end(), [](char c){return !(c>=32);}), val.end());
 		if (!val.empty())
