@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:34:00 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/15 16:25:58 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/15 16:50:46 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -205,7 +205,7 @@ void ft::Response::generateResponse()
 	{
 		std::cerr << "lol\n";
 		this->request->display();
-		this->generateStatusPage(405);
+		this->generateStatusPage(404);
 		return;
 	}
 
@@ -255,13 +255,17 @@ void ft::Response::writeFields(void)
 	this->data += "\n";
 }
 
-//TODO: does this need to be cleaner? header part could be split up
 ft::ResponseStatus ft::Response::send(int32_t socket)
 {
 	//send the header part
 	if (!this->sentHeader)
 	{
-		ft::send(socket, this->data.data(), this->data.length(), 0);
+		size_t len = ft::send(socket, this->data.data(), this->data.length(), 0);
+		if (len < this->data.length())
+		{
+			this->data.erase(0, len);
+			return ft::NOT_DONE;
+		}
 		this->sentHeader = true;
 		if (this->fileFd < 0)
 			return ft::DONE;
