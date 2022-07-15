@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/02 12:34:20 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/14 22:00:33 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/15 15:18:11 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,6 +104,7 @@ void ft::Server::pollInEvent(pollfd* poll)
 		if (maxBodySize < bodySize)
 		{
 			delete this->requests[poll->fd];
+			this->requests.erase(poll->fd);
 			this->generateOutStatus(poll, 413);
 			return ;
 		}
@@ -126,7 +127,7 @@ void ft::Server::pollInEvent(pollfd* poll)
 		return ;
 	}
 
-	if (temp->method == ft::Method::POST)
+	if (temp->method == ft::Method::POST && temp->fields.find("Content-Length") != temp->fields.end())
 	{
 		this->req_buf.erase(poll->fd);
 		this->requests[poll->fd] = temp;
@@ -157,19 +158,20 @@ rep:
 
 void ft::Server::resolveConnection(pollfd *poll)
 {
-	if (this->responses[poll->fd]->fields["Connection"] == "keep-alive")
+	int temp = poll->fd;
+
+	if (this->responses[temp]->fields["Connection"] == "keep-alive")
 	{
-		delete this->responses[poll->fd];
+		delete this->responses[temp];
 		poll->events = POLLIN;
 	}
 	else
 	{
-		int temp = poll->fd;
 		close(poll->fd);
 		poll->fd = -1;
 		delete this->responses[temp];
 	}
-	this->responses.erase(poll->fd);
+	this->responses.erase(temp);
 }
 
 void ft::Server::pollOutEvent(pollfd* poll)
