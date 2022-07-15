@@ -137,6 +137,8 @@ rep:
 	//construct response on store them in response buffer
 	try
 	{
+		if (this->responses.find(poll->fd) != this->responses.end())
+			delete this->responses[poll->fd];
 		this->responses[poll->fd] = new ft::Response(temp, &(this->config));
 		if (this->responses[poll->fd]->verify())
 			this->responses[poll->fd]->generateResponse();
@@ -167,6 +169,7 @@ void ft::Server::resolveConnection(pollfd *poll)
 		poll->fd = -1;
 		delete this->responses[temp];
 	}
+	this->responses.erase(poll->fd);
 }
 
 void ft::Server::pollOutEvent(pollfd* poll)
