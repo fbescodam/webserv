@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/02 12:34:20 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/19 21:28:52 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/19 21:53:52 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,13 +96,22 @@ void ft::Server::pollInEvent(pollfd* poll)
 	brecv = ft::receive(poll->fd, buff, BUFF_SIZE, 0);
 	this->req_buf[poll->fd] += buff;
 
-	temp = new ft::Request(this->req_buf[poll->fd], this->clientIpv4[poll->fd]);
-	if (!temp->parse())
+	try
 	{
-		delete temp;
+		temp = new ft::Request(this->req_buf[poll->fd], this->clientIpv4[poll->fd]);
+		if (!temp->parse())
+		{
+			delete temp;
+			return ;
+		}
+	}
+	catch (ft::BadRequest &e)
+	{
+		this->generateOutStatus(poll, 400);
 		return ;
 	}
 	//TODO: limit body size
+	//TODO: https still fucks this thing
 
 	//construct response on store them in response buffer
 	try
