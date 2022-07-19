@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/25 19:34:04 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/07 15:49:18 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/19 16:08:04 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,18 @@ void ft::split(const std::string& string, char *delim, std::vector<std::string>&
 	}
 }
 
+void ft::split(const std::string& string, std::string delim, std::vector<std::string>& output)
+{
+	output.clear();
+
+	size_t start, end = 0;
+	while ((start = string.find_first_not_of(delim, end)) != std::string::npos)
+	{
+		end = string.find(delim, start);
+		output.push_back(string.substr(start, end - start));
+	}
+}
+
 std::string ft::basedir(const std::string& path)
 {
 	std::string base = path;
@@ -43,7 +55,17 @@ std::string ft::basedir(const std::string& path)
 void ft::slice(const std::string& string, char delim, std::pair<std::string, std::string>& output)
 {
 	size_t start, end = 0;
-	start = string.find_first_of(delim, end);
+	start = string.find_first_of(delim);
+	if (start == std::string::npos)
+		throw ft::DelimiterNotFoundException();
+	output.first = string.substr(0, start);
+	output.second = string.substr(start + 1);
+}
+
+void ft::slice(const std::string& string, std::string delim, std::pair<std::string, std::string>& output)
+{
+	size_t start, end = 0;
+	start = string.find_first_of(delim);
 	if (start == std::string::npos)
 		throw ft::DelimiterNotFoundException();
 	output.first = string.substr(0, start);

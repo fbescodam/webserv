@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 11:51:45 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/15 17:06:39 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/19 21:01:09 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,49 +28,71 @@ static std::vector<const char*> c_arr(const std::vector<std::string>& array)
 	return (out);
 }
 
-/**
- * @see https://www.ibm.com/docs/en/netcoolomnibus/8.1?topic=SSSHTQ_8.1.0/com.ibm.netcool_OMNIbus.doc_8.1.0/webtop/wip/reference/web_cust_envvariablesincgiscripts.html
- */
-static std::vector<std::string> get_envp(const ft::Response& response, const std::string& path) 
-{
-	static std::unordered_map<ft::Method, std::string> const methods = 
-	{ 
-		{ ft::Method::GET, "GET" },
-		{ ft::Method::POST, "POST" },
-		{ ft::Method::DELETE, "DELETE" },
-	};
-
-	std::vector<std::string> envp = {
-		"GATEWAY_INTERFACE=CGI/1.1", 
-		"SERVER_PROTOCOL=HTTP/1.1",
-		ft::format("REMOTE_ADDR=%s", response.request->ipv4.c_str()), //TODO: could be null ig
-		ft::format("REQUEST_METHOD=%s", methods.find(response.request->method)),
-		ft::format("SCRIPT_NAME=%s", path.c_str()),
-		ft::format("SERVER_NAME=%s", response.config.getValue("server_names")->c_str()), // TODO: only get one server name (the first one)
-		ft::format("SERVER_PORT=%s", response.config.getValue("listen")->c_str()), //TODO: get value can return NULL
-		//ft::format("QUERY_STRING=%s", "TODO: Fill in!"), // 
-		// ft::format("CONTENT_LENGTH=%s", request.body.length()),
-	};
-
-	return (envp);
-}
-
-void ft::CGI::runCGI(const ft::Response& response, const std::string& path, std::string &out)
+void ft::CGI::runCGI(const ft::Response& response, const std::string& path, std::string &out, const std::string &cgiBin)
 {
 	int32_t fds[2];
-	ft::Response outResponse;
 
-	char* const bruh[999] = {
-		"/bin/sh",
-		const_cast<char *>(path.c_str()),
-		nullptr,
-	};
+	std::vector<std::string> envpp;
+	envpp.push_back("GATEWAY_INTERFACE=CGI/1.1");
+	envpp.push_back("REMOTE_ADDR=" + response.request->ipv4);
+	envpp.push_back("REQUEST_METHOD=POST");
+	envpp.push_back("SCRIPT_NAME=" + path);
+	envpp.push_back("SERVER_NAME=localhost");
+	envpp.push_back("SERVER_PROTOCOL=HTTP/1.1");
+	envpp.push_back("CONTENT_LENGTH=" + std::to_string(response.request->body.size()));
 
-	if (!ft::filesystem::fileExists(path))
+	try
 	{
-		// ft::Response::getError(404).send(response.socket);
-		return;
+		ft::pipe(fds);
+
+		pid_t pid;
+		if ((pid = ft::fork()) == 0)
+		{
+			ft::dup2(fds[READ], STDIN_FILENO);
+			ft::dup2(fds[WRITE], STDOUT_FILENO);
+			ft::dup2(fds[WRITE], STDERR_FILENO);
+
+			write(STDIN_FILENO, response.request->body.c_str(), response.request->body.size());
+
+			char* const* argv = const_cast<char* const*>(c_arr({cgiBin, path}).data());
+			char* const* envp = const_cast<char* const*>(c_arr(envpp).data());
+
+			ft::execve(cgiBin, argv, envp);
+		}
+		else // Parent
+		{
+			size_t bread;
+			char buf[4096] = {0};
+			while ((bread = read(fds[READ], buf, sizeof(buf))) > 0)
+			{
+				std::cerr << "lol\n";
+				out += buf;
+				bzero(buf, sizeof(buf));
+				if (bread < sizeof(buf))
+					close(fds[READ]);
+			}
+		}
 	}
+	catch(const std::exception& e)
+	{
+		std::cerr << e.what() << '\n';
+	}
+}
+
+//////////////////////////////////////////
+
+/*
+
+	int32_t fds[2];
+	ft::Response outResponse;
+	std::vector<std::string> envpp;
+	envpp.push_back("GATEWAY_INTERFACE=CGI/1.1");
+	envpp.push_back("REMOTE_ADDR=" + response.request->ipv4);
+	envpp.push_back("REQUEST_METHOD=POST");
+	envpp.push_back("SCRIPT_NAME=" + path);
+	envpp.push_back("SERVER_NAME=localhost");
+	envpp.push_back("SERVER_PROTOCOL=HTTP/1.1");
+	envpp.push_back("CONTENT_LENGTH=" + std::to_string(response.request->body.size()));
 
 	try
 	{
@@ -80,18 +102,23 @@ void ft::CGI::runCGI(const ft::Response& response, const std::string& path, std:
 		if ((pid = ft::fork()) == 0)
 		{
 			// Redirect 
-			// ft::dup2(fds[READ], STDIN_FILENO);
+			ft::dup2(fds[READ], STDIN_FILENO);
 			ft::dup2(fds[WRITE], STDOUT_FILENO);
-			//ft::dup2(request.socket, STDERR_FILENO);
 
 			// Convert Cpp => C style
-			auto argv = const_cast<char* const*>(c_arr({"TODO: File path"}).data());
-			auto envp = const_cast<char* const*>(c_arr(get_envp(response, path)).data());
+			//auto argv = const_cast<char* const*>(c_arr({cgiBin, path}).data());
+			//auto envp = const_cast<char* const*>(c_arr(get_envp(response, path)).data());
+
+
+			auto argvv = c_arr({cgiBin, path});
+			char* const* argv = const_cast<char* const*>(argvv.data());
+
+			auto envpv = c_arr(envpp);
+			char* const* envp = const_cast<char* const*>(envpv.data());
+			//char* const* envp
 
 			// Execve will abandon proccess or throw
-			// ft::execve("examples/www/cgi_tester", NULL, NULL);
-			ft::execve("/bin/sh", bruh, NULL);
-
+			ft::execve(cgiBin, argv, envp);
 			// Close all our pipes
 			close(fds[READ]);
 			close(fds[WRITE]);
@@ -99,16 +126,18 @@ void ft::CGI::runCGI(const ft::Response& response, const std::string& path, std:
 			close(STDERR_FILENO);
 			exit(EXIT_FAILURE);
 		}
-		waitpid(pid, NULL, 0);
+		ft::dup2(fds[WRITE], STDIN_FILENO);
+		write(fds[WRITE], response.request->body.c_str(), response.request->body.size());
 		close(fds[WRITE]);
+		waitpid(-1, NULL, 0);
 	}
 	catch(const std::exception& e)
 	{
 		std::cerr << e.what() << std::endl;
-		// ft::Response::getError(500).send(response.socket);
 	}
 
 
+	ft::dup2(fds[READ], STDOUT_FILENO);
 	#define BUFFER_SIZE 4096
 	char buf[BUFFER_SIZE + 1] = {0};
 	while (read(fds[READ], buf, BUFFER_SIZE) > 0)
@@ -117,9 +146,5 @@ void ft::CGI::runCGI(const ft::Response& response, const std::string& path, std:
 		bzero(buf, BUFFER_SIZE);
 	}
 	//TODO: use binary stream for potential images
-
 	close(fds[READ]);
-	close(fds[WRITE]);
-}
-
-//////////////////////////////////////////
+*/

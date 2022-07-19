@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:34:00 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/15 17:51:37 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/19 20:12:45 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,7 +87,7 @@ bool ft::Response::verify(void)
 		{
 			const std::string* dir = this->config.getValue("dir_listing");
 
-			if (dir != nullptr && *dir == "no")
+			if (dir != nullptr && *dir == "no" && this->request->method != ft::Method::POST)
 				this->request->path += "index.html";
 		}
 	}
@@ -189,24 +189,23 @@ void ft::Response::deleteMethod(std::string filePath)
 		this->generateStatusPage(404);
 }
 
-struct body{
-	std::string fileName;
-	std::map<std::string, std::string> fields;
-	std::string data;
-
-};
-
 void ft::Response::postMethod(std::string filePath)
 {
-	// if (filePath == cgi)
-	// 	cgi process
+	std::string out;
+	std::list<std::string> cgiBin;
 
-	if (this->request->fields["Content-Type"].find("multipart/form-data;") != std::string::npos)
-		;//suffering time
-
-	std::cout << filePath;
-
-
+	if (!ft::filesystem::fileExists(filePath))
+		this->generateStatusPage(404);
+	else if (this->config.getValueAsList("cgi_bin", cgiBin))
+	{
+		std::cerr<<"lol1"<<std::endl;
+		ft::CGI::runCGI(*this, filePath, out, cgiBin.back());
+		std::cerr<<"lol2"<<std::endl;
+		this->data = out;
+		std::cout << this->data;
+	}		
+	else
+		this->generateStatusPage(400);
 }
 
 //after verify, make up the response
@@ -224,10 +223,8 @@ void ft::Response::generateResponse()
 	if (this->request->method == ft::Method::POST)
 	{
 		this->postMethod(filePath);
-		this->generateStatusPage(404);
 		return;
 	}
-
 
 	//check if filepath ends with /, if so, dir listing
 	if (filePath.back() == '/')

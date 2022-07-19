@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/02 12:34:20 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/15 17:01:58 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/19 21:28:52 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,50 +96,14 @@ void ft::Server::pollInEvent(pollfd* poll)
 	brecv = ft::receive(poll->fd, buff, BUFF_SIZE, 0);
 	this->req_buf[poll->fd] += buff;
 
-	//append shit to request body if needed and make response if the body is done
-	if (this->requests.find(poll->fd) != this->requests.end())
-	{
-		this->requests[poll->fd]->body += this->req_buf[poll->fd];
-		size_t bodySize = this->requests[poll->fd]->body.size();
-		static size_t maxBodySize = std::stoi(*this->config.getValue("limit_body_size"));
-		if (maxBodySize < bodySize)
-		{
-			delete this->requests[poll->fd];
-			this->requests.erase(poll->fd);
-			this->generateOutStatus(poll, 413);
-			return ;
-		}
-		size_t clength = std::stoi(this->requests[poll->fd]->fields["Content-Length"]);
-		if (bodySize < clength)
-		{
-			this->generateOutStatus(poll, 100);
-			return ;
-		}
-		this->requests[poll->fd]->body.erase(bodySize - (bodySize-clength));
-		this->req_buf[poll->fd].erase();
-		temp = this->requests[poll->fd];
-		this->requests.erase(poll->fd);
-		goto rep;
-	}
-
-	//assume more data is coming, send 100 continue
 	temp = new ft::Request(this->req_buf[poll->fd], this->clientIpv4[poll->fd]);
 	if (!temp->parse())
 	{
 		delete temp;
-		this->generateOutStatus(poll, 100);
 		return ;
 	}
+	//TODO: limit body size
 
-	//start reading body data
-	if (temp->method == ft::Method::POST && temp->fields.find("Content-Length") != temp->fields.end())
-	{
-		this->req_buf.erase(poll->fd);
-		this->requests[poll->fd] = temp;
-		return ;
-	}
-
-rep:
 	//construct response on store them in response buffer
 	try
 	{
@@ -171,6 +135,7 @@ void ft::Server::resolveConnection(pollfd *poll)
 	{
 		close(poll->fd);
 		poll->fd = -1;
+		poll->events = POLLIN;
 	}
 	delete this->responses[temp];
 	this->responses.erase(temp);

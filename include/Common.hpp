@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 17:39:22 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/07 15:57:40 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/19 16:05:59 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,8 @@ FT_BEGIN
  * @param output The output.
  */
 void split(const std::string& string, char *Delim, std::vector<std::string>& output);
+void split(const std::string& string, std::string delim, std::vector<std::string>& output);
+
 
 /**
  * Slices a string into two parts at the first occurence of the delimiter.
@@ -61,6 +63,8 @@ void split(const std::string& string, char *Delim, std::vector<std::string>& out
  * @param output The output.
  */
 void slice(const std::string& string, char delim, std::pair<std::string, std::string>& output);
+void slice(const std::string& string, std::string delim, std::pair<std::string, std::string>& output);
+
 
 /**
  * Remove whitespace characters from the beginning and end of a string.

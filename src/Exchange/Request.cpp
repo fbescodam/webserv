@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:34:12 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/15 17:04:10 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/19 16:36:01 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,18 +30,15 @@ void parseLineOne(ft::Request &req, std::string lineOne)
 
 bool ft::Request::parse(void)
 {
-	if (this->buffer.find("\r\n\r\n") == std::string::npos)
+	size_t pos = this->buffer.find("\r\n\r\n");
+	if (pos== std::string::npos)
 		return (false);
 
-	std::vector<std::string> splitBuffer;
-	ft::split(buffer, "\r\n\r\n", splitBuffer);
-	if (splitBuffer.size() == 0)
-		throw ft::BadRequest();
-	std::istringstream iss(splitBuffer[0]);
-
+	std::pair<std::string, std::string> splitBuffer(buffer.substr(0, pos), buffer.substr(pos));
+	std::istringstream iss(splitBuffer.first);
 	std::vector<std::string> tempFields;
-	ft::trim(splitBuffer[0]);
-	ft::split(splitBuffer[0], "\n", tempFields);
+	ft::trim(splitBuffer.first);
+	ft::split(splitBuffer.first, "\n", tempFields);
 
 	parseLineOne(*this, tempFields[0]);
 	tempFields.erase(tempFields.begin());
@@ -61,11 +58,17 @@ bool ft::Request::parse(void)
 				throw ft::BadRequest();
 			this->fields[output.first] = output.second;
 		}
+	}	
+
+
+	if (splitBuffer.second.size() > 0)
+		this->body += splitBuffer.second;
+
+	if (this->method == ft::Method::POST)
+	{
+		if (this->body.size() < std::stoul(this->fields["Content-Length"]))
+			return (false);
 	}
-
-	if (splitBuffer.size() > 1)
-		this->body = splitBuffer[1];
-
 	return (true);
 }
 
