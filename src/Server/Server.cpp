@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/02 12:34:20 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/20 19:50:18 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/20 20:45:40 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,12 +34,11 @@ void ft::Server::init(void)
 	}
 
 	this->nfds = 0;
-	this->maxClients = 120; // this should be gotten from config
 	this->numFds = 1;
 
 	try
 	{
-		this->pollfds = new pollfd[this->maxClients];
+		this->pollfds = new pollfd[MAX_CLIENTS];
 	}
 	catch(const std::exception& e)
 	{
@@ -69,6 +68,8 @@ void ft::Server::pollListen()
 		this->timeout[poll->fd] = std::time(0);
 		return;
 	}
+	if (this->numFds >= MAX_CLIENTS)
+		return ; //TODO: this needs to work for all servers not just this one
 	this->pollfds[numFds].fd = clientSocket;
 	this->pollfds[numFds].events = POLLIN;
 	this->pollfds[numFds].revents = 0;
@@ -89,7 +90,7 @@ void ft::Server::pollInEvent(pollfd* poll)
 {
 	ssize_t brecv; //brecvast
 	char buff[BUFF_SIZE] = {0};
-	ft::Request *temp;
+	ft::Request *temp = NULL;
 
 	//receive bytes and store them in our request buffer, organized per connection(poll->fd)
 	brecv = ft::receive(poll->fd, buff, BUFF_SIZE, 0);
@@ -100,20 +101,28 @@ void ft::Server::pollInEvent(pollfd* poll)
 	try
 	{
 		temp = new ft::Request(this->req_buf[poll->fd], this->clientIpv4[poll->fd]);
-		if (!temp->parse())
-		{
+		if (!temp->parse(std::stoul(*this->config.getValue("limit_body_size"))))
+		{			
 			delete temp;
 			this->generateOutStatus(poll, 100);
 			return ;
 		}
 	}
+	catch (ft::PayloadTooLarge &e)
+	{
+		if (temp)
+			delete temp;
+		this->generateOutStatus(poll, 413);
+		return ;
+	}
 	catch (ft::BadRequest &e)
 	{
+		if (temp)
+			delete temp;
 		this->generateOutStatus(poll, 400);
 		return ;
 	}
-	//TODO: limit body size
-	//TODO: https still fucks this thing
+	//TODO: 50/50 chance https throws a badrequest atm, its done in parse
 
 	//construct response on store them in response buffer
 	try
