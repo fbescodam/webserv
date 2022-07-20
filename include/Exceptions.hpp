@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 18:05:00 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/14 21:09:36 by fbes          ########   odam.nl         */
+/*   Updated: 2022/07/20 20:23:40 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -130,6 +130,13 @@ struct BadRequest : public std::exception
 {
 	const char* what() const throw() override {
 		return ("Bad request");
+	}
+};
+
+struct PayloadTooLarge : public std::exception
+{
+	const char* what() const throw() override {
+		return ("Payload too large");
 	}
 };
 

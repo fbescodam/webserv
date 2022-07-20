@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:13:27 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/15 17:04:14 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/20 20:25:41 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ public: // Ctor ~ Dtor
 public: // Methods
 	void display(void) const;
 	void setMethod(const std::string& method);
-	bool parse(void);
+	bool parse(size_t bodySize);
 
 private:
 
