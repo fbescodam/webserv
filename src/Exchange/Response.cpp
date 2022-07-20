@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:34:00 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/20 19:28:07 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/20 19:39:00 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -206,6 +206,7 @@ void ft::Response::postMethod(std::string filePath)
 			this->generateStatusPage(500);
 			return ;
 		}
+		this->fields["Connection"] = "close";
 		this->data = out;
 	}		
 	else
