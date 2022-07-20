@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:34:12 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/20 20:26:33 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/20 20:35:54 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,13 @@ bool isAscii (const std::string& s)
 
 bool ft::Request::parse(size_t bodySize)
 {
+	if (this->buffer.size() < 1)
+		throw ft::BadRequest();
+	
+	for (int i = 0; i < 3; i++)
+		if (!isupper(this->buffer[i]))
+			throw ft::BadRequest();
+
 	if (isAscii(this->buffer) == false)
 		throw ft::BadRequest();
 

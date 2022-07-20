@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/02 12:34:20 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/20 20:26:40 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/20 20:38:05 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,7 +118,7 @@ void ft::Server::pollInEvent(pollfd* poll)
 		this->generateOutStatus(poll, 400);
 		return ;
 	}
-	//TODO: https still fucks this thing
+	//TODO: 50/50 chance https throws a badrequest atm, its done in parse
 
 	//construct response on store them in response buffer
 	try
