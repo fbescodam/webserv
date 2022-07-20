@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/02 12:34:20 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/20 20:38:05 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/20 20:45:40 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,7 +90,7 @@ void ft::Server::pollInEvent(pollfd* poll)
 {
 	ssize_t brecv; //brecvast
 	char buff[BUFF_SIZE] = {0};
-	ft::Request *temp;
+	ft::Request *temp = NULL;
 
 	//receive bytes and store them in our request buffer, organized per connection(poll->fd)
 	brecv = ft::receive(poll->fd, buff, BUFF_SIZE, 0);
@@ -110,11 +110,15 @@ void ft::Server::pollInEvent(pollfd* poll)
 	}
 	catch (ft::PayloadTooLarge &e)
 	{
+		if (temp)
+			delete temp;
 		this->generateOutStatus(poll, 413);
 		return ;
 	}
 	catch (ft::BadRequest &e)
 	{
+		if (temp)
+			delete temp;
 		this->generateOutStatus(poll, 400);
 		return ;
 	}
