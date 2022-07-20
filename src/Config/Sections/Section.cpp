@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 15:39:35 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/14 15:48:16 by fbes          ########   odam.nl         */
+/*   Updated: 2022/07/20 21:42:51 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,6 +84,15 @@ int ft::Section::returnValueAsInt(const std::string& key) const
 	if (it == this->fields.end())
 		return (-1);
 	return (std::stoi(it->second));
+}
+
+bool ft::Section::returnValueAsBoolean(const std::string& key) const
+{
+	auto it = this->fields.find(key);
+
+	if (it == this->fields.end())
+		return (true); // intended
+	return (it->second == "yes");
 }
 
 bool ft::Section::getValueAsList(const std::string& key, std::list<std::string>& list) const
@@ -181,17 +190,17 @@ void ft::Section::verifyKeyValue(uint32_t lineNum, std::string& key, std::string
 	long bignum;
 	switch (index)
 	{
-		// expecting integer in range > 0 < INT32_MAX
+		// expecting integer in range > 0 < INT_MAX
 		case 0: // limit_body_size
 			bignum = std::stol(value);
-			if (bignum <= 0 || bignum > INT32_MAX)
+			if (bignum <= 0 || bignum > INT_MAX)
 				throw ft::InvalidFieldValueException(lineNum);
 			break;
 
-		// expecting integer in range > 0 < UINT16_MAX
+		// expecting integer in range > 0 < USHRT_MAX
 		case 1: // listen
 			bignum = std::stol(value);
-			if (bignum <= 0 || bignum > UINT16_MAX)
+			if (bignum <= 0 || bignum > USHRT_MAX)
 				throw ft::InvalidFieldValueException(lineNum);
 			break;
 

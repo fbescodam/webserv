@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:34:00 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/20 19:39:00 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/20 21:42:08 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,7 @@ ft::Response::~Response()
 static bool checkMethods(const std::list<std::string>& methods, ft::Method requestMethod)
 {
 	std::string reqMethodString = ft::enumStrings[static_cast<int32_t>(requestMethod)];
-	
+
 	for (const std::string &val: methods)
 		if (val == reqMethodString)
 			return (true);
@@ -88,9 +88,7 @@ bool ft::Response::verify(void)
 	{
 		if (!ft::filesystem::fileExists(this->request->path + *this->config.getValue("index")))
 		{
-			const std::string* dir = this->config.getValue("dir_listing");
-
-			if (dir != nullptr && *dir == "no" && this->request->method != ft::Method::POST)
+			if (!this->config.returnValueAsBoolean("dir_listing") && this->request->method != ft::Method::POST)
 				this->request->path += "index.html";
 		}
 	}
@@ -100,19 +98,18 @@ bool ft::Response::verify(void)
 	std::list<std::string> methodList;
 	static std::list<std::string> methodGet = {{"GET"}};
 	bool methodRules = this->config.getValueAsList("methods", methodList);
-	
+
 	// Checks if request method is in allowed methods
 	if (!checkMethods(methodRules ? methodList : methodGet, this->request->method))
 	{
-		this->generateStatusPage(405); 
+		this->generateStatusPage(405);
 		return (false);
 	}
 
 	// Checks if access is allowed to request path
-	const std::string* access = this->config.getValue("access");
-	if (access != nullptr && *access == "no")
+	if (!this->config.returnValueAsBoolean("access"))
 	{
-		this->generateStatusPage(403); 
+		this->generateStatusPage(403);
 		return (false);
 	}
 
@@ -142,7 +139,7 @@ void ft::Response::retrievePigPath(std::string &name)
 }
 
 void ft::Response::generateStatusPage(int32_t code)
-{	
+{
 	//try to find custom error page, if it doesnt exit make one on the fly
 	std::string errorPage = "error_" + std::to_string(code);
 	if (this->config.keyExists(errorPage))
@@ -175,7 +172,7 @@ void ft::Response::generateStatusPage(int32_t code, std::string content)
 	this->fields["Content-Length"] = std::to_string(content.length());
 	this->fields["Content-Type"] = "text/html";
 	this->writeFields();
-	
+
 	// Build content
 	this->data += content;
 }
@@ -208,7 +205,7 @@ void ft::Response::postMethod(std::string filePath)
 		}
 		this->fields["Connection"] = "close";
 		this->data = out;
-	}		
+	}
 	else
 		this->generateStatusPage(400);
 }
@@ -220,7 +217,7 @@ void ft::Response::generateResponse()
 
 	if (this->request->method == ft::Method::DELETE)
 	{
-		this->deleteMethod(filePath); 
+		this->deleteMethod(filePath);
 		return;
 	}
 
