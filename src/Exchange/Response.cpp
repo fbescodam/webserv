@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:34:00 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/19 20:12:45 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/20 17:30:20 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,10 @@ ft::Response::Response(int32_t statusIn, ft::ServerSection *configIn)
 	this->config.importFields(configIn->exportFields());
 	this->request = NULL;
 	this->file = NULL;
-	this->fields["Connection"] = "close";
+	if (statusIn == 408)
+		this->fields["Connection"] = "close";
+	else
+		this->fields["Connection"] = "keep-alive";
 	this->generateStatusPage(statusIn);
 }
 

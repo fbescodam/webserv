@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/02 12:34:20 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/19 21:53:52 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/20 17:29:18 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,6 +102,7 @@ void ft::Server::pollInEvent(pollfd* poll)
 		if (!temp->parse())
 		{
 			delete temp;
+			this->generateOutStatus(poll, 100);
 			return ;
 		}
 	}
