@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/02 12:34:20 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/20 17:38:42 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/20 19:50:18 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,10 +90,11 @@ void ft::Server::pollInEvent(pollfd* poll)
 	ssize_t brecv; //brecvast
 	char buff[BUFF_SIZE] = {0};
 	ft::Request *temp;
-	this->timeout[poll->fd] = std::time(nullptr);
 
 	//receive bytes and store them in our request buffer, organized per connection(poll->fd)
 	brecv = ft::receive(poll->fd, buff, BUFF_SIZE, 0);
+	if (brecv > -1)
+		this->timeout[poll->fd] = std::time(nullptr);
 	this->req_buf[poll->fd] += buff;
 
 	try
@@ -156,6 +157,7 @@ void ft::Server::pollOutEvent(pollfd* poll)
 	ft::ResponseStatus ret = this->responses[poll->fd]->send(poll->fd);
 	if (ret == ft::DONE)
 	{
+		std::cout << this->responses[poll->fd]->data<<std::endl;
 		this->resolveConnection(poll);
 		std::cout << "//=/ Sent Response /=//" << std::endl;
 	}
