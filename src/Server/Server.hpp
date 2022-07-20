@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/02 12:25:53 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/15 16:58:57 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/20 20:18:49 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,6 @@ private:
 	std::list<std::string> serverNames;
 
 	// Running part
-	int32_t maxClients;
 	int32_t numFds;
 	pollfd* pollfds;
 	nfds_t nfds;

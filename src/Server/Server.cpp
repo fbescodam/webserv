@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/02 12:34:20 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/20 19:50:18 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/20 20:20:23 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,12 +34,11 @@ void ft::Server::init(void)
 	}
 
 	this->nfds = 0;
-	this->maxClients = 120; // this should be gotten from config
 	this->numFds = 1;
 
 	try
 	{
-		this->pollfds = new pollfd[this->maxClients];
+		this->pollfds = new pollfd[MAX_CLIENTS];
 	}
 	catch(const std::exception& e)
 	{
@@ -69,6 +68,8 @@ void ft::Server::pollListen()
 		this->timeout[poll->fd] = std::time(0);
 		return;
 	}
+	if (this->numFds >= MAX_CLIENTS)
+		return ; //TODO: this needs to work for all servers not just this one
 	this->pollfds[numFds].fd = clientSocket;
 	this->pollfds[numFds].events = POLLIN;
 	this->pollfds[numFds].revents = 0;
