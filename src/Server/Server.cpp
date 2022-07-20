@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/02 12:34:20 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/20 17:29:18 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/20 17:34:50 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -145,7 +145,6 @@ void ft::Server::resolveConnection(pollfd *poll)
 	{
 		close(poll->fd);
 		poll->fd = -1;
-		poll->events = POLLIN;
 	}
 	delete this->responses[temp];
 	this->responses.erase(temp);
@@ -162,17 +161,13 @@ void ft::Server::pollOutEvent(pollfd* poll)
 	}
 }
 
-//TODO: 408 request timeout
 void ft::Server::cleanSocket(pollfd *poll)
 {
 	std::cout << "Connection closed-time out" << std::endl;
 
-	this->timeout.erase(poll->fd);
-	close(poll->fd);
-	poll->fd = -1;
+	this->generateOutStatus(poll, 408);
 }
 
-//TODO: this shit dont work
 bool ft::Server::checkTimeout(pollfd *poll)
 {
 	return (this->timeout.find(poll->fd) != this->timeout.end() && \
