@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/02 12:34:20 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/20 17:38:11 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/20 17:38:42 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -206,6 +206,4 @@ void ft::Server::run(void)
 	}
 }
 
-
-//TODO: set all delete pointers to null
 //////////////////////////////////////////

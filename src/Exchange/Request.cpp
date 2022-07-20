@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:34:12 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/19 21:53:17 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/20 17:40:04 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ void parseLineOne(ft::Request &req, std::string lineOne)
 	req.version = fields[2];
 }
 
-bool isASCII (const std::string& s)
+bool isAscii (const std::string& s)
 {
     return !std::any_of(s.begin(), s.end(), [](char c) { 
         return static_cast<unsigned char>(c) > 127; 
@@ -37,7 +37,7 @@ bool isASCII (const std::string& s)
 
 bool ft::Request::parse(void)
 {
-	if (isASCII(this->buffer) == false)
+	if (isAscii(this->buffer) == false)
 		throw ft::BadRequest();
 
 	size_t pos = this->buffer.find("\r\n\r\n");
