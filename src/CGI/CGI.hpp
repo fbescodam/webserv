@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 10:13:49 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/19 17:42:23 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/20 19:25:46 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@ namespace CGI
 	 * @param request The incoming request.
 	 * @param path The file path to execute.
 	 */
-	void runCGI(const ft::Response& request, const std::string& path, std::string &out, const std::string &cgiBin);
+	bool runCGI(const ft::Response& request, const std::string& path, std::string &out, const std::string &cgiBin);
 }
 
 FT_END

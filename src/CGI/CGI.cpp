@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 11:51:45 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/20 16:51:44 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/20 19:27:39 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ static std::vector<const char*> c_arr(const std::vector<std::string> &v)
 	return (c_arr);
 }
 
-void ft::CGI::runCGI(const ft::Response& response, const std::string& path, std::string &out, const std::string &cgiBin)
+bool ft::CGI::runCGI(const ft::Response& response, const std::string& path, std::string &out, const std::string &cgiBin)
 {
 	int32_t fds[2];
 	int32_t body_pipe[2];
@@ -81,7 +81,9 @@ void ft::CGI::runCGI(const ft::Response& response, const std::string& path, std:
 	catch(const std::exception& e)
 	{
 		std::cerr << e.what() << '\n';
+		return (false);
 	}
+	return (true);
 }
 
 //////////////////////////////////////////

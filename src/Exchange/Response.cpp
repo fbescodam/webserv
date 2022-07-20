@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:34:00 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/20 17:30:20 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/20 19:28:07 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -201,11 +201,12 @@ void ft::Response::postMethod(std::string filePath)
 		this->generateStatusPage(404);
 	else if (this->config.getValueAsList("cgi_bin", cgiBin))
 	{
-		std::cerr<<"lol1"<<std::endl;
-		ft::CGI::runCGI(*this, filePath, out, cgiBin.back());
-		std::cerr<<"lol2"<<std::endl;
+		if (!ft::CGI::runCGI(*this, filePath, out, cgiBin.back()))
+		{
+			this->generateStatusPage(500);
+			return ;
+		}
 		this->data = out;
-		std::cout << this->data;
 	}		
 	else
 		this->generateStatusPage(400);
