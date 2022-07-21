@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/02 12:34:20 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/21 15:55:30 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/21 16:16:36 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -122,7 +122,7 @@ void ft::Server::pollInEvent(pollfd* poll)
 		if (!temp->parse(std::stoul(*this->config.getValue("limit_body_size"))))
 		{			
 			delete temp;
-			this->generateOutStatus(poll, 100);
+			this->generateOutStatus(poll, 100); //TODO: something goes wrong here with big bodys through post
 			return ;
 		}
 	}
@@ -183,7 +183,7 @@ void ft::Server::pollOutEvent(pollfd* poll)
 	ft::ResponseStatus ret = this->responses[poll->fd]->send(poll->fd);
 	if (ret == ft::DONE)
 	{
-		std::cout << this->responses[poll->fd]->data<<std::endl;
+		// std::cout << this->responses[poll->fd]->data<<std::endl;
 		this->resolveConnection(poll);
 		std::cout << "//=/ Sent Response /=//" << std::endl;
 	}

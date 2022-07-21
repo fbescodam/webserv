@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:34:12 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/20 20:35:54 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/21 16:14:43 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,9 +28,9 @@ void parseLineOne(ft::Request &req, std::string lineOne)
 	req.version = fields[2];
 }
 
-bool isAscii (const std::string& s)
+bool isAscii (const std::string& s, size_t pos)
 {
-    return !std::any_of(s.begin(), s.end(), [](char c) { 
+    return !std::any_of(s.begin(), (s.begin() + pos), [](char c) { 
         return static_cast<unsigned char>(c) > 127; 
     });
 }
@@ -44,12 +44,13 @@ bool ft::Request::parse(size_t bodySize)
 		if (!isupper(this->buffer[i]))
 			throw ft::BadRequest();
 
-	if (isAscii(this->buffer) == false)
-		throw ft::BadRequest();
-
 	size_t pos = this->buffer.find("\r\n\r\n");
 	if (pos== std::string::npos)
 		return (false);
+
+	if (isAscii(this->buffer, pos) == false)
+		throw ft::BadRequest();
+
 
 	std::pair<std::string, std::string> splitBuffer(buffer.substr(0, pos), buffer.substr(pos));
 	std::istringstream iss(splitBuffer.first);
