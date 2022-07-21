@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/02 12:34:20 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/21 15:14:31 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/21 15:55:30 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,6 +81,8 @@ void ft::Server::pollListen()
 
 void ft::Server::generateOutStatus(pollfd *poll, int code)
 {
+	if (this->responses.find(poll->fd) != this->responses.end())
+		delete this->responses[poll->fd];
 	this->responses[poll->fd] = new ft::Response(code, &(this->config));
 	poll->events = POLLOUT;
 }
@@ -91,6 +93,11 @@ void ft::Server::pollInEvent(pollfd* poll)
 	ssize_t brecv; //brecvast
 	char buff[BUFF_SIZE] = {0};
 	ft::Request *temp = NULL;
+	if (this->responses.find(poll->fd) != this->responses.end())
+	{
+		delete this->responses[poll->fd];
+		this->responses.erase(poll->fd);
+	}
 
 	//receive bytes and store them in our request buffer, organized per connection(poll->fd)
 	try 
@@ -101,6 +108,7 @@ void ft::Server::pollInEvent(pollfd* poll)
 	{
 		this->req_buf.erase(poll->fd);
 		this->timeout.erase(poll->fd);
+		close(poll->fd);
 		poll->fd = -1;
 		return ;
 	}
@@ -137,8 +145,6 @@ void ft::Server::pollInEvent(pollfd* poll)
 	//construct response on store them in response buffer
 	try
 	{
-		if (this->responses.find(poll->fd) != this->responses.end())
-			delete this->responses[poll->fd];
 		this->responses[poll->fd] = new ft::Response(temp, &(this->config));
 		if (this->responses[poll->fd]->verify())
 			this->responses[poll->fd]->generateResponse();
@@ -172,7 +178,8 @@ void ft::Server::resolveConnection(pollfd *poll)
 
 void ft::Server::pollOutEvent(pollfd* poll)
 {
-	this->timeout[poll->fd] = std::time(0);
+	if (this->timeout.find(poll->fd) != this->timeout.end())
+		this->timeout[poll->fd] = std::time(0);
 	ft::ResponseStatus ret = this->responses[poll->fd]->send(poll->fd);
 	if (ret == ft::DONE)
 	{

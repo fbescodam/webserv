@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:34:00 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/20 21:42:08 by fbes          ########   odam.nl         */
+/*   Updated: 2022/07/21 15:52:17 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,13 +19,13 @@ ft::Response::Response(int32_t statusIn, ft::ServerSection *configIn)
 	this->config.importFields(configIn->exportFields());
 	this->request = NULL;
 	this->file = NULL;
+	this->fileFd = -1;
 	if (statusIn == 408)
 		this->fields["Connection"] = "close";
 	else
 		this->fields["Connection"] = "keep-alive";
 	this->generateStatusPage(statusIn);
 }
-
 
 ft::Response::Response(ft::Request *requestIn, ft::ServerSection* configIn)
 {
@@ -290,11 +290,13 @@ ft::ResponseStatus ft::Response::send(int32_t socket)
 		return ft::NOT_DONE;
 	}
 
+	if (this->fileFd < 0)
+		return ft::ResponseStatus::DONE;
 	//send the file, if its done resolve the connection
 	off_t len = 0;
-	sendfile(this->fileFd, socket, this->fileOffset, &len, NULL, 0);
+	if (sendfile(this->fileFd, socket, this->fileOffset, &len, NULL, 0) < 0)
+		std::cerr << strerror(errno)<< "  - "<<this->fileFd<<std::endl;
 	this->fileOffset += len;
-
 	if (this->fileOffset >= this->fileSize)
 		return ft::ResponseStatus::DONE;
 	return ft::ResponseStatus::NOT_DONE;
