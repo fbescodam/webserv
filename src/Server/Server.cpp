@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/02 12:34:20 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/21 15:14:31 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/21 17:45:26 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ void ft::Server::init(void)
 		this->serverFD = ft::socket(IPV4, TCP, NONE);
 		ft::setSocketOption(this->serverFD, SOL_SOCKET, SO_REUSEADDR, true, sizeof(int32_t)); // make kernel release socket after exit
 		ft::bind(this->serverFD, &this->address);
-		ft::listen(this->serverFD, 128);
+		ft::listen(this->serverFD, MAX_CLIENTS);
 		ft::fcntl(this->serverFD, F_SETFL, O_NONBLOCK);
 	}
 	catch(const std::exception& e)
@@ -66,13 +66,14 @@ void ft::Server::pollListen()
 		poll->events = POLLIN;
 		poll->revents = 0;
 		this->timeout[poll->fd] = std::time(0);
+		this->clientIpv4[clientSocket] = ft::inet_ntop(this->address);
 		return;
 	}
 	if (this->numFds >= MAX_CLIENTS)
 		return ; //TODO: this needs to work for all servers not just this one
 	this->pollfds[numFds].fd = clientSocket;
 	this->pollfds[numFds].events = POLLIN;
-	this->pollfds[numFds].revents = 0;
+	this->pollfds[numFds].revents = 0; // initialize event to 0 just to be safe
 	this->timeout[this->pollfds[numFds].fd] = std::time(0);
 	this->numFds++;
 
@@ -81,6 +82,8 @@ void ft::Server::pollListen()
 
 void ft::Server::generateOutStatus(pollfd *poll, int code)
 {
+	if (this->responses.find(poll->fd) != this->responses.end())
+		delete this->responses[poll->fd];
 	this->responses[poll->fd] = new ft::Response(code, &(this->config));
 	poll->events = POLLOUT;
 }
@@ -91,6 +94,11 @@ void ft::Server::pollInEvent(pollfd* poll)
 	ssize_t brecv; //brecvast
 	char buff[BUFF_SIZE] = {0};
 	ft::Request *temp = NULL;
+	if (this->responses.find(poll->fd) != this->responses.end())
+	{
+		delete this->responses[poll->fd];
+		this->responses.erase(poll->fd);
+	}
 
 	//receive bytes and store them in our request buffer, organized per connection(poll->fd)
 	try 
@@ -101,6 +109,7 @@ void ft::Server::pollInEvent(pollfd* poll)
 	{
 		this->req_buf.erase(poll->fd);
 		this->timeout.erase(poll->fd);
+		close(poll->fd);
 		poll->fd = -1;
 		return ;
 	}
@@ -114,7 +123,7 @@ void ft::Server::pollInEvent(pollfd* poll)
 		if (!temp->parse(std::stoul(*this->config.getValue("limit_body_size"))))
 		{			
 			delete temp;
-			this->generateOutStatus(poll, 100);
+			this->generateOutStatus(poll, 100); //TODO: something goes wrong here with big bodys through post
 			return ;
 		}
 	}
@@ -133,24 +142,13 @@ void ft::Server::pollInEvent(pollfd* poll)
 		return ;
 	}
 	//TODO: 50/50 chance https throws a badrequest atm, its done in parse
+	//TODO: catch new exceptions ...
 
 	//construct response on store them in response buffer
-	try
-	{
-		if (this->responses.find(poll->fd) != this->responses.end())
-			delete this->responses[poll->fd];
-		this->responses[poll->fd] = new ft::Response(temp, &(this->config));
-		if (this->responses[poll->fd]->verify())
-			this->responses[poll->fd]->generateResponse();
-		this->req_buf.erase(poll->fd);
-	}
-	catch (ft::BadRequest &e)
-	{
-		std::cerr<<e.what()<<std::endl;
-		this->req_buf.erase(poll->fd);
-		this->responses[poll->fd] = new ft::Response(400, &(this->config));
-	}
-
+	this->responses[poll->fd] = new ft::Response(temp, &(this->config));
+	if (this->responses[poll->fd]->verify())
+		this->responses[poll->fd]->generateResponse();
+	this->req_buf.erase(poll->fd);
 	//set poll to check for pollout events, this means we can send() to the fd because the client is ready
 	poll->events = POLLOUT;
 }
@@ -172,11 +170,12 @@ void ft::Server::resolveConnection(pollfd *poll)
 
 void ft::Server::pollOutEvent(pollfd* poll)
 {
-	this->timeout[poll->fd] = std::time(0);
+	if (this->timeout.find(poll->fd) != this->timeout.end())
+		this->timeout[poll->fd] = std::time(0); //event is happening so prevent timeout
 	ft::ResponseStatus ret = this->responses[poll->fd]->send(poll->fd);
 	if (ret == ft::DONE)
 	{
-		std::cout << this->responses[poll->fd]->data<<std::endl;
+		// std::cout << this->responses[poll->fd]->data<<std::endl;
 		this->resolveConnection(poll);
 		std::cout << "//=/ Sent Response /=//" << std::endl;
 	}
