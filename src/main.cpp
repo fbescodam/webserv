@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 17:39:03 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/21 15:00:17 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/07/21 15:23:47 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,13 +60,12 @@ int32_t main(int32_t argc, const char* argv[])
 	}
 
 	// Main loop
-	//TODO: your mom
 	while (true)
 	{
-
+		usleep(500); // NOTE: To reduce CPU Usage
 		for (auto it = servers.begin(); it != servers.end(); it++)
 		{
-			try { (*it).run(); }
+			try { it->run(); }
 			catch(const std::exception& e)
 			{
 				std::cerr << "Server " << it->config.getName() << " has crashed!" << std::endl;
@@ -75,7 +74,6 @@ int32_t main(int32_t argc, const char* argv[])
 				break;
 			}
 		}
-		usleep(500);
 	}
 
 	std::cout << "Webserv: Shutting down" << std::endl;
