@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 13:54:52 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/07 17:59:17 by fbes          ########   odam.nl         */
+/*   Updated: 2022/07/20 21:40:20 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,13 +58,22 @@ public: // Functions
 	bool getValueAsInt(const std::string& key, int& output) const;
 
 	/**
-	 * @brief get the value of a configuration field, as an integer
+	 * @brief directly return the value of a configuration field, as an integer
 	 * @warning can throw whatever std::stoi decides to throw at you
 	 *
 	 * @param key the key of a configuration field to get the value of
 	 * @return the direct value of the configuration
 	 */
 	int returnValueAsInt(const std::string& key) const;
+
+	/**
+	 * @brief directly return the value of a configuration field, as a boolean
+	 * @warning will also return TRUE if the key does not exist
+	 *
+	 * @param key the key of a configuration field to get the value of
+	 * @return true if the value equals "yes" OR DOES NOT EXIST, else false
+	 */
+	bool returnValueAsBoolean(const std::string& key) const;
 
 	/**
 	 * @brief get the value of a configuration field, as a string array
