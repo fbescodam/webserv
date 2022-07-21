@@ -6,12 +6,14 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 11:51:45 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/20 19:27:39 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/21 19:44:00 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "CGI.hpp"
 #include "GlobalConfig.hpp"
+#include <signal.h>
+
 
 //////////////////////////////////////////
 
@@ -48,40 +50,62 @@ bool ft::CGI::runCGI(const ft::Response& response, const std::string& path, std:
 	{
 		ft::pipe(fds);
 		ft::pipe(body_pipe);
-
-		pid_t pid;
-		if ((pid = ft::fork()) == 0)
-		{
-			ft::dup2(body_pipe[READ], STDIN_FILENO);
-			ft::dup2(fds[WRITE], STDOUT_FILENO);
-			ft::dup2(fds[WRITE], STDERR_FILENO);
-			
-			close(body_pipe[WRITE]);
-			close(fds[WRITE]);
-			close(fds[READ]);
-
-			ft::execve(cgiBin, (char *const *)c_arr(argv).data(), (char *const *)c_arr(envpp).data());
-		}
-		else // Parent
-		{
-			write(body_pipe[WRITE], response.request->body.data(), response.request->body.size());
-			close(body_pipe[READ]);
-			close(body_pipe[WRITE]);
-			close(fds[WRITE]);
-			size_t bread;
-			char buf[4096] = {0};
-			while (read(fds[READ], buf, sizeof(buf)) > 0)
-			{
-				out += buf;
-				bzero(buf, sizeof(buf));
-			}
-			close(fds[READ]);
-		}
 	}
 	catch(const std::exception& e)
 	{
+		close(fds[WRITE]);
+		close(fds[READ]);
+		close(body_pipe[READ]);
+		close(body_pipe[WRITE]);
 		std::cerr << e.what() << '\n';
 		return (false);
+	}
+
+	pid_t pid;	
+	try {pid = ft::fork();}
+	catch (std::exception &e)
+	{
+		close(fds[WRITE]);
+		close(fds[READ]);
+		close(body_pipe[READ]);
+		close(body_pipe[WRITE]);
+		std::cerr << e.what() << '\n';
+		return (false);
+	}
+	if (pid == 0)
+	{
+		::dup2(body_pipe[READ], STDIN_FILENO);
+		::dup2(fds[WRITE], STDOUT_FILENO);
+		::dup2(fds[WRITE], STDERR_FILENO);
+		
+		close(body_pipe[WRITE]);
+		close(fds[WRITE]);
+		close(fds[READ]);
+
+		::execve(cgiBin.c_str(), (char *const *)c_arr(argv).data(), (char *const *)c_arr(envpp).data());
+		close(body_pipe[READ]);
+		exit(1);
+	}
+	else // Parent
+	{
+		if (response.request->body.empty())
+			close(body_pipe[WRITE]);
+		else
+		{
+			write(body_pipe[WRITE], response.request->body.data(), response.request->body.size());
+			close(body_pipe[WRITE]);
+		}
+		close(body_pipe[READ]);
+		close(fds[WRITE]);
+		size_t bread;
+		char buf[4096] = {0};
+		while (read(fds[READ], buf, sizeof(buf)) > 0)
+		{
+			out += buf;
+			bzero(buf, sizeof(buf));
+		}
+		close(fds[READ]);
+		wait(NULL);
 	}
 	return (true);
 }
