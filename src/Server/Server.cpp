@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/02 12:34:20 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/21 17:45:26 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/21 20:03:08 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,6 +104,8 @@ void ft::Server::pollInEvent(pollfd* poll)
 	try 
 	{
 		brecv = ft::receive(poll->fd, buff, BUFF_SIZE, 0);
+		if (brecv == 0)
+			throw std::exception();
 	}
 	catch (std::exception &e)
 	{
@@ -187,6 +189,7 @@ void ft::Server::cleanSocket(pollfd *poll)
 
 	this->timeout.erase(poll->fd);
 	this->generateOutStatus(poll, 408);
+	poll->events = POLLIN | POLLOUT;
 }
 
 bool ft::Server::checkTimeout(pollfd *poll)

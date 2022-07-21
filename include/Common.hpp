@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 17:39:22 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/20 20:17:46 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/21 19:06:27 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@
 # define WHITESPACE " \t\r\n\t\f\v"
 # define S_TIMEOUT 5
 # define MS_TIMEOUT S_TIMEOUT*1000
-# define MAX_CLIENTS 120
+# define MAX_CLIENTS 60
 
 FT_BEGIN
 

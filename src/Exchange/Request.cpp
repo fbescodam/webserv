@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:34:12 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/21 16:14:43 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/21 19:24:16 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,16 @@ bool ft::Request::parse(size_t bodySize)
 			throw ft::BadRequest();
 
 	size_t pos = this->buffer.find("\r\n\r\n");
+	std::string header;
+	if (pos == std::string::npos)
+		header = this->buffer;
+	else
+		header = this->buffer.substr(0, pos);
+	std::vector<std::string> shit;
+	ft::split(header, "\r\n", shit);
+	for (size_t i = 1; i < shit.size(); i++)
+		if (shit[i].find(":") == std::string::npos)
+			throw ft::BadRequest();
 	if (pos== std::string::npos)
 		return (false);
 
@@ -87,15 +97,9 @@ bool ft::Request::parse(size_t bodySize)
 
 	if (this->method == ft::Method::POST)
 	{
-		std::cout << this->body.size() <<std::endl;
-		std::cout << std::stoul(this->fields["Content-Length"]) <<std::endl;
 		if (this->body.size() < std::stoul(this->fields["Content-Length"]))
-		{
-			std::cout << "AFEWFOJWFJWFOW1"<<std::endl;
 			return (false);
-		}
 	}
-	std::cout << "AFEWFOJWFJWFOW2"<<std::endl;
 	return (true);
 }
 
