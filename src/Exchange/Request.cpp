@@ -87,9 +87,15 @@ bool ft::Request::parse(size_t bodySize)
 
 	if (this->method == ft::Method::POST)
 	{
+		std::cout << this->body.size() <<std::endl;
+		std::cout << std::stoul(this->fields["Content-Length"]) <<std::endl;
 		if (this->body.size() < std::stoul(this->fields["Content-Length"]))
+		{
+			std::cout << "AFEWFOJWFJWFOW1"<<std::endl;
 			return (false);
+		}
 	}
+	std::cout << "AFEWFOJWFJWFOW2"<<std::endl;
 	return (true);
 }
 

@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:34:00 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/21 15:52:17 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/21 17:58:42 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ ft::Response::Response(int32_t statusIn, ft::ServerSection *configIn)
 	this->request = NULL;
 	this->file = NULL;
 	this->fileFd = -1;
-	if (statusIn == 408)
+	if (statusIn == 408) // timeout occurred, now be gone thot
 		this->fields["Connection"] = "close";
 	else
 		this->fields["Connection"] = "keep-alive";
@@ -59,6 +59,7 @@ static bool checkMethods(const std::list<std::string>& methods, ft::Method reque
 	return (false);
 }
 
+//returns true if no issues found
 bool ft::Response::verify(void)
 {
 	//TODO: probably not the right spot for this but idk where else to put it for now
@@ -76,11 +77,19 @@ bool ft::Response::verify(void)
 		if (val.appliesForPath(this->request->path))
 			this->config.importFields(val.exportFields());
 
+	// Checks if access is allowed to request path
+	if (!this->config.returnValueAsBoolean("access"))
+	{
+		this->generateStatusPage(403);
+		return (false);
+	}
+
+	// dir listing
 	struct stat stats;
 	stat((*this->config.getValue("path") + this->request->path).c_str(), &stats);
 	if (S_ISDIR(stats.st_mode) && this->request->path.back() != '/')
 	{
-		this->fields["Location"] = this->request->path + "/";
+		this->fields["Location"] = this->request->path + "/"; // redirect to dir ending in / to prevent server hanging
 		this->generateStatusPage(308);
 		return (false);
 	}
@@ -89,7 +98,7 @@ bool ft::Response::verify(void)
 		if (!ft::filesystem::fileExists(this->request->path + *this->config.getValue("index")))
 		{
 			if (!this->config.returnValueAsBoolean("dir_listing") && this->request->method != ft::Method::POST)
-				this->request->path += "index.html";
+				this->request->path += "index.html"; //TODO: this should be index set by config
 		}
 	}
 
@@ -103,13 +112,6 @@ bool ft::Response::verify(void)
 	if (!checkMethods(methodRules ? methodList : methodGet, this->request->method))
 	{
 		this->generateStatusPage(405);
-		return (false);
-	}
-
-	// Checks if access is allowed to request path
-	if (!this->config.returnValueAsBoolean("access"))
-	{
-		this->generateStatusPage(403);
 		return (false);
 	}
 
@@ -130,11 +132,11 @@ void ft::Response::retrievePigPath(std::string &name)
 {
 	DIR *dir = opendir("./examples/www/imgs/pig1_files");
 	srand(time(0));
-	int rand = std::rand() % 100;
+	int rand = std::rand() % 100; // choose a random pig to deliver
 	dirent* ent;
 	for (int i = rand; i > 0; i--)
-		ent = readdir(dir);
-	name = "/imgs/pig1_files/" + std::string(ent->d_name);
+		ent = readdir(dir); // skip over files until we found the pig to deliver
+	name = "/imgs/pig1_files/" + std::string(ent->d_name); // create pig path
 	closedir(dir);
 }
 
@@ -157,6 +159,7 @@ void ft::Response::generateStatusPage(int32_t code)
 			this->writeFields();
 			return;
 		}
+		// if we get here, then the file specified was unreadable and we generate nonetheless
 	}
 
 	std::string name;
@@ -198,6 +201,7 @@ void ft::Response::postMethod(std::string filePath)
 		this->generateStatusPage(404);
 	else if (this->config.getValueAsList("cgi_bin", cgiBin))
 	{
+		// TODO check if file ends with extension specified in cgi_bin in config, if it is not, then resume with the request as normally (no 400)
 		if (!ft::CGI::runCGI(*this, filePath, out, cgiBin.back()))
 		{
 			this->generateStatusPage(500);
@@ -207,7 +211,7 @@ void ft::Response::postMethod(std::string filePath)
 		this->data = out;
 	}
 	else
-		this->generateStatusPage(400);
+		this->generateStatusPage(400); // TODO change to parse as GET (so just return)
 }
 
 //after verify, make up the response
@@ -221,7 +225,6 @@ void ft::Response::generateResponse()
 		return;
 	}
 
-	//TODO: check if filepath is a cgi and handle a post accordingly
 	if (this->request->method == ft::Method::POST)
 	{
 		this->postMethod(filePath);
@@ -286,16 +289,17 @@ ft::ResponseStatus ft::Response::send(int32_t socket)
 		}
 		this->sentHeader = true;
 		if (this->fileFd < 0)
-			return ft::DONE;
+			return ft::DONE; // data included body, we're done here
 		return ft::NOT_DONE;
 	}
 
+	//double check, its important
 	if (this->fileFd < 0)
 		return ft::ResponseStatus::DONE;
+
 	//send the file, if its done resolve the connection
 	off_t len = 0;
-	if (sendfile(this->fileFd, socket, this->fileOffset, &len, NULL, 0) < 0)
-		std::cerr << strerror(errno)<< "  - "<<this->fileFd<<std::endl;
+	sendfile(this->fileFd, socket, this->fileOffset, &len, NULL, 0); // could fail, don't care, no errno, will work afterwards
 	this->fileOffset += len;
 	if (this->fileOffset >= this->fileSize)
 		return ft::ResponseStatus::DONE;
