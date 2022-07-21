@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/02 12:34:20 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/20 20:45:40 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/21 15:14:31 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,7 +93,17 @@ void ft::Server::pollInEvent(pollfd* poll)
 	ft::Request *temp = NULL;
 
 	//receive bytes and store them in our request buffer, organized per connection(poll->fd)
-	brecv = ft::receive(poll->fd, buff, BUFF_SIZE, 0);
+	try 
+	{
+		brecv = ft::receive(poll->fd, buff, BUFF_SIZE, 0);
+	}
+	catch (std::exception &e)
+	{
+		this->req_buf.erase(poll->fd);
+		this->timeout.erase(poll->fd);
+		poll->fd = -1;
+		return ;
+	}
 	if (brecv > -1)
 		this->timeout[poll->fd] = std::time(nullptr);
 	this->req_buf[poll->fd] += buff;
