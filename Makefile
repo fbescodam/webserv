@@ -6,7 +6,7 @@
 #    By: lde-la-h <lde-la-h@student.codam.nl>         +#+                      #
 #                                                    +#+                       #
 #    Created: 2022/05/13 11:36:28 by lde-la-h      #+#    #+#                  #
-#    Updated: 2022/07/13 15:49:39 by pvan-dij      ########   odam.nl          #
+#    Updated: 2022/07/21 18:13:07 by pvan-dij      ########   odam.nl          #
 #                                                                              #
 # **************************************************************************** #
 
@@ -25,7 +25,6 @@ RESET	:= \033[0m
 #//= Files =//#
 CC		:=	clang++
 NAME	:=	webserv
-# TODO: Pjotr pls explain lol
 HEADERS :=	$(addprefix -I , $(shell find ./src -iname '*.hpp' | sed -E "s|/[^/]+$$||" | uniq)) -I include
 # Project requires you do it in 98, frankly we don't care (We asked)
 CFLAGS	:= -std=c++17 -Wextra -Wall -Werror -Wno-unreachable-code -Wno-char-subscripts -Wno-unused-variable -Wno-unused-parameter -Wno-writable-strings -Wno-unused-function
