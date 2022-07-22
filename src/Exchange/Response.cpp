@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:34:00 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/22 12:08:50 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/07/22 12:12:49 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -131,6 +131,8 @@ bool ft::Response::verify(void)
 void ft::Response::retrievePigPath(std::string &name)
 {
 	DIR *dir = opendir("./examples/www/imgs/pig1_files");
+	if (!dir)
+		return ;
 	srand(time(0));
 	int rand = std::rand() % 100; // choose a random pig to deliver
 	dirent* ent;
@@ -165,7 +167,10 @@ void ft::Response::generateStatusPage(int32_t code)
 	std::string name;
 	const std::string& statusText = ft::getStatusCodes().at(code);
 	this->retrievePigPath(name);
-	ft::Response::generateStatusPage(code, "<!DOCTYPE html><html><head><title>"+statusText+"</title></head><body><h1>"+std::to_string(code)+" "+statusText+"</h1><img src=\""+name+"\"></body></html>");
+	if (name.empty())
+		ft::Response::generateStatusPage(code, "<!DOCTYPE html><html><head><title>"+statusText+"</title></head><body><h1>"+std::to_string(code)+" "+statusText+"</h1></body></html>");
+	else
+		ft::Response::generateStatusPage(code, "<!DOCTYPE html><html><head><title>"+statusText+"</title></head><body><h1>"+std::to_string(code)+" "+statusText+"</h1><img src=\""+name+"\"></body></html>");
 }
 
 void ft::Response::generateStatusPage(int32_t code, std::string content)
@@ -217,7 +222,7 @@ void ft::Response::postMethod(std::string filePath)
 //after verify, make up the response
 void ft::Response::generateResponse()
 {
-	std::string filePath(*this->config.getValue("path") + this->request->path);
+	std::string filePath = *this->config.getValue("path") + this->request->path;
 
 	switch (this->request->method)
 	{
@@ -231,8 +236,13 @@ void ft::Response::generateResponse()
 			this->postMethod(filePath);
 			return;
 		}
-	
 		default: break; // Is a GET request
+	}
+
+	if (filePath.find(".sh") != std::string::npos)
+	{
+		this->postMethod(filePath);
+		return;
 	}
 
 	// Check if filepath ends with /, if so, dir listing.

@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/13 17:05:34 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/17 08:35:00 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/21 18:58:21 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,11 @@
 void ft::pipe(int32_t fds[2])
 {
 	if (::pipe(fds) == -1)
+	{
+		fds[0] = -1;
+		fds[1] = -1;
 		throw ft::GenericErrnoException();
+	}
 }
 
 int32_t ft::fork(void)

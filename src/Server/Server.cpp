@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/02 12:34:20 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/22 12:04:59 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/07/22 12:12:42 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,9 +101,13 @@ void ft::Server::pollInEvent(pollfd* poll)
 	if (this->responses.find(poll->fd) != this->responses.end())
 		this->responses.erase(poll->fd); //delete this->responses[poll->fd];
 
-	// Receive bytes and store them in our request buffer, organized per connection(poll->fd)
-	try { brecv = ft::receive(poll->fd, buff, BUFF_SIZE, 0); }
-	catch (const std::exception& e)
+	//receive bytes and store them in our request buffer, organized per connection(poll->fd)
+	try 
+	{
+		brecv = ft::receive(poll->fd, buff, BUFF_SIZE, 0);
+		if (brecv == 0) throw std::exception();
+	}
+	catch (std::exception &e)
 	{
 		this->req_buf.erase(poll->fd);
 		this->timeout.erase(poll->fd);
@@ -199,6 +203,7 @@ void ft::Server::cleanSocket(pollfd *poll)
 
 	this->timeout.erase(poll->fd);
 	this->generateOutStatus(poll, 408);
+	poll->events = POLLIN | POLLOUT;
 }
 
 bool ft::Server::checkTimeout(pollfd *poll)
