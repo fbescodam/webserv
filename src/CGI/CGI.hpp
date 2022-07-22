@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 10:13:49 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/20 19:25:46 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/22 13:15:05 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,11 +19,11 @@
 # include "CommonUnix.hpp"
 # include <strstream>
 # include <unordered_map>
+# include <signal.h>
 FT_BEGIN
 
 /**
- * Static class that is responsible of executing incoming requests
- * and process an outgoing response.
+ * Responsible of executing incoming requests and process an outgoing response.
  *
  * The CGI checks if the given input file is on any of the matching files
  * and applies the appropriate action on that file, say you give it a php

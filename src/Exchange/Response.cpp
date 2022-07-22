@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:34:00 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/22 12:12:49 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/07/22 13:42:28 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,10 +20,7 @@ ft::Response::Response(int32_t statusIn, ft::ServerSection *configIn)
 	this->request = NULL;
 	this->file = NULL;
 	this->fileFd = -1;
-	if (statusIn == 408) // timeout occurred, now be gone thot
-		this->fields["Connection"] = "close";
-	else
-		this->fields["Connection"] = "keep-alive";
+	this->fields["Connection"] = statusIn == 408 ? "close" : "keep-alive"; // Timeout occurred, now be gone thot
 	this->generateStatusPage(statusIn);
 }
 
@@ -53,7 +50,7 @@ static bool checkMethods(const std::list<std::string>& methods, ft::Method reque
 {
 	std::string reqMethodString = ft::enumStrings[static_cast<int32_t>(requestMethod)];
 
-	for (const std::string &val: methods)
+	for (const std::string& val: methods)
 		if (val == reqMethodString)
 			return (true);
 	return (false);
@@ -89,19 +86,20 @@ bool ft::Response::verify(void)
 	stat((*this->config.getValue("path") + this->request->path).c_str(), &stats);
 	if (S_ISDIR(stats.st_mode) && this->request->path.back() != '/')
 	{
-		this->fields["Location"] = this->request->path + "/"; // redirect to dir ending in / to prevent server hanging
+		// HACK: Redirect to dir ending in / to prevent server hanging
+		this->fields["Location"] = this->request->path + "/";
 		this->generateStatusPage(308);
 		return (false);
 	}
 	if (this->request->path.back() == '/')
 	{
-		if (!ft::filesystem::fileExists(this->request->path + *this->config.getValue("index")))
+		std::string indexFile = *this->config.getValue("index");
+		if (!ft::filesystem::fileExists(this->request->path + indexFile))
 		{
 			if (!this->config.returnValueAsBoolean("dir_listing") && this->request->method != ft::Method::POST)
-				this->request->path += "index.html"; //TODO: this should be index set by config
+				this->request->path += indexFile;
 		}
 	}
-
 
 	// Gets the allowed methods for path
 	std::list<std::string> methodList;
