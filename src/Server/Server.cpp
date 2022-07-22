@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/02 12:34:20 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/21 17:45:26 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/22 12:04:59 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@ void ft::Server::init(void)
 		this->config.getValueAsList("server_names", serverNames);
 		this->address = ft::SocketAddress(AF_INET, htons(this->config.returnValueAsInt("listen")), INADDR_ANY); // needs config values
 		this->serverFD = ft::socket(IPV4, TCP, NONE);
+		
 		ft::setSocketOption(this->serverFD, SOL_SOCKET, SO_REUSEADDR, true, sizeof(int32_t)); // make kernel release socket after exit
 		ft::bind(this->serverFD, &this->address);
 		ft::listen(this->serverFD, MAX_CLIENTS);
@@ -30,16 +31,14 @@ void ft::Server::init(void)
 	}
 	catch(const std::exception& e)
 	{
+		std::cerr << "Webserv: Failed to create socket for server" << std::endl;
 		ft::exceptionExit(e, EXIT_FAILURE);
 	}
 
 	this->nfds = 0;
 	this->numFds = 1;
 
-	try
-	{
-		this->pollfds = new pollfd[MAX_CLIENTS];
-	}
+	try { this->pollfds = new pollfd[MAX_CLIENTS]; }
 	catch(const std::exception& e)
 	{
 		ft::exceptionExit(e, EXIT_FAILURE);
@@ -55,6 +54,7 @@ void ft::Server::pollListen()
 
 	int32_t clientSocket = ft::accept(this->serverFD, &this->address);
 	ft::fcntl(clientSocket, F_SETFL, O_NONBLOCK);
+
 	for (int i = 0; i < this->numFds; i++)
 	{
 		pollfd* poll = &this->pollfds[i];
@@ -69,6 +69,7 @@ void ft::Server::pollListen()
 		this->clientIpv4[clientSocket] = ft::inet_ntop(this->address);
 		return;
 	}
+
 	if (this->numFds >= MAX_CLIENTS)
 		return ; //TODO: this needs to work for all servers not just this one
 	this->pollfds[numFds].fd = clientSocket;
@@ -88,68 +89,78 @@ void ft::Server::generateOutStatus(pollfd *poll, int code)
 	poll->events = POLLOUT;
 }
 
-#define BUFF_SIZE 4096
 void ft::Server::pollInEvent(pollfd* poll)
 {
-	ssize_t brecv; //brecvast
-	char buff[BUFF_SIZE] = {0};
-	ft::Request *temp = NULL;
-	if (this->responses.find(poll->fd) != this->responses.end())
-	{
-		delete this->responses[poll->fd];
-		this->responses.erase(poll->fd);
-	}
+	// Fetch the raw data
 
-	//receive bytes and store them in our request buffer, organized per connection(poll->fd)
-	try 
-	{
-		brecv = ft::receive(poll->fd, buff, BUFF_SIZE, 0);
-	}
-	catch (std::exception &e)
+	ssize_t brecv; //brecvast
+	const size_t BUFF_SIZE = 4096;
+	char buff[4096] = {0};
+
+	ft::Request* temp = NULL;
+	if (this->responses.find(poll->fd) != this->responses.end())
+		this->responses.erase(poll->fd); //delete this->responses[poll->fd];
+
+	// Receive bytes and store them in our request buffer, organized per connection(poll->fd)
+	try { brecv = ft::receive(poll->fd, buff, BUFF_SIZE, 0); }
+	catch (const std::exception& e)
 	{
 		this->req_buf.erase(poll->fd);
 		this->timeout.erase(poll->fd);
 		close(poll->fd);
 		poll->fd = -1;
-		return ;
+		return;
 	}
+
 	if (brecv > -1)
 		this->timeout[poll->fd] = std::time(nullptr);
 	this->req_buf[poll->fd] += buff;
 
-	try
+	try // Parse the incoming request
 	{
 		temp = new ft::Request(this->req_buf[poll->fd], this->clientIpv4[poll->fd]);
 		if (!temp->parse(std::stoul(*this->config.getValue("limit_body_size"))))
 		{			
 			delete temp;
 			this->generateOutStatus(poll, 100); //TODO: something goes wrong here with big bodys through post
-			return ;
+			return;
 		}
 	}
-	catch (ft::PayloadTooLarge &e)
+	catch (const ft::PayloadTooLarge& e)
 	{
-		if (temp)
-			delete temp;
+		delete temp;
 		this->generateOutStatus(poll, 413);
-		return ;
+		return;
 	}
-	catch (ft::BadRequest &e)
+	catch (const ft::BadRequest& e)
 	{
-		if (temp)
-			delete temp;
+		delete temp;
 		this->generateOutStatus(poll, 400);
-		return ;
+		return;
 	}
-	//TODO: 50/50 chance https throws a badrequest atm, its done in parse
-	//TODO: catch new exceptions ...
+	catch (const std::bad_alloc& e)
+	{
+		this->generateOutStatus(poll, 507);
+		return;
+	}
+	catch (const std::exception& e)
+	{
+		delete temp;
+		this->generateOutStatus(poll, 500);
+		return;
+	}
 
-	//construct response on store them in response buffer
+	//TODO: 50/50 chance https throws a badrequest atm, its done in parse
+
+	// Construct response on store them in response buffer
 	this->responses[poll->fd] = new ft::Response(temp, &(this->config));
+
 	if (this->responses[poll->fd]->verify())
 		this->responses[poll->fd]->generateResponse();
+
 	this->req_buf.erase(poll->fd);
-	//set poll to check for pollout events, this means we can send() to the fd because the client is ready
+
+	// Set poll to check for pollout events, this means we can send() to the fd because the client is ready
 	poll->events = POLLOUT;
 }
 
@@ -170,12 +181,13 @@ void ft::Server::resolveConnection(pollfd *poll)
 
 void ft::Server::pollOutEvent(pollfd* poll)
 {
+	// Event is happening so prevent timeout
 	if (this->timeout.find(poll->fd) != this->timeout.end())
-		this->timeout[poll->fd] = std::time(0); //event is happening so prevent timeout
-	ft::ResponseStatus ret = this->responses[poll->fd]->send(poll->fd);
-	if (ret == ft::DONE)
+		this->timeout[poll->fd] = std::time(0);
+
+	ft::ResponseStatus ret;
+	if ((ret = this->responses[poll->fd]->send(poll->fd)) == ft::DONE)
 	{
-		// std::cout << this->responses[poll->fd]->data<<std::endl;
 		this->resolveConnection(poll);
 		std::cout << "//=/ Sent Response /=//" << std::endl;
 	}
@@ -201,6 +213,7 @@ void ft::Server::run(void)
 
 	// Check our open fds for events
 	ft::poll(this->pollfds, this->nfds, 0);
+
 	for (int i = 0; i < this->numFds; i++)
 	{
 		pollfd* poll = &this->pollfds[i];

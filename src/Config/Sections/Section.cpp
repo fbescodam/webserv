@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 15:39:35 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/20 21:42:51 by fbes          ########   odam.nl         */
+/*   Updated: 2022/07/22 10:55:46 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -141,11 +141,12 @@ uint32_t ft::Section::getAmountOfFields() const
 void ft::Section::print(std::string prefix) const
 {
 	std::cout << "[DEBUG] " << prefix << ">>>> SECTION NAME " << this->name << " <<<<" << std::endl;
+
 	if (!this->appliesToPath.empty())
 		std::cout << "[DEBUG] " << prefix << ">>>> APPLIES TO PATH " << this->appliesToPath << " <<<<" << std::endl;
-	for (auto it = this->fields.begin(); it != this->fields.end(); it++) {
-		std::cout << "[DEBUG] " << prefix <<  it->first << " = " << it->second << std::endl;
-	}
+
+	for (auto& i : this->fields)
+		std::cout << "[DEBUG] " << prefix <<  i.first << " = " << i.second << std::endl;
 }
 
 const std::string& ft::Section::getcwd() const

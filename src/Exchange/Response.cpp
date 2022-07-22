@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:34:00 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/21 17:58:42 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/22 12:08:50 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -217,46 +217,54 @@ void ft::Response::postMethod(std::string filePath)
 //after verify, make up the response
 void ft::Response::generateResponse()
 {
-	std::string filePath = *this->config.getValue("path") + this->request->path;
+	std::string filePath(*this->config.getValue("path") + this->request->path);
 
-	if (this->request->method == ft::Method::DELETE)
+	switch (this->request->method)
 	{
-		this->deleteMethod(filePath);
-		return;
+		case ft::Method::DELETE:
+		{
+			this->deleteMethod(filePath);
+			return;
+		}
+		case ft::Method::POST:
+		{
+			this->postMethod(filePath);
+			return;
+		}
+	
+		default: break; // Is a GET request
 	}
 
-	if (this->request->method == ft::Method::POST)
-	{
-		this->postMethod(filePath);
-		return;
-	}
-
-	//check if filepath ends with /, if so, dir listing
+	// Check if filepath ends with /, if so, dir listing.
 	if (filePath.back() == '/')
 	{
 		std::string dirListing;
 		ft::DirectoryFactory::buildContentFromDir(filePath, dirListing);
+
 		this->writeHeader(200);
 		this->fields["Content-Length"] = std::to_string(dirListing.size());
 		this->fields["Content-Type"] = "text/html";
 		this->writeFields();
+
 		this->data += dirListing;
 		return;
 	}
 
-	//if file exists write appropriate fields
+	// If file exists write the appropriate fields
 	if (ft::filesystem::fileExists(filePath))
 	{
-		this->file = fopen(filePath.data(), "r");
+		this->file = fopen(filePath.data(), "r"); // TODO: Check that we close this descriptor!
 		this->fileFd = fileno(this->file);
 		this->fileSize = ft::filesystem::getFileSize(this->file);
+
 		this->writeHeader(200);
 		this->fields["Content-Length"] = std::to_string(this->fileSize);
 		this->fields["Content-Type"] = ft::getContentType(filePath);
 		this->writeFields();
+
 		return;
 	}
-	//file doesnt exist, make errorpage
+	// File doesnt exist, make error page.
 	this->generateStatusPage(404);
 }
 
@@ -278,31 +286,30 @@ void ft::Response::writeFields(void)
 
 ft::ResponseStatus ft::Response::send(int32_t socket)
 {
-	//send the header part
+	// Send the header part
 	if (!this->sentHeader)
 	{
 		size_t len = ft::send(socket, this->data.data(), this->data.length(), 0);
 		if (len < this->data.length())
 		{
 			this->data.erase(0, len);
-			return ft::NOT_DONE;
+			return (ft::NOT_DONE);
 		}
 		this->sentHeader = true;
-		if (this->fileFd < 0)
-			return ft::DONE; // data included body, we're done here
-		return ft::NOT_DONE;
+
+		// Data included body, we're done here.
+		return (this->fileFd < 0 ? ft::DONE : ft::NOT_DONE);
 	}
 
-	//double check, its important
-	if (this->fileFd < 0)
-		return ft::ResponseStatus::DONE;
+	// Double check, its important.
+	if (this->fileFd < 0) return (ft::DONE);
 
-	//send the file, if its done resolve the connection
+	// Send the file, if its done resolve the connection
+
+	// NOTE: Could fail, don't care, no errno, will work afterwards
 	off_t len = 0;
-	sendfile(this->fileFd, socket, this->fileOffset, &len, NULL, 0); // could fail, don't care, no errno, will work afterwards
+	sendfile(this->fileFd, socket, this->fileOffset, &len, NULL, 0);
 	this->fileOffset += len;
-	if (this->fileOffset >= this->fileSize)
-		return ft::ResponseStatus::DONE;
-	return ft::ResponseStatus::NOT_DONE;
-}
 
+	return (this->fileOffset >= this->fileSize ? ft::DONE : ft::NOT_DONE);
+}

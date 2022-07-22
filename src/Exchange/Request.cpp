@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:34:12 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/21 16:14:43 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/22 12:06:16 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,11 +91,11 @@ bool ft::Request::parse(size_t bodySize)
 		std::cout << std::stoul(this->fields["Content-Length"]) <<std::endl;
 		if (this->body.size() < std::stoul(this->fields["Content-Length"]))
 		{
-			std::cout << "AFEWFOJWFJWFOW1"<<std::endl;
+			//std::cout << "AFEWFOJWFJWFOW1"<<std::endl;
 			return (false);
 		}
 	}
-	std::cout << "AFEWFOJWFJWFOW2"<<std::endl;
+	//std::cout << "AFEWFOJWFJWFOW2"<<std::endl;
 	return (true);
 }
 

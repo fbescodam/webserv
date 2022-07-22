@@ -6,7 +6,7 @@
 /*   By: fbes <fbes@student.codam.nl>                 +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/16 21:23:40 by fbes          #+#    #+#                 */
-/*   Updated: 2022/07/07 18:32:53 by fbes          ########   odam.nl         */
+/*   Updated: 2022/07/22 11:00:53 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,23 +23,20 @@ void ft::ServerSection::printAll() const
 {
 	this->print("");
 	for (const ft::Section& location : this->locations)
-		location.print("	");
+		location.print("\t");
 	std::cout << "[DEBUG] " << std::endl;
 }
 
 const std::string* ft::ServerSection::getKeyFromLocationOrServer(const ft::Section& location, const std::string& key) const
 {
 	const std::string* ptr = location.getValue(key);
-	if (ptr)
-		return (ptr);
-	return (this->getValue(key));
+
+	return (ptr != nullptr ? ptr : this->getValue(key));
 }
 
 bool ft::ServerSection::keyExistsInLocationOrServer(const ft::Section& location, const std::string& key) const
 {
-	if (location.keyExists(key))
-		return (true);
-	return (this->keyExists(key));
+	return (location.keyExists(key) ? true : this->keyExists(key));
 }
 
 //////////////////////////////////////////
