@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/02 12:34:20 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/22 12:12:42 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/07/26 14:13:53 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,7 +101,7 @@ void ft::Server::pollInEvent(pollfd* poll)
 	if (this->responses.find(poll->fd) != this->responses.end())
 		this->responses.erase(poll->fd); //delete this->responses[poll->fd];
 
-	//receive bytes and store them in our request buffer, organized per connection(poll->fd)
+	// Receive bytes and store them in our request buffer, organized per connection(poll->fd)
 	try 
 	{
 		brecv = ft::receive(poll->fd, buff, BUFF_SIZE, 0);
@@ -142,15 +142,15 @@ void ft::Server::pollInEvent(pollfd* poll)
 		this->generateOutStatus(poll, 400);
 		return;
 	}
-	catch (const std::bad_alloc& e)
-	{
-		this->generateOutStatus(poll, 507);
-		return;
-	}
 	catch (const std::exception& e)
 	{
 		delete temp;
 		this->generateOutStatus(poll, 500);
+		return;
+	}
+	catch (const std::bad_alloc& e)
+	{
+		this->generateOutStatus(poll, 507);
 		return;
 	}
 

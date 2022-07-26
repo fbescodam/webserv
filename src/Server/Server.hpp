@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/02 12:25:53 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/20 20:18:49 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/26 14:11:58 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,8 +45,8 @@ public: // Attributes
 	ft::ServerSection config;
 
 	std::map<int32_t, std::string> clientIpv4;
-	std::map<int32_t, ft::Response *> responses;
-	std::map<int32_t, ft::Request *> requests;
+	std::map<int32_t, ft::Response*> responses;
+	std::map<int32_t, ft::Request*> requests;
 	std::map<int32_t, std::string> req_buf;
 
 private:

@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 17:39:03 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/22 10:53:24 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/07/26 12:08:24 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,6 +68,7 @@ int32_t main(int32_t argc, const char* argv[])
 			try { it->run(); }
 			catch(const std::exception& e)
 			{
+				// NOTE: If we reach this place we utterly failed!
 				std::cerr << "Server " << it->config.getName() << " has crashed!" << std::endl;
 				std::cerr << e.what() << std::endl;
 				servers.erase(it);

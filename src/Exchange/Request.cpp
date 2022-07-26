@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:34:12 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/22 12:10:04 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/07/26 15:40:14 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,30 +28,32 @@ void parseLineOne(ft::Request &req, std::string lineOne)
 	req.version = fields[2];
 }
 
-bool isAscii (const std::string& s, size_t pos)
-{
-    return !std::any_of(s.begin(), (s.begin() + pos), [](char c) { 
-        return static_cast<unsigned char>(c) > 127; 
-    });
-}
-
+// TODO: utterly fucked
 bool ft::Request::parse(size_t bodySize)
 {
 	if (this->buffer.size() < 1)
 		throw ft::BadRequest();
+
+	// Check if the first byte can even be printed, this should check for HTTPS
+	if (!isalpha(this->buffer[0]))
+	{
+		// NOTE: Not much we can do just state bad request and move on.
+		std::cout << "Possible HTTPS request or malformed request!" << std::endl;
+		throw ft::BadRequest();
+	}
 	
+	// NOTE: Very bad!!!!!!!
 	for (int i = 0; i < 3; i++)
-		if (!isupper(this->buffer[i]))
+		if (!isupper(this->buffer[i])) 
 			throw ft::BadRequest();
 
+	// Not a valid request
 	size_t pos = this->buffer.find("\r\n\r\n");
-	if (pos== std::string::npos)
+	if (pos == std::string::npos)
 		return (false);
 
-	if (isAscii(this->buffer, pos) == false)
-		throw ft::BadRequest();
 
-
+	// W T F ?????? I have no idea what the fuck this is ...
 	std::pair<std::string, std::string> splitBuffer(buffer.substr(0, pos), buffer.substr(pos));
 	std::istringstream iss(splitBuffer.first);
 	std::vector<std::string> tempFields;
@@ -65,7 +67,7 @@ bool ft::Request::parse(size_t bodySize)
 	for (std::string &val : tempFields)
 	{	
 		ft::trim(val);
-		val.erase(remove_if(val.begin(), val.end(), [](char c){return !(c>=32);}), val.end());
+		val.erase(remove_if(val.begin(), val.end(), [](char c){return !(c >= 32);}), val.end());
 		if (!val.empty())
 		{
 			if (val.find(':') == std::string::npos)
@@ -87,22 +89,37 @@ bool ft::Request::parse(size_t bodySize)
 
 	if (this->method == ft::Method::POST)
 	{
-		std::cout << this->body.size() <<std::endl;
-		std::cout << std::stoul(this->fields["Content-Length"]) <<std::endl;
-		if (this->body.size() < std::stoul(this->fields["Content-Length"]))
-		{
-			//std::cout << "AFEWFOJWFJWFOW1"<<std::endl;
-			return (false);
-		}
+		const size_t size = std::stoul(this->fields["Content-Length"]);
+		std::cout << "File size: " << size << 'B' << std::endl;
+		std::cout << "Request size: " << this->body.size() << 'B' << std::endl;
+
+		// for (auto &&i : this->fields)
+			// std::cout << i.first << " - " << i.second << std::endl;
+
+		if (this->body.size() < size)
+			return (false);		
+
+		// write(1, this->body.c_str(), this->body.size());
+
+
+		// throw ft::BadRequest();
+		
+
+		// std::cout << this->body.size() <<std::endl;
+		// std::cout << std::stoul(this->fields["Content-Length"]) << std::endl;
+
+		// if (this->body.size() < std::stoul(this->fields["Content-Length"]))
+		// {
+		// 	return (false);
+		// }
 	}
-	//std::cout << "AFEWFOJWFJWFOW2"<<std::endl;
 	return (true);
 }
 
-ft::Request::Request(std::string buffe, std::string ip)
+ft::Request::Request(std::string buffer, std::string ip)
 {
 	this->ipv4 = ip;
-	this->buffer = buffe;
+	this->buffer = buffer;
 }
 
 //////////////////////////////////////////

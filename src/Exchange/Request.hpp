@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:13:27 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/20 20:25:41 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/07/26 14:15:44 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 
 #ifndef REQUEST_HPP
 # define REQUEST_HPP
+# include <array>
 # include "Exchange.hpp"
 FT_BEGIN
 
@@ -31,7 +32,7 @@ class Request final : public Exchange
 {
 public: // Ctor ~ Dtor
 	Request() {}
-	Request(std::string buffe, std::string ipv4);
+	Request(std::string buffer, std::string ipv4);
 
 public: // Methods
 	void display(void) const;
