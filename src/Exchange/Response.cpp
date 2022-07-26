@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:34:00 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/22 13:42:28 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/07/26 17:23:58 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,10 +16,14 @@
 
 ft::Response::Response(int32_t statusIn, ft::ServerSection *configIn)
 {
-	this->config.importFields(configIn->exportFields());
 	this->request = NULL;
+	this->config.importFields(configIn->exportFields());
+	this->locations = configIn->locations;
 	this->file = NULL;
 	this->fileFd = -1;
+	this->sentHeader = false;
+	this->fileSize = 0;
+	this->fileOffset = 0;
 	this->fields["Connection"] = statusIn == 408 ? "close" : "keep-alive"; // Timeout occurred, now be gone thot
 	this->generateStatusPage(statusIn);
 }
@@ -294,13 +298,17 @@ void ft::Response::writeFields(void)
 
 ft::ResponseStatus ft::Response::send(int32_t socket)
 {
+	std::cout << " SEND NOW " << std::endl;
+
 	// Send the header part
 	if (!this->sentHeader)
 	{
+		std::cout << "Sending " << this->data.substr(9, 3) << " Response" << std::endl;
 		size_t len = ft::send(socket, this->data.data(), this->data.length(), 0);
 		if (len < this->data.length())
 		{
 			this->data.erase(0, len);
+			std::cout << "Send is not done, continue in next loop" << std::endl;
 			return (ft::NOT_DONE);
 		}
 		this->sentHeader = true;
@@ -308,9 +316,13 @@ ft::ResponseStatus ft::Response::send(int32_t socket)
 		// Data included body, we're done here.
 		return (this->fileFd < 0 ? ft::DONE : ft::NOT_DONE);
 	}
+	else
+		std::cout << "Header was already sent!" << std::endl;
 
-	// Double check, its important.
+	// Double check, its important. Otherwise we accidentally send a file
 	if (this->fileFd < 0) return (ft::DONE);
+
+	std::cout << "Sending file now using sendfile" << std::endl;
 
 	// Send the file, if its done resolve the connection
 

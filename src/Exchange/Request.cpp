@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 19:34:12 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/26 15:40:14 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/07/26 16:33:03 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,13 +47,13 @@ bool ft::Request::parse(size_t bodySize)
 		if (!isupper(this->buffer[i])) 
 			throw ft::BadRequest();
 
-	// Not a valid request
+	// Body is not found yet, so keep going: return false to send a 100 response
 	size_t pos = this->buffer.find("\r\n\r\n");
 	if (pos == std::string::npos)
 		return (false);
 
 
-	// W T F ?????? I have no idea what the fuck this is ...
+	// split the header on newlines, up to the beginning of the body (marked by pos), or if pos is not set, the whole thing because there IS no body yet
 	std::pair<std::string, std::string> splitBuffer(buffer.substr(0, pos), buffer.substr(pos));
 	std::istringstream iss(splitBuffer.first);
 	std::vector<std::string> tempFields;
@@ -81,7 +81,7 @@ bool ft::Request::parse(size_t bodySize)
 	}	
 
 
-	if (splitBuffer.second.size() > 0)
+	if (splitBuffer.second.size() > 0) // splitBuffer.second is body
 		this->body += splitBuffer.second;
 
 	if (this->body.size() > bodySize)
@@ -93,11 +93,21 @@ bool ft::Request::parse(size_t bodySize)
 		std::cout << "File size: " << size << 'B' << std::endl;
 		std::cout << "Request size: " << this->body.size() << 'B' << std::endl;
 
+		//std::cout << "NEW RESPONSE. BODY: " << std::endl;
+		//std::cout << this->body << std::endl;
+		std::cout << "NEW RESPONSE. BUFFER: " << std::endl;
+		std::cout << this->buffer << std::endl;
+
 		// for (auto &&i : this->fields)
 			// std::cout << i.first << " - " << i.second << std::endl;
 
 		if (this->body.size() < size)
+		{
+			std::cout << "Expecting more shit" << std::endl;
 			return (false);		
+		}
+		else
+			std::cout << "Received all the shit" << std::endl;
 
 		// write(1, this->body.c_str(), this->body.size());
 

@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/02 12:34:20 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/26 14:13:53 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/07/26 17:36:08 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,11 +86,15 @@ void ft::Server::generateOutStatus(pollfd *poll, int code)
 	if (this->responses.find(poll->fd) != this->responses.end())
 		delete this->responses[poll->fd];
 	this->responses[poll->fd] = new ft::Response(code, &(this->config));
+	std::cout << "Pollout now" << std::endl;
 	poll->events = POLLOUT;
 }
 
 void ft::Server::pollInEvent(pollfd* poll)
 {
+
+	std::cout << " Run pollin event aaa " << std::endl;
+
 	// Fetch the raw data
 
 	ssize_t brecv; //brecvast
@@ -98,8 +102,10 @@ void ft::Server::pollInEvent(pollfd* poll)
 	char buff[4096] = {0};
 
 	ft::Request* temp = NULL;
-	if (this->responses.find(poll->fd) != this->responses.end())
+	if (this->responses.find(poll->fd) != this->responses.end()) {
 		this->responses.erase(poll->fd); //delete this->responses[poll->fd];
+		std::cout << "Deleted an old response" << std::endl;
+	}
 
 	// Receive bytes and store them in our request buffer, organized per connection(poll->fd)
 	try 
@@ -109,6 +115,7 @@ void ft::Server::pollInEvent(pollfd* poll)
 	}
 	catch (std::exception &e)
 	{
+		std::cout << " Receive threw a fucking exception " << std::endl;
 		this->req_buf.erase(poll->fd);
 		this->timeout.erase(poll->fd);
 		close(poll->fd);
@@ -116,19 +123,25 @@ void ft::Server::pollInEvent(pollfd* poll)
 		return;
 	}
 
+	// set the timeout only on successful receive
 	if (brecv > -1)
 		this->timeout[poll->fd] = std::time(nullptr);
 	this->req_buf[poll->fd] += buff;
+
+	std::cout << " It got here" << std::endl;
 
 	try // Parse the incoming request
 	{
 		temp = new ft::Request(this->req_buf[poll->fd], this->clientIpv4[poll->fd]);
 		if (!temp->parse(std::stoul(*this->config.getValue("limit_body_size"))))
 		{			
+			std::cout << "Parse fail, incomplete." << std::endl;
 			delete temp;
 			this->generateOutStatus(poll, 100); //TODO: something goes wrong here with big bodys through post
 			return;
 		}
+		else
+			std::cout << "Parse success, fully completed." << std::endl;
 	}
 	catch (const ft::PayloadTooLarge& e)
 	{
@@ -161,10 +174,13 @@ void ft::Server::pollInEvent(pollfd* poll)
 
 	if (this->responses[poll->fd]->verify())
 		this->responses[poll->fd]->generateResponse();
+	else
+		std::cout << "Response verification failed!!!!!! " << std::endl;
 
 	this->req_buf.erase(poll->fd);
 
 	// Set poll to check for pollout events, this means we can send() to the fd because the client is ready
+	std::cout << "Pollout now! (final)" << std::endl;
 	poll->events = POLLOUT;
 }
 
@@ -195,6 +211,8 @@ void ft::Server::pollOutEvent(pollfd* poll)
 		this->resolveConnection(poll);
 		std::cout << "//=/ Sent Response /=//" << std::endl;
 	}
+	else
+		std::cout << "Unable to send response." << std::endl;
 }
 
 void ft::Server::cleanSocket(pollfd *poll)
@@ -228,19 +246,19 @@ void ft::Server::run(void)
 
 		// Create new connection
 		if (!i && (this->pollfds[0].revents & POLLIN))
-			this->pollListen();
+		{	std::cout << "Polllisten" << std::endl; this->pollListen(); }
 
 		// Pollfd is ready for reading
 		else if (poll->revents & POLLIN)
-			this->pollInEvent(poll);
+		{	std::cout << "Pollin" << std::endl; this->pollInEvent(poll); }
 
 		// Pollfd is ready for writing
 		else if (poll->revents & POLLOUT)
-			this->pollOutEvent(poll);
+		{	std::cout << "Pollout" << std::endl; this->pollOutEvent(poll); }
 
 		//connection timed out: 5 seconds
-		if (i > 0 && this->checkTimeout(poll))
-			this->cleanSocket(poll);
+		//if (i > 0 && this->checkTimeout(poll))
+		//	this->cleanSocket(poll);
 	}
 }
 
