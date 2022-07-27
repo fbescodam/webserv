@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 13:54:52 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/20 21:40:20 by fbes          ########   odam.nl         */
+/*   Updated: 2022/07/27 10:37:45 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,13 @@
 
 #ifndef SECTION_HPP
 # define SECTION_HPP
-# include "Common.hpp"
+# include <list>
+# include <map>
+# include <iostream>
+# include <sstream>
 # include "Exceptions.hpp"
-FT_BEGIN
+
+namespace ft {
 
 // A section consists of a name along with a map of key-value pairs (called fields) that can be retrieved.
 class Section
@@ -161,6 +165,5 @@ private:
 	std::string cwd;
 
 };
-
-FT_END
+}
 #endif

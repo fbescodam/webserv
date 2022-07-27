@@ -14,9 +14,9 @@
 
 #ifndef SERVERSECTION_HPP
 # define SERVERSECTION_HPP
-# include "Common.hpp"
+# include <vector>
 # include "Section.hpp"
-FT_BEGIN
+namespace ft {
 
 class ServerSection final : public ft::Section
 {
@@ -53,6 +53,5 @@ public: // Attributes
 	// Server locations
 	std::vector<ft::Section> locations;
 };
-
-FT_END
+}
 #endif

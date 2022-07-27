@@ -6,11 +6,10 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 14:59:11 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/14 21:11:52 by fbes          ########   odam.nl         */
+/*   Updated: 2022/07/26 18:05:33 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <sys/stat.h>
 #include "GlobalConfig.hpp"
 
 //////////////////////////////////////////
@@ -27,7 +26,7 @@ static bool isSectionDef(const std::string& line)
 
 static bool isSubSectionDef(const std::string& line)
 {
-	size_t firstCharIndex = line.find_first_not_of(WHITESPACE, 1);
+	size_t firstCharIndex = line.find_first_not_of(" \t\r\n\t\f\v", 1);
 	return (line[firstCharIndex] == '.');
 }
 

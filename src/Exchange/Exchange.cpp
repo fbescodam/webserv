@@ -5,8 +5,8 @@
 /*                                                     +:+                    */
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
-/*   Created: 2022/05/23 19:15:11 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/17 06:49:40 by pvan-dij      ########   odam.nl         */
+/*   Created: 2022/07/26 17:50:42 by lde-la-h      #+#    #+#                 */
+/*   Updated: 2022/07/26 17:52:28 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,17 +14,11 @@
 
 //////////////////////////////////////////
 
-bool ft::Exchange::keyExists(const std::string& key) const
+const std::string* ft::Exchange::getHeaderValue(const std::string& key) const
 {
-	return (this->fields.find(key) != this->fields.end());
+	auto it = this->headers.find(key);
+
+	return (it != this->headers.end() ? &it->second : nullptr);
 }
-
-const std::string* ft::Exchange::getValue(const std::string& key) const
-{
-	auto it = this->fields.find(key);
-
-	return (it != this->fields.end() ? &it->second : nullptr);
-}
-
 
 //////////////////////////////////////////

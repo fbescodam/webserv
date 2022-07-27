@@ -5,8 +5,8 @@
 /*                                                     +:+                    */
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
-/*   Created: 2022/05/23 19:13:27 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/06/17 09:12:08 by pvan-dij      ########   odam.nl         */
+/*   Created: 2022/07/26 17:42:38 by lde-la-h      #+#    #+#                 */
+/*   Updated: 2022/07/26 17:52:53 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,53 +14,46 @@
 
 #ifndef EXCHANGE_HPP
 # define EXCHANGE_HPP
-# include "CommonNetwork.hpp"
-# include "ServerSection.hpp"
-FT_BEGIN
+# include <map>
+# include <string>
 
-// Supported exchange methods for the webserver.
-enum class Method : uint8_t
+namespace ft
 {
-	GET,
-	POST,
-	DELETE,
-	ERR
-};
 
-// An exchange is both a response and a request via http.
 class Exchange
 {
 public: // Ctor ~ Dtor
 	virtual ~Exchange() { }
 
+    enum class Method : uint8_t
+    {
+        GET,
+        POST,
+        DELETE,
+        MAX
+    };
+
 public: // Functions
-	/**
-	 * @brief check if a key exists in the headers
-	 *
-	 * @param key the key to check for
-	 * @return true if the key exists
-	 */
-	bool keyExists(const std::string& key) const;
 
 	/**
-	 * @brief get the value of a header field
+	 * @brief Get the value of a header field.
 	 *
-	 * @param key the key of a header field to get the value of
-	 * @return a pointer to the value (NULL if field does not exist)
+	 * @param[in] key The key of a header field to get the value of.
+	 * @return A pointer to the value, null if field does not exist.
 	 */
-	const std::string* getValue(const std::string& key) const;
+	const std::string* getHeaderValue(const std::string& key) const;
 
-public: // Attributes
+public:
 
-	// The exchange make-up and parameters.
-	std::map<std::string, std::string> fields;
+    // The exchange make-up and parameters.
+    std::map<std::string, std::string> headers;
 
-	// The raw data of the exchange method, e.g: file, text, script, ...
-	std::string data;
+    // The raw data of the exchange method, e.g: file, text, script, ...
+    std::string body;
 
-	// The either incoming or outgoing socket of the exchange.
-	int32_t socket;
+    // The either incoming or outgoing socket of the exchange.
+    int32_t socketFD;
 };
 
-FT_END
+}
 #endif

@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 13:54:52 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/07 18:30:30 by fbes          ########   odam.nl         */
+/*   Updated: 2022/07/26 18:06:38 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,11 +14,17 @@
 
 #ifndef GLOBALCONFIG_HPP
 # define GLOBALCONFIG_HPP
-# include "Common.hpp"
-# include "Exceptions.hpp"
-# include "ServerSection.hpp"
-FT_BEGIN
+# include <vector>
+# include <string>
+# include <sys/stat.h>
+# include "exceptions.hpp"
+# include <sstream>
+# include <iostream>
+# include <fstream>
 
+namespace ft
+{
+    
 /**
  * A config files containskey & values along with several
  * entries with their own unique single subsection.
@@ -59,5 +65,5 @@ public: // Attributes
 	std::vector<ft::ServerSection> serverSections; // TODO: Server class should hold a reference to an section as its 'config'
 };
 
-FT_END
+}
 #endif
