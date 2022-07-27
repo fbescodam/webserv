@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:08:42 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/27 11:39:17 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/07/27 18:53:56 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,8 +36,6 @@ void ft::Server::init(void)
 	}
 
 	this->nfds = 0;
-	this->numFds = 1;
-
 	try { this->pollfds = new pollfd[MAX_CLIENTS]; }
 	catch(const std::exception& e)
 	{
@@ -47,4 +45,50 @@ void ft::Server::init(void)
 
 	this->pollfds->fd = serverFD;
 	this->pollfds->events = POLLIN;
+}
+
+void ft::Server::respondWithStatus(pollfd* poll, int32_t statusCode)
+{
+	// if (this->responses.find(poll->fd) != this->responses.end())
+	// 	delete this->responses[poll->fd];
+		
+	// this->responses[poll->fd] = new ft::Response(code, &(this->config));
+	// std::cout << "Pollout now" << std::endl;
+	// poll->events = POLLOUT;
+}
+
+static void pollListen(void)
+{
+
+}
+
+static void pollInEvent(pollfd* poll)
+{
+
+}
+
+static void pollOutEvent(pollfd* poll)
+{
+
+}
+
+void ft::Server::run(void)
+{
+	// Check our open fds for events.
+	ft::poll(this->pollfds, this->nfds, 0);
+
+	for (int i = 0; i < this->nfds; i++)
+	{
+		pollfd* poll = &this->pollfds[i];
+
+		// Create new connection
+		if (!i && (this->pollfds[0].revents & POLLIN))
+			pollListen();
+		// Pollfd is ready for reading.
+		else if (poll->revents & POLLIN)
+			pollInEvent(poll);
+		// Pollfd is ready for writing.
+		else if (poll->revents & POLLOUT)
+			pollOutEvent(poll);
+	}
 }

@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:08:47 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/27 11:39:17 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/07/27 18:53:56 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,9 @@ public: // Attributes
     // The server's own copy of the config
     ft::ServerSection config;
 
+public: // Functions
+	void respondWithStatus(pollfd* poll, int32_t statusCode);
+
 private:
 
 	// Network part
@@ -52,9 +55,8 @@ private:
 	ft::SocketAddress address;
 
     // Poll
-	int32_t numFds;
-	pollfd* pollfds;
-	nfds_t nfds;
+	nfds_t nfds;		// Poll size
+	pollfd* pollfds;	// Polls
 
 	std::map<int32_t, time_t> timeout;
 };
