@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 14:59:11 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/26 18:05:33 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/07/27 10:47:03 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ static bool isSectionDef(const std::string& line)
 
 static bool isSubSectionDef(const std::string& line)
 {
-	size_t firstCharIndex = line.find_first_not_of(" \t\r\n\t\f\v", 1);
+	size_t firstCharIndex = line.find_first_not_of(WHITESPACE, 1);
 	return (line[firstCharIndex] == '.');
 }
 
@@ -171,7 +171,7 @@ void ft::GlobalConfig::readFile(const std::string& filePath)
 			continue; // continue with next line
 		}
 
-		ft::slice(line, '=', output);
+		ft::slice(line, "=", output);
 		ft::trim(output.first);
 		ft::trim(output.second);
 		currentSection->verifyKeyValue(lineNum, output.first, output.second);
