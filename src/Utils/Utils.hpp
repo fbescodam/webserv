@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 10:40:21 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/28 10:42:11 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/07/28 11:25:09 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,15 +16,23 @@
 # define UTILS_HPP
 # define WHITESPACE " \t\r\n\t\f\v"
 # include <string>
+# include <poll.h>
+# include <netinet/in.h>
+# include <arpa/inet.h>
+# include <sys/socket.h>
+# include <sys/poll.h>
+# include <fcntl.h>
+# include <unistd.h>
+# include <map>
 # include "Exceptions.hpp"
+# include "SocketAddress.hpp"
 # define NONE 0
 # define GREEN "\033[32;1m"
 # define BLACK "\033[30;1m"
 # define RED "\033[31;1m"
 # define RESET "\033[0m"
 
-namespace ft
-{
+namespace ft {
 
 // NOTE: Cant be bothered with templates just yet ...
 
@@ -87,6 +95,21 @@ int32_t fcntl(int32_t fd, int32_t cmd, Args... args)
 	if (Value < 0) throw ft::GenericErrnoException();
 	return (Value);
 }
+
+/**
+ * @brief Get the list of exisiting status codes.
+ * 
+ * @return const std::map<uint16_t, std::string>& 
+ */
+const std::map<uint16_t, std::string>& getStatusCodes();
+
+/**
+ * @brief Retrieve the content type value based on the given extension.
+ * 
+ * @param ext The file extension, include the '.' in it.
+ * @return std::string& The content type.
+ */
+std::string& getContentType(std::string ext);
 
 }
 #endif

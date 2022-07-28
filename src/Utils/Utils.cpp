@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 10:41:28 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/27 11:38:56 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/07/28 11:25:10 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,4 +87,153 @@ std::string ft::inet_ntop(SocketAddress& address)
 	if (::inet_ntop(AF_INET, &temp, buf, sizeof(buf)) == nullptr)
 		return "";
 	return std::string(buf);
+}
+
+const std::map<uint16_t, std::string>& ft::getStatusCodes()
+{
+	static std::map<uint16_t, std::string> list = {
+		// 1xx Informational
+		{100, "Continue"},
+		{101, "Switching Protocols"},
+		{102, "Processing"},
+
+		// 2xx Success
+		{200, "OK"},
+		{201, "Created"},
+		{202, "Accepted"},
+		{203, "Non-authoritative Information"},
+		{204, "No Content"},
+		{205, "Reset Content"},
+		{206, "Partial Content"},
+		{207, "Multi-Status"},
+		{208, "Already Reported"},
+		{226, "IM Used"},
+
+		// 3xx Redirection
+		{300, "Multiple Choices"},
+		{301, "Moved Permanently"},
+		{302, "Found"},
+		{303, "See Other"},
+		{304, "Not Modified"},
+		{305, "Use Proxy"},
+		{307, "Temporary Redirect"},
+		{308, "Permanent Redirect"},
+
+		// 4xx Client Error
+		{400, "Bad Request"},
+		{401, "Unauthorized"},
+		{402, "Payment Required"},
+		{403, "Forbidden"},
+		{404, "Not Found"},
+		{405, "Method Not Allowed"},
+		{406, "Not Acceptable"},
+		{407, "Proxy Authentication Required"},
+		{408, "Request Timeout"},
+		{409, "Conflict"},
+		{410, "Gone"},
+		{411, "Length Required"},
+		{412, "Precondition Failed"},
+		{413, "Payload Too Large"},
+		{414, "Request-URI Too Long"},
+		{415, "Unsupported Media Type"},
+		{416, "Requested Range Not Satisfiable"},
+		{417, "Expectation Failed"},
+		{418, "I'm a teapot"},
+		{421, "Misdirected Request"},
+		{422, "Unprocessable Entity"},
+		{423, "Locked"},
+		{424, "Failed Dependency"},
+		{426, "Upgrade Required"},
+		{428, "Precondition Required"},
+		{429, "Too Many Requests"},
+		{431, "Request Header Fields Too Large"},
+		{444, "Connection Closed Without Response"},
+		{451, "Unavailable For Legal Reasons"},
+		{499, "Client Closed Request"},
+
+		//5xx Server Error
+		{500, "Internal Server Error"},
+		{501, "Not Implemented"},
+		{502, "Bad Gateway"},
+		{503, "Service Unavailable"},
+		{504, "Gateway Timeout"},
+		{505, "HTTP Version Not Supported"},
+		{506, "Variant Also Negotiates"},
+		{507, "Insufficient Storage"},
+		{508, "Loop Detected"},
+		{510, "Not Extended"},
+		{511, "Network Authentication Required"},
+		{599, "Network Connect Timeout Error"}
+	};
+
+	return (list);
+}
+
+std::string& ft::getContentType(std::string ext)
+{
+	static std::map<std::string, std::string> list = {
+		{"html",	"text/html"},
+		{"htm",		"text/html"},
+		{"shtml",	"text/html"},
+		{"css",		"text/css"},
+		{"xml",		"text/xml"},
+		{"mml",		"text/mathml"},
+		{"txt",		"text/plain"},
+		{"jad",		"text/vnd.sun.j2me.app-descriptor"},
+		{"wml",		"text/vnd.wap.wml"},
+		{"htc",  	"text/x-component"},
+		
+		{"js",		"application/javascript"},
+		{"atom",	"application/atom+xml"},
+		{"rss",		"application/rss+xml"},
+		{"7z",		"application/x-7z-compressed"},
+
+		{"gif",		"image/gif"},
+		{"jpeg",	"image/jpeg"},
+		{"jpg",		"image/jpeg"},
+		{"avif",	"image/avif"},
+		{"png",		"image/png"},
+		{"svg",		"image/svg+xml"},
+		{"svgz",	"image/svg+xml"},
+		{"tif",		"image/tif"},
+		{"tiff",	"image/tiff"},
+		{"wbmp",	"image/wbmp"},
+		{"webp",	"image/webp"},
+		{"ico",		"image/ico"},
+		{"jng",		"image/jng"},
+		{"bmp",		"image/bmp"},
+		
+		{"json",	"application/json"},
+
+		{"mid",		"audio/midi"},
+		{"midi",	"audio/midi"},
+		{"kar",		"audio/midi"},
+		{"mp3",		"audio/mpeg"},
+		{"ogg",		"audio/ogg"},
+		{"m4a",		"audio/x-m4a"},
+		{"ra",		"audio/x-realaudio"},
+
+		{"mid",		"audio/midi"},
+		{"midi",	"audio/midi"},
+		{"kar",		"audio/midi"},
+		{"mp3",		"audio/mpeg"},
+		{"ogg",		"audio/ogg"},
+		{"m4a",		"audio/x-m4a"},
+		{"ra",		"audio/x-realaudio"},
+
+		{"3gpp",	"video/3gpp"},
+		{"3gp",		"video/3gpp"},
+		{"mp4",		"video/mp4"},
+		{"mpeg",	"video/mpeg"},
+		{"mpg",		"video/mpeg"},
+		{"mov",		"video/mov"},
+		{"m4a",		"video/webm"},
+	};
+
+	// Find the damn thing
+	auto reslt = list.find(ext.substr(ext.find_last_of(".") + 1));
+
+	if (reslt == list.end())
+		return (list["html"]); // Default
+	return ((*reslt).second);
 }
