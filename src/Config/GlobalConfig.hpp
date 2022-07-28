@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 13:54:52 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/27 10:43:16 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/07/28 16:32:39 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@
 
 namespace ft
 {
-    
+
 /**
  * A config files containskey & values along with several
  * entries with their own unique single subsection.
@@ -63,7 +63,7 @@ public: // Attributes
 	// Global configuration at the start.
 	ft::Section globalSection = ft::Section(getcwd(NULL, 0), "global");
 
-	// Server sections.
+	// Server sections
 	std::vector<ft::ServerSection> serverSections; // TODO: Server class should hold a reference to an section as its 'config'
 };
 

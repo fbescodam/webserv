@@ -6,69 +6,68 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:08:42 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/28 12:50:29 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/07/28 17:02:42 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server.hpp"
 
-ft::Server::Server(ft::ServerSection& inConfig) : config(inConfig) { }
+ft::Server::Server(ft::ServerSection& inConfig) : config(inConfig) {}
 
 //////////////////////////////////////////
 
-void ft::Server::init(void)
+bool ft::Server::init(void)
 {
 	try
 	{
 		//this->config.getValueAsList("server_names", serverNames);
 		this->address = ft::SocketAddress(AF_INET, htons(this->config.returnValueAsInt("listen")), INADDR_ANY); // needs config values
-		this->serverFD = ft::socket(IPV4, TCP, NONE);
-		
+		this->socket = ft::socket(IPV4, TCP, NONE);
+
 		// Make kernel release socket after exit
-		ft::setSocketOption(this->serverFD, SOL_SOCKET, SO_REUSEADDR, true, sizeof(int32_t));
-		ft::bind(this->serverFD, &this->address);
-		ft::listen(this->serverFD, MAX_CLIENTS);
-		ft::fcntl(this->serverFD, F_SETFL, O_NONBLOCK);
+		ft::setSocketOption(this->socket, SOL_SOCKET, SO_REUSEADDR, true, sizeof(int32_t));
+		ft::bind(this->socket, &this->address);
+		ft::listen(this->socket, MAX_CLIENTS);
+		ft::fcntl(this->socket, F_SETFL, O_NONBLOCK);
 	}
 	catch(const std::exception& e)
 	{
 		std::cerr << "Webserv: Failed to create socket for server" << std::endl;
 		std::cerr << e.what() << std::endl;
-        exit(EXIT_FAILURE); // TODO: What do here
+		return (false);
 	}
-
-	this->nfds = 0;
-	try { this->pollfds = new pollfd[MAX_CLIENTS]; }
-	catch(const std::exception& e)
-	{
-		std::cerr << "Webserv: Failed to create poll for server." << std::endl;
-		std::cerr << e.what() << std::endl;
-        exit(EXIT_FAILURE); // TODO: What do here
-	}
-
-	this->pollfds->fd = serverFD;
-	this->pollfds->events = POLLIN;
+	return (true);
 }
 
 void ft::Server::respondWithStatus(pollfd* poll, int32_t statusCode)
 {
 	// if (this->responses.find(poll->fd) != this->responses.end())
 	// 	delete this->responses[poll->fd];
-		
+
 	// this->responses[poll->fd] = new ft::Response(code, &(this->config));
 	// std::cout << "Pollout now" << std::endl;
 	// poll->events = POLLOUT;
 }
 
+const ft::fd_t ft::Server::getSocket(void) const
+{
+	return (this->socket);
+}
+
+const ft::SocketAddress& ft::Server::getAddress(void) const
+{
+	return (this->address);
+}
+
 //////////////////////////////////////////
 
 /**
- * @brief 
- * 
+ * @brief
+ *
  */
 void ft::Server::pollListen(void)
 {
-	std::cout << GREEN << "Accepting Conneciton" << RESET << std::endl;
+	std::cout << GREEN << "Accepting connection" << RESET << std::endl;
 
 	// Accept a connection and set it to nonblocking mode.
 	int32_t clientSocket = ft::accept(this->serverFD, &this->address);
@@ -95,9 +94,9 @@ void ft::Server::pollListen(void)
 	// TODO: Else ?
 }
 /**
- * @brief To receive 
- * 
- * @param poll 
+ * @brief To receive
+ *
+ * @param poll
  */
 void ft::Server::pollInEvent(pollfd* poll)
 {
@@ -147,14 +146,14 @@ void ft::Server::pollInEvent(pollfd* poll)
 		this->respondWithStatus(poll, 500);
 		return;
 	}
-	
+
 	poll->events = POLLOUT;
 }
 
 /**
- * @brief 
- * 
- * @param poll 
+ * @brief
+ *
+ * @param poll
  */
 void ft::Server::pollOutEvent(pollfd* poll)
 {
@@ -164,17 +163,17 @@ void ft::Server::pollOutEvent(pollfd* poll)
 	std::cout << "\033[30;1m" << "Sent Response" << "\033[0m" << std::endl;
 }
 
-void ft::Server::run(void)
+void ft::Server::run(pollfd* fds, size_t size)
 {
 	// Check our open fds for events.
-	ft::poll(this->pollfds, this->nfds, 0);
+	ft::poll(fds, size, 0);
 
-	for (int i = 0; i < this->nfds; i++)
+	for (int i = 0; i < size; i++)
 	{
-		pollfd* poll = &this->pollfds[i];
+		pollfd* poll = &fds[i];
 
 		// Create new connection
-		if (!i && (this->pollfds[0].revents & POLLIN))
+		if (!i && (fds[0].revents & POLLIN))
 			this->pollListen();
 		// Pollfd is ready for reading.
 		else if (poll->revents & POLLIN)

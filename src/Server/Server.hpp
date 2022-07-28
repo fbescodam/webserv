@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:08:47 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/28 11:25:11 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/07/28 16:57:02 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,40 +30,33 @@ public: // Ctor ~ Dtor
 	Server(ft::ServerSection& inConfig);
 
 public: // Functions
-
-	void init(void);
-	void run(void);
+	bool init(void);
+	ft::fd_t getSocket(void) const;
+	ft::SocketAddress& getAddress(void) const;
 
 public: // Functions
 	/**
 	 * @brief Send a response to the current client with a given status code.
-	 * 
+	 *
 	 * @param poll The current connection.
 	 * @param statusCode The status code to send back.
 	 */
 	void respondWithStatus(pollfd* poll, int32_t statusCode);
-	
+
 private:
 	void pollListen(void);
 	void pollInEvent(pollfd* poll);
 	void pollOutEvent(pollfd* poll);
 
 public: // Attributes
-
-    // The server's own copy of the config
-    ft::ServerSection config;
+	// The server's own copy of the config
+	ft::ServerSection config;
 
 private:
 
 	// Network part
-	int32_t serverFD;
-	ft::SocketAddress address;
-
-    // Poll
-	nfds_t	nfds;		// Poll size
-	pollfd* pollfds;	// Poll array
-
-	std::map<int32_t, time_t> timeout;
+	ft::fd_t			socket;
+	ft::SocketAddress	address;
 };
 }
 #endif

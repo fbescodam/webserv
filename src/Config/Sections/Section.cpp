@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 15:39:35 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/27 10:36:19 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/07/28 14:53:21 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -161,7 +161,7 @@ void ft::Section::verifyKeyValue(uint32_t lineNum, std::string& key, std::string
 	const std::string possibleKeys[] = {
 		"limit_body_size",
 		"listen",
-		"server_names",
+		"server_name",
 		"index",
 		"access",
 		"dir_listing",
@@ -206,7 +206,7 @@ void ft::Section::verifyKeyValue(uint32_t lineNum, std::string& key, std::string
 			break;
 
 		// expecting a non-empty string
-		case 2: // server_names
+		case 2: // server_name
 		case 3: // index
 		case 6: // error_404
 		case 7: // methods

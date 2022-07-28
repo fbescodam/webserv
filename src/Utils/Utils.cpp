@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 10:41:28 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/28 11:25:10 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/07/28 16:57:08 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ void ft::slice(const std::string& string, std::string delim, std::pair<std::stri
 
 //////////////////////////////////////////
 
-int32_t ft::socket(int32_t domain, int32_t type, int32_t protocol)
+ft::fd_t ft::socket(int32_t domain, int32_t type, int32_t protocol)
 {
 	int32_t fd = ::socket(domain, type, protocol);
 	if (fd < 0)
@@ -52,11 +52,11 @@ void ft::listen(int32_t socketFD, int32_t BackLog = 128)
 		throw ft::GenericErrnoException();
 }
 
-int32_t ft::accept(int32_t socketFD, ft::SocketAddress* address)
+ft::fd_t ft::accept(ft::fd_t socket, ft::SocketAddress* address)
 {
 	socklen_t length = address->getSize();
 
-	int32_t fd = ::accept(socketFD, reinterpret_cast<sockaddr*>(address), &length);
+	int32_t fd = ::accept(socket, reinterpret_cast<sockaddr*>(address), &length);
 	if (fd < 0)
 		throw ft::GenericErrnoException();
 	return (fd);
@@ -78,7 +78,7 @@ int32_t ft::setSocketOption(int32_t socket, int32_t level, int32_t optionName, b
 	return (Value);
 }
 
-std::string ft::inet_ntop(SocketAddress& address) 
+std::string ft::inet_ntop(SocketAddress& address)
 {
 	// 4 bytes, IPV4
 	static char buf[sizeof(int32_t) * 4];
@@ -182,7 +182,7 @@ std::string& ft::getContentType(std::string ext)
 		{"jad",		"text/vnd.sun.j2me.app-descriptor"},
 		{"wml",		"text/vnd.wap.wml"},
 		{"htc",  	"text/x-component"},
-		
+
 		{"js",		"application/javascript"},
 		{"atom",	"application/atom+xml"},
 		{"rss",		"application/rss+xml"},
@@ -202,7 +202,7 @@ std::string& ft::getContentType(std::string ext)
 		{"ico",		"image/ico"},
 		{"jng",		"image/jng"},
 		{"bmp",		"image/bmp"},
-		
+
 		{"json",	"application/json"},
 
 		{"mid",		"audio/midi"},

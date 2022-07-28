@@ -6,77 +6,93 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 17:39:03 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/28 13:05:36 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/07/28 17:00:37 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <Server.hpp>
-#include <GlobalConfig.hpp>
+#include <list>
+#include <array>
+#include "Utils.hpp"
+#include "Poller.hpp"
+#include "Server.hpp"
+#include "GlobalConfig.hpp"
+
+// curl --verbose http://localhost:8080/
+// --header for custom headers ala "header:123"
 
 /**
- * Program entry point.
+ * @brief Verify arguments.
  *
  * @param[in] argc Argument count.
- * @param[in] argv Argument value.
- * @return Either EXIT_SUCCESS or EXIT_FAILURE.
  */
-int32_t main(int32_t argc, const char* argv[])
+static void verifyArguments(const int32_t argc)
 {
 	// Check arguments
 	if (argc != 2)
 	{
 		std::cerr << "\nWebserv: Invalid arguments\n" << std::endl;
 		std::cerr << "Usage: ./webserv <Configuration Filepath>\n" << std::endl;
-		return (EXIT_FAILURE);
+		exit(EXIT_FAILURE);
 	}
+}
 
+/**
+ * @brief
+ *
+ * @param[in] configPath path to a config file
+ * @param[in] config reference to the server configuration
+ * @param[in] servers reference to the vector list of servers
+ */
+static void setupServers(const std::string& configPath, ft::GlobalConfig& config, std::vector<ft::Server>& servers, ft::Poller& poller)
+{
 	// Handle Interrupt signals
 	signal(SIGINT, [](int32_t)
 	{
-		std::cout << "\n\nWebserv: Signal catched, shutting down ..." << std::endl;
-		exit (EXIT_FAILURE);
+		std::cout << "\n\nWebserv: Signal catched, shutting down..." << std::endl;
+		exit(EXIT_SUCCESS);
 	});
 
-	std::cout << BLACK << "Webserv: Starting..." << RESET << std::endl;
 	std::cout << BLACK << "Webserv: Reading config file" << RESET << std::endl;
-
-	static ft::GlobalConfig config;
-	try { config.readFile(argv[1]); }
-	catch(const std::exception& e)
+	try { config.readFile(configPath); }
+	catch (const std::exception& e)
 	{
 		std::cerr << e.what() << std::endl;
-		return (EXIT_FAILURE);
+		exit(EXIT_FAILURE);
 	}
-	
-	std::cout << BLACK << "Webserv: Creating servers" << RESET << std::endl;
 
-	static std::vector<ft::Server> servers;
+	std::cout << BLACK << "Webserv: Creating servers" << RESET << std::endl;
 	for (ft::ServerSection& serverSection : config.serverSections)
 	{
 		ft::Server server(serverSection);
-		servers.push_back((server.init(), server));
+		if (!server.init())
+			exit(EXIT_FAILURE);
+		servers.push_back(server);
 	}
 
+	poller.setServerAmount(servers.size());
+}
+
+/**
+ * Program entry point.
+ *
+ * @param[in] argc argument count
+ * @param[in] argv argument values
+ * @return Either EXIT_SUCCESS or EXIT_FAILURE.
+ */
+int32_t main(int32_t argc, const char* argv[])
+{
+	ft::GlobalConfig						config;	 			// Contains the entire configuration for the whole application/
+	std::vector<ft::Server>					servers; 			// A vector list that contains all of the servers.
+	ft::Poller								poller(servers);	// Poller to handle incoming and outgoing communication.
+
+	verifyArguments(argc);
+
+	std::cout << BLACK << "Webserv: Starting" << RESET << std::endl;
+	setupServers(argv[1], config, servers, poller);
+
 	std::cout << BLACK << "Webserv: Running" << RESET << std::endl;
-	while (true)
-	{
-		usleep(500); // NOTE: To reduce CPU Usage
-		for (auto it = servers.begin(); it != servers.end(); it++)
-		{
-			try { it->run(); }
-			catch(const std::exception& e)
-			{
-				// NOTE: If we reach this place we utterly failed!
-				std::cerr << RED <<  "Webserv: Server " << it->config.getName() << " has crashed!" << std::endl;
-				std::cerr << e.what() << RESET << std::endl;
-				servers.erase(it);
-			}	
-		}
-	}
+	do { poller.pollAll(); usleep(420); } while (true);
 
 	std::cout << "Webserv: Shutting down" << std::endl;
 	return (EXIT_SUCCESS);
 }
-
-// curl --verbose http://localhost:8080/
-// --header for custom headers ala "header:123"

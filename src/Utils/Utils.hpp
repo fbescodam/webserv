@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 10:40:21 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/28 11:25:09 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/07/28 16:33:24 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,8 @@
 # define RESET "\033[0m"
 
 namespace ft {
+
+typedef int32_t fd_t;
 
 // NOTE: Cant be bothered with templates just yet ...
 
@@ -61,7 +63,7 @@ void slice(const std::string& string, std::string delim, std::pair<std::string, 
 //////////////////////////////////////////
 
 // Socket creates an endpoint for communication and returns a descriptor.
-int32_t socket(int32_t domain, int32_t type, int32_t protocol);
+ft::fd_t socket(int32_t domain, int32_t type, int32_t protocol);
 
 // Assigns a name to an unnamed socket, requests that address be assigned to the socket.
 void bind(int32_t socketFD, SocketAddress* address);
@@ -70,7 +72,7 @@ void bind(int32_t socketFD, SocketAddress* address);
 void listen(int32_t socketFD, int32_t BackLog);
 
 // Extracts the first connection request on the queue of pending connections
-int32_t accept(int32_t socketFD, SocketAddress* address);
+ft::fd_t accept(int32_t socketFD, SocketAddress* address);
 
 // Examines a set of file descriptors to see if some of them are ready for I/O or if certain events have occurred on them.
 int32_t poll(struct pollfd fds[], size_t size, int32_t timeout);
@@ -98,14 +100,14 @@ int32_t fcntl(int32_t fd, int32_t cmd, Args... args)
 
 /**
  * @brief Get the list of exisiting status codes.
- * 
- * @return const std::map<uint16_t, std::string>& 
+ *
+ * @return const std::map<uint16_t, std::string>&
  */
 const std::map<uint16_t, std::string>& getStatusCodes();
 
 /**
  * @brief Retrieve the content type value based on the given extension.
- * 
+ *
  * @param ext The file extension, include the '.' in it.
  * @return std::string& The content type.
  */

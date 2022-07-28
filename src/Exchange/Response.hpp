@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:07:33 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/28 12:40:15 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/07/28 14:55:17 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,15 +62,21 @@ public: // Functions
      * @param content The content of the page. Browser should be able handle even simple strings
      */
     void generateStatus(int32_t status, const std::string& content);
+    void generateStatus(int32_t status);
 
 private:
 
-	void writeHead(int32_t status);
+	void writeStatusLine(int32_t status);
 	void writeHeaders(void);
 
     void deleteMethod(const std::string& filePath);
 	void postMethod(const std::string& filePath);
     void getMethod(void);
+
+private: // Attributes
+
+    // Copy of the configuration of the current server.
+	ft::Section config;
 
 };
 }

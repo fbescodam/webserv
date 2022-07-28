@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:07:35 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/28 13:01:59 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/07/28 15:25:20 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,8 @@
 
 //////////////////////////////////////////
 
-void ft::Response::writeHead(int32_t status)
+void ft::Response::writeStatusLine(int32_t status)
 {
-	// this->data += ft::format("HTTP/1.1 %u %s\n", status, ft::getStatusCodes().at(status).c_str());
 	this->data += "HTTP/1.1 " + std::to_string(status) + ft::getStatusCodes().at(status);
 	this->headers["Server"] = "Breadserv";
 }
@@ -28,10 +27,23 @@ void ft::Response::writeHeaders(void)
 	this->data += "\n";
 }
 
+void ft::Response::generateStatus(int32_t status)
+{
+	// Build header and fields
+	this->writeStatusLine(status);
+
+	// Try to find custom error page
+	if (this->config.)
+	{
+		/* code */
+	}
+	
+}
+
 void ft::Response::generateStatus(int32_t status, const std::string& content)
 {
 	// Build header and fields
-	this->writeHead(code);
+	this->writeStatusLine(status);
 	this->headers["Content-Length"] = std::to_string(content.length());
 	this->headers["Content-Type"] = "text/html";
 	this->writeHeaders();
@@ -44,7 +56,7 @@ void ft::Response::deleteMethod(const std::string& filePath)
 {
 	if (ft::filesystem::fileExists(filePath))
 	{
-		if (std::remove(filePath.c_str() != 0))
+		if (std::remove(filePath.c_str()) != 0)
 			this->generateStatus(500, "File deletion failed!");
 		else
 			this->generateStatus(200, "File deleted");
