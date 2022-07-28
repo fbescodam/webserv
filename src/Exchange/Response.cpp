@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:07:35 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/28 15:25:20 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/07/28 21:58:15 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@ void ft::Response::generateStatus(int32_t status)
 	{
 		/* code */
 	}
-	
+
 }
 
 void ft::Response::generateStatus(int32_t status, const std::string& content)
