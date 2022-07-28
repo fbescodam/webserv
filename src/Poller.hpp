@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/28 15:48:18 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/28 17:01:50 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/07/28 17:38:23 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,13 +46,17 @@ public: // Functions
 	void pollAll(void);
 
 private: // Functions
-	bool acceptIncoming(const ft::Server& server, const pollfd& fd);
+	bool acceptIncoming(const ft::Server& server);
+	void pollInEvent(pollfd& fd, Connection& conn);
+	void pollOutEvent(pollfd& fd, Connection& conn);
+	void closeConnection(pollfd& fd, Connection& conn);
 
 private: // Attributes
-	size_t										activeClients;	// The amount of active client connections right now.
-	const std::vector<ft::Server>&				servers;		// The vector list of servers
-	std::array<Connection, MAX_CLIENTS + 1>		connections;	// An array containing all our connections. The first few are reserved for incoming connections for the server, one per server.
-	std::array<pollfd, MAX_CLIENTS + 1>			pollfds;		// All of our pollfds used by poll wow so weird who would have thought that
+	size_t									activeClients;		// The amount of active client connections right now.
+	const std::vector<ft::Server>&			servers;			// The vector list of servers
+	std::array<Connection, MAX_CLIENTS + 1>	connections;		// An array containing all our connections. The first few are reserved for incoming connections for the server, one per server.
+	std::array<pollfd, MAX_CLIENTS + 1>		pollfds;			// All of our pollfds used by poll wow so weird who would have thought that
+	char									buffer[BUFF_SIZE];	// The buffer for reading from a pollInEvent
 };
 
 }

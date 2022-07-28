@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:08:42 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/28 17:02:42 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/07/28 17:41:52 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,50 +49,18 @@ void ft::Server::respondWithStatus(pollfd* poll, int32_t statusCode)
 	// poll->events = POLLOUT;
 }
 
-const ft::fd_t ft::Server::getSocket(void) const
+ft::fd_t ft::Server::getSocket(void) const
 {
 	return (this->socket);
 }
 
-const ft::SocketAddress& ft::Server::getAddress(void) const
+ft::SocketAddress& ft::Server::getAddress(void) const
 {
 	return (this->address);
 }
 
 //////////////////////////////////////////
 
-/**
- * @brief
- *
- */
-void ft::Server::pollListen(void)
-{
-	std::cout << GREEN << "Accepting connection" << RESET << std::endl;
-
-	// Accept a connection and set it to nonblocking mode.
-	int32_t clientSocket = ft::accept(this->serverFD, &this->address);
-	ft::fcntl(clientSocket, F_SETFL, O_NONBLOCK);
-
-	// Find available file descriptor
-	for (nfds_t i = 0; i < this->nfds; i++)
-	{
-		pollfd* poll = &this->pollfds[i];
-
-		// Already used
-		if (poll->fd != -1) continue;
-
-		poll->fd = clientSocket;
-		poll->events = POLLIN;
-		poll->revents = NONE;
-
-		// TODO: Set time out
-		// TODO: Get IPV4 Address
-
-		return;
-	}
-
-	// TODO: Else ?
-}
 /**
  * @brief To receive
  *
@@ -163,6 +131,7 @@ void ft::Server::pollOutEvent(pollfd* poll)
 	std::cout << "\033[30;1m" << "Sent Response" << "\033[0m" << std::endl;
 }
 
+/*
 void ft::Server::run(pollfd* fds, size_t size)
 {
 	// Check our open fds for events.
@@ -183,3 +152,4 @@ void ft::Server::run(pollfd* fds, size_t size)
 			this->pollOutEvent(poll);
 	}
 }
+*/
