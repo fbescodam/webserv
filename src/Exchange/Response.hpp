@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:07:33 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/28 11:43:31 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/07/28 12:40:15 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 # include "Exchange.hpp"
 # include "ServerSection.hpp"
 # include "DirectoryFactory.hpp"
+# include "Filesystem.hpp"
 
 namespace ft {
 
@@ -53,6 +54,14 @@ public: // Functions
      * @return ft::Response::Status The status if we are done or not.
      */
     ft::Response::Status send(int32_t socket);
+
+    /**
+     * @brief Let the response generate a response page out of a given status code.
+     * 
+     * @param status The status code.
+     * @param content The content of the page. Browser should be able handle even simple strings
+     */
+    void generateStatus(int32_t status, const std::string& content);
 
 private:
 

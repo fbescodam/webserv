@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:08:42 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/28 11:04:41 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/07/28 12:50:29 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,8 @@ void ft::Server::init(void)
 		this->address = ft::SocketAddress(AF_INET, htons(this->config.returnValueAsInt("listen")), INADDR_ANY); // needs config values
 		this->serverFD = ft::socket(IPV4, TCP, NONE);
 		
-		ft::setSocketOption(this->serverFD, SOL_SOCKET, SO_REUSEADDR, true, sizeof(int32_t)); // make kernel release socket after exit
+		// Make kernel release socket after exit
+		ft::setSocketOption(this->serverFD, SOL_SOCKET, SO_REUSEADDR, true, sizeof(int32_t));
 		ft::bind(this->serverFD, &this->address);
 		ft::listen(this->serverFD, MAX_CLIENTS);
 		ft::fcntl(this->serverFD, F_SETFL, O_NONBLOCK);
@@ -32,7 +33,8 @@ void ft::Server::init(void)
 	catch(const std::exception& e)
 	{
 		std::cerr << "Webserv: Failed to create socket for server" << std::endl;
-        exit(EXIT_FAILURE);
+		std::cerr << e.what() << std::endl;
+        exit(EXIT_FAILURE); // TODO: What do here
 	}
 
 	this->nfds = 0;
@@ -40,7 +42,8 @@ void ft::Server::init(void)
 	catch(const std::exception& e)
 	{
 		std::cerr << "Webserv: Failed to create poll for server." << std::endl;
-        exit(EXIT_FAILURE);
+		std::cerr << e.what() << std::endl;
+        exit(EXIT_FAILURE); // TODO: What do here
 	}
 
 	this->pollfds->fd = serverFD;
