@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 10:41:28 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/28 16:57:08 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/07/28 21:23:16 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ void ft::slice(const std::string& string, std::string delim, std::pair<std::stri
 
 ft::fd_t ft::socket(int32_t domain, int32_t type, int32_t protocol)
 {
-	int32_t fd = ::socket(domain, type, protocol);
+	ft::fd_t fd = ::socket(domain, type, protocol);
 	if (fd < 0)
 		throw ft::GenericErrnoException();
 	return (fd);
@@ -56,26 +56,26 @@ ft::fd_t ft::accept(ft::fd_t socket, ft::SocketAddress* address)
 {
 	socklen_t length = address->getSize();
 
-	int32_t fd = ::accept(socket, reinterpret_cast<sockaddr*>(address), &length);
+	ft::fd_t fd = ::accept(socket, reinterpret_cast<sockaddr*>(address), &length);
 	if (fd < 0)
 		throw ft::GenericErrnoException();
 	return (fd);
 }
 
-int32_t ft::poll(struct pollfd fds[], size_t size, int32_t timeout)
+int32_t ft::poll(pollfd* fds, size_t size, int32_t timeout)
 {
-	int32_t FDs = ::poll(fds, size, timeout);
-	if (FDs < 0)
+	int32_t ret = ::poll(fds, size, timeout);
+	if (ret < 0)
 		throw ft::GenericErrnoException();
-	return (FDs);
+	return (ret);
 }
 
-int32_t ft::setSocketOption(int32_t socket, int32_t level, int32_t optionName, bool optionValue, size_t optionLen)
+int32_t ft::setSocketOption(ft::fd_t socket, int32_t level, int32_t optionName, bool optionValue, size_t optionLen)
 {
-	int32_t Value = setsockopt(socket, level, optionName, &optionValue, optionLen);
-	if (Value == -1)
+	int32_t ret = setsockopt(socket, level, optionName, &optionValue, optionLen);
+	if (ret == -1)
 		throw ft::GenericErrnoException();
-	return (Value);
+	return (ret);
 }
 
 std::string ft::inet_ntop(SocketAddress& address)

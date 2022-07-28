@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 17:39:03 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/28 17:09:17 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/07/28 21:08:04 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ static void verifyArguments(const int32_t argc)
  * @param[in] config reference to the server configuration
  * @param[in] servers reference to the vector list of servers
  */
-static void setupServers(const std::string& configPath, ft::GlobalConfig& config, std::vector<ft::Server>& servers, ft::Poller& poller)
+static void setupServers(const std::string& configPath, ft::GlobalConfig& config, std::vector<ft::Server>& servers)
 {
 	// Handle Interrupt signals
 	signal(SIGINT, [](int32_t)
@@ -63,13 +63,8 @@ static void setupServers(const std::string& configPath, ft::GlobalConfig& config
 	std::cout << BLACK << "Webserv: Creating servers" << RESET << std::endl;
 	for (ft::ServerSection& serverSection : config.serverSections)
 	{
-		ft::Server server(serverSection);
-		if (!server.init())
-			exit(EXIT_FAILURE);
-		servers.push_back(server);
+		servers.push_back(ft::Server(serverSection));
 	}
-
-	//poller.setServerAmount(servers.size());
 }
 
 /**
@@ -81,14 +76,14 @@ static void setupServers(const std::string& configPath, ft::GlobalConfig& config
  */
 int32_t main(int32_t argc, const char* argv[])
 {
-	ft::GlobalConfig						config;	 			// Contains the entire configuration for the whole application/
-	std::vector<ft::Server>					servers; 			// A vector list that contains all of the servers.
-	ft::Poller								poller(servers);	// Poller to handle incoming and outgoing communication.
+	ft::GlobalConfig						config;	 					// Contains the entire configuration for the whole application/
+	std::vector<ft::Server>					servers; 					// A vector list that contains all of the servers.
 
 	verifyArguments(argc);
 
 	std::cout << BLACK << "Webserv: Starting" << RESET << std::endl;
-	setupServers(argv[1], config, servers, poller);
+	setupServers(argv[1], config, servers);
+	ft::Poller poller(servers, config);
 
 	std::cout << BLACK << "Webserv: Running" << RESET << std::endl;
 	do { poller.pollAll(); usleep(420); } while (true);

@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:07:33 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/28 14:55:17 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/07/28 19:57:41 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,18 +38,11 @@ public: // Ctor ~ Dtor
 	Response() = default;
 	~Response();
 
-public: // Types
-    enum class Status : uint8_t
-    {
-        DONE,
-        NOT_DONE,  
-    };
-
 public: // Functions
 
     /**
      * @brief Send the current response object onto the socket.
-     * 
+     *
      * @param socket The client socket.
      * @return ft::Response::Status The status if we are done or not.
      */
@@ -57,7 +50,7 @@ public: // Functions
 
     /**
      * @brief Let the response generate a response page out of a given status code.
-     * 
+     *
      * @param status The status code.
      * @param content The content of the page. Browser should be able handle even simple strings
      */

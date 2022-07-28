@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 18:05:00 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/28 15:59:03 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/07/28 20:47:59 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -131,6 +131,13 @@ struct BadRequest : public std::exception
 {
 	const char* what() const throw() override {
 		return ("Bad request");
+	}
+};
+
+struct NotImplemented : public std::exception
+{
+	const char* what() const throw() override {
+		return ("Not implemented");
 	}
 };
 

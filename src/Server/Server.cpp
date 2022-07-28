@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:08:42 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/28 17:41:52 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/07/28 21:31:06 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,29 +15,6 @@
 ft::Server::Server(ft::ServerSection& inConfig) : config(inConfig) {}
 
 //////////////////////////////////////////
-
-bool ft::Server::init(void)
-{
-	try
-	{
-		//this->config.getValueAsList("server_names", serverNames);
-		this->address = ft::SocketAddress(AF_INET, htons(this->config.returnValueAsInt("listen")), INADDR_ANY); // needs config values
-		this->socket = ft::socket(IPV4, TCP, NONE);
-
-		// Make kernel release socket after exit
-		ft::setSocketOption(this->socket, SOL_SOCKET, SO_REUSEADDR, true, sizeof(int32_t));
-		ft::bind(this->socket, &this->address);
-		ft::listen(this->socket, MAX_CLIENTS);
-		ft::fcntl(this->socket, F_SETFL, O_NONBLOCK);
-	}
-	catch(const std::exception& e)
-	{
-		std::cerr << "Webserv: Failed to create socket for server" << std::endl;
-		std::cerr << e.what() << std::endl;
-		return (false);
-	}
-	return (true);
-}
 
 void ft::Server::respondWithStatus(pollfd* poll, int32_t statusCode)
 {
@@ -49,9 +26,19 @@ void ft::Server::respondWithStatus(pollfd* poll, int32_t statusCode)
 	// poll->events = POLLOUT;
 }
 
+void ft::Server::setSocket(const ft::fd_t& socket)
+{
+	this->socket = socket;
+}
+
 ft::fd_t ft::Server::getSocket(void) const
 {
 	return (this->socket);
+}
+
+void ft::Server::setAddress(const ft::SocketAddress& address)
+{
+	this->address = address;
 }
 
 ft::SocketAddress& ft::Server::getAddress(void) const

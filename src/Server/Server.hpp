@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:08:47 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/28 16:57:02 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/07/28 21:28:07 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,8 +30,9 @@ public: // Ctor ~ Dtor
 	Server(ft::ServerSection& inConfig);
 
 public: // Functions
-	bool init(void);
+	void setSocket(const ft::fd_t& socket);
 	ft::fd_t getSocket(void) const;
+	void setAddress(const ft::SocketAddress& address);
 	ft::SocketAddress& getAddress(void) const;
 
 public: // Functions

@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/26 17:42:38 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/28 11:13:42 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/07/28 19:57:48 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,12 +26,19 @@ class Exchange
 public: // Ctor ~ Dtor
 	virtual ~Exchange() { }
 
+public: // Types
     enum class Method : uint8_t
     {
         GET,
         POST,
         DELETE,
         MAX
+    };
+
+    enum class Status : uint8_t
+    {
+        DONE,
+        NOT_DONE,
     };
 
 public: // Functions
