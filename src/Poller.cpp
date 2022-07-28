@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/28 15:48:13 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/28 17:43:15 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/07/28 18:08:11 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,16 +50,18 @@ void ft::Poller::pollAll(void)
 	}
 
 	// Shift all valid connections to the front.
-	// While all inactive once get shifted to the back.
-	for (size_t i = 0; i < this->pollfds.size(); i++)
+	struct { bool operator()(pollfd& a, pollfd& b) const { return a.fd > 0; } } sortPoll;
+	std::sort(this->pollfds.begin(), this->pollfds.end(), sortPoll);
+
+	// struct { bool operator()(pollfd& a, pollfd& b) const { return a.fd > 0; } } sortConn;
+	// std::sort(this->pollfds.begin(), this->pollfds.end(), sortConn)
+
+	// Go over each connection and look for timeouts
+	time_t now = std::time(nullptr);
+	for (size_t i = 0; i < MAX_CLIENTS; i++)
 	{
-		// Connection is not active
-		if (this->pollfds[i].fd == -1)
-		{
-			pollfd temp = this->pollfds[i];
-			this->pollfds[i] = this->pollfds[i + 1];
-			this->pollfds[i + 1] = temp;
-		}
+		if (now - this->connections[i].lastActivity > 30000) // TODO: define timeout in config file
+			this->closeConnection(this->pollfds.at(i), this->connections.at(i));
 	}
 }
 
@@ -74,24 +76,29 @@ bool ft::Poller::acceptIncoming(const ft::Server& server)
 	}
 	try
 	{
+		// Accept this connection.
 		ft::fd_t clientSocket = ft::accept(server.getSocket(), &server.getAddress());
-		ft::fcntl(clientSocket, F_SETFL, O_NONBLOCK);
+		ft::fcntl(clientSocket, F_SETFL, O_NONBLOCK); // Set the clientSocket to non-blocking mode for use with poll
 
 		// Find available file descriptor
 		for (ft::fd_t i = this->servers.size() - 1; i < this->pollfds.size(); i++)
 		{
-			pollfd& fd = this->pollfds[i];
-
 			// Already in use, skip
-			if (poll->fd != -1) continue;
+			if (this->pollfds[i].fd != -1) continue;
 
 			std::cout << GREEN << "Accepting incoming connection" << RESET << std::endl;
 
-			fd->fd = clientSocket;
-			fd->events = POLLIN;
-			fd->revents = NONE;
+			// Populate pollfd
+			this->pollfds[i].fd = clientSocket;
+			this->pollfds[i].events = POLLIN;
+			this->pollfds[i].revents = NONE;
 
+			// Populate connection struct
+			this->connections[i].lastActivity = std::time(nullptr);
+			this->connections[i].server = nullptr; // don't know yet
+			this->connections[i].ipv4 = ft::inet_ntop(server.getAddress());
 
+			// Increment the active connection count
 			this->activeClients++;
 
 			return (true);
@@ -123,12 +130,16 @@ void ft::Poller::pollInEvent(pollfd& fd, Connection& conn)
 		else
 			std::cout << "Connection closed by peer" << std::endl;
 		this->closeConnection(fd, conn);
+		return;
 	}
+	conn.lastActivity = std::time(nullptr);
 }
+
+//////////////////////////////////////////
 
 void ft::Poller::pollOutEvent(pollfd& fd, Connection& conn)
 {
-
+	conn.lastActivity = std::time(nullptr);
 }
 
 //////////////////////////////////////////
@@ -137,4 +148,14 @@ void ft::Poller::closeConnection(pollfd& fd, Connection& conn)
 {
 	close(fd.fd);
 	fd.fd = -1;
+	this->resetConnection(conn);
+}
+
+//////////////////////////////////////////
+
+void ft::Poller::resetConnection(Connection& conn)
+{
+	conn.lastActivity = NONE;
+	conn.server = nullptr;
+	conn.ipv4 = nullptr;
 }

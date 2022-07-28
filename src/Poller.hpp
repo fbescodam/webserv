@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/28 15:48:18 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/28 17:38:23 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/07/28 17:53:40 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 # include <vector>
 # include <array>
 # include <poll.h>
+# include <algorithm>
 # include "Utils.hpp"
 # include "Server.hpp"
 
@@ -39,6 +40,7 @@ protected: // Types
 	{
 		ft::Server*	server;			// The server to which this connection belongs.
 		time_t		lastActivity;	// The timestamp pointing to the last time there was activity on this connection.
+		std::string	ipv4;			// Client IP.
 	};
 
 public: // Functions
@@ -50,6 +52,7 @@ private: // Functions
 	void pollInEvent(pollfd& fd, Connection& conn);
 	void pollOutEvent(pollfd& fd, Connection& conn);
 	void closeConnection(pollfd& fd, Connection& conn);
+	void resetConnection(Connection& conn);
 
 private: // Attributes
 	size_t									activeClients;		// The amount of active client connections right now.
