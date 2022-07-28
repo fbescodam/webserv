@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:08:42 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/27 18:53:56 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/07/28 11:04:41 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,19 +57,108 @@ void ft::Server::respondWithStatus(pollfd* poll, int32_t statusCode)
 	// poll->events = POLLOUT;
 }
 
-static void pollListen(void)
-{
+//////////////////////////////////////////
 
+/**
+ * @brief 
+ * 
+ */
+void ft::Server::pollListen(void)
+{
+	std::cout << GREEN << "Accepting Conneciton" << RESET << std::endl;
+
+	// Accept a connection and set it to nonblocking mode.
+	int32_t clientSocket = ft::accept(this->serverFD, &this->address);
+	ft::fcntl(clientSocket, F_SETFL, O_NONBLOCK);
+
+	// Find available file descriptor
+	for (nfds_t i = 0; i < this->nfds; i++)
+	{
+		pollfd* poll = &this->pollfds[i];
+
+		// Already used
+		if (poll->fd != -1) continue;
+
+		poll->fd = clientSocket;
+		poll->events = POLLIN;
+		poll->revents = NONE;
+
+		// TODO: Set time out
+		// TODO: Get IPV4 Address
+
+		return;
+	}
+
+	// TODO: Else ?
+}
+/**
+ * @brief To receive 
+ * 
+ * @param poll 
+ */
+void ft::Server::pollInEvent(pollfd* poll)
+{
+	std::cout << BLACK << "Incoming Request" << RESET << std::endl;
+
+	ssize_t brecv;							// Bytes received
+	const size_t BUFF_SIZE = 4096;			// Buffer size
+	static char buffer[BUFF_SIZE] = {0};	// The buffer
+
+	// Receive the incoming message
+	if ((brecv = recv(poll->fd, buffer, BUFF_SIZE, NONE)) <= 0)
+	{
+		if (brecv == NONE)
+			std::cerr << BLACK << "Connection closed by client" << RESET << std::endl;
+		else
+			std::cerr << RED << "Receive function has failed!" << RESET << std::endl;
+
+		close(poll->fd);
+		poll->fd = -1;
+		return;
+	}
+
+	// Parse the incoming request
+	try
+	{
+		// TODO: Parse HTTP request
+	}
+	catch (const ft::PayloadTooLarge& e)
+	{
+		this->respondWithStatus(poll, 413);
+		return;
+	}
+	catch (const ft::BadRequest& e)
+	{
+		this->respondWithStatus(poll, 400);
+		return;
+	}
+	catch (const std::bad_alloc& e)
+	{
+		std::cerr << RED << "Failed to allocate memory" << RESET << std::endl;
+		this->respondWithStatus(poll, 507);
+		return;
+	}
+	catch (const std::exception& e)
+	{
+		std::cerr << RED << "Something went wrong while parsing request" << RESET << std::endl;
+		this->respondWithStatus(poll, 500);
+		return;
+	}
+	
+	poll->events = POLLOUT;
 }
 
-static void pollInEvent(pollfd* poll)
+/**
+ * @brief 
+ * 
+ * @param poll 
+ */
+void ft::Server::pollOutEvent(pollfd* poll)
 {
+	// TODO: Prevent timeout!
+	// TODO: Use response class to send response.
 
-}
-
-static void pollOutEvent(pollfd* poll)
-{
-
+	std::cout << "\033[30;1m" << "Sent Response" << "\033[0m" << std::endl;
 }
 
 void ft::Server::run(void)
@@ -83,12 +172,12 @@ void ft::Server::run(void)
 
 		// Create new connection
 		if (!i && (this->pollfds[0].revents & POLLIN))
-			pollListen();
+			this->pollListen();
 		// Pollfd is ready for reading.
 		else if (poll->revents & POLLIN)
-			pollInEvent(poll);
+			this->pollInEvent(poll);
 		// Pollfd is ready for writing.
 		else if (poll->revents & POLLOUT)
-			pollOutEvent(poll);
+			this->pollOutEvent(poll);
 	}
 }

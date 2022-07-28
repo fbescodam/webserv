@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 10:40:21 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/27 11:38:22 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/07/28 10:42:11 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,10 @@
 # include <string>
 # include "Exceptions.hpp"
 # define NONE 0
+# define GREEN "\033[32;1m"
+# define BLACK "\033[30;1m"
+# define RED "\033[31;1m"
+# define RESET "\033[0m"
 
 namespace ft
 {
