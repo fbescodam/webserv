@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:07:39 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/28 21:55:33 by fbes          ########   odam.nl         */
+/*   Updated: 2022/07/31 13:51:08 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,7 @@ void ft::Request::parseHeader()
 
 	// Parse the status line
 	std::string line;
-	std::getline(iss, statusLine);
+	std::getline(iss, line);
 	this->parseStatusLine(line);
 
 	// Parse the headers
@@ -110,25 +110,22 @@ void ft::Request::checkHeader()
 
 //////////////////////////////////////////
 
-void ft::Request::parseStatusLine(const std::string& buffer)
+void ft::Request::parseStatusLine(const std::string& line)
 {
-	std::string statusLine;
-	std::getline(iss, statusLine);
-
 	std::vector<std::string> values;
-	ft::split(statusLine, " ", values);
+	ft::split(line, " ", values);
 
 	if (values.size() != 3) throw ft::BadRequest();
 
 	if (values[0] == "GET")
-		this->method = ft::Method::GET;
+		this->method = ft::Exchange::Method::GET;
 	else if (values[0] == "POST")
-		this->method = ft::Method::POST;
+		this->method = ft::Exchange::Method::POST;
 	else if (values[0] == "DELETE")
-		this->method = ft::Method::DELETE;
+		this->method = ft::Exchange::Method::DELETE;
 	else
-		throw ft::NotImplemented()
+		throw ft::NotImplemented();
 
-	this.path = values[1];
-	this.version = values[2];
+	this->path = values[1];
+	this->version = values[2];
 }

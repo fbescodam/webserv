@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 10:41:28 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/28 21:23:16 by fbes          ########   odam.nl         */
+/*   Updated: 2022/07/31 13:43:32 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,15 @@ void ft::slice(const std::string& string, std::string delim, std::pair<std::stri
 		throw ft::DelimiterNotFoundException();
 	output.first = string.substr(0, start);
 	output.second = string.substr(start + 1);
+}
+
+void ft::split(const std::string& string, char delim, std::vector<std::string>& outVec)
+{
+	std::string tmp;
+	std::stringstream ss(string);
+
+	while (std::getline(ss, tmp, delim))
+		outVec.push_back(tmp);
 }
 
 //////////////////////////////////////////
