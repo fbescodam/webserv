@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:07:39 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/31 15:25:18 by fbes          ########   odam.nl         */
+/*   Updated: 2022/07/31 17:11:34 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,11 +80,12 @@ void ft::Request::parseHeader()
 	const std::string* host = this->getHeaderValue("Host");
 	if (host)
 	{
-		// TODO: request belongs to first server on this port
+
+		//TODO: request belongs to the first server with this name, OR IF IT DOES NOT EXIST, the first server on this port
 	}
 	else
 	{
-		//TODO: request belongs to the first server with this name, OR IF IT DOES NOT EXIST, the first server on this port
+		// TODO: request belongs to first server on this port
 	}
 
 	// Empty the data
@@ -95,17 +96,6 @@ void ft::Request::parseHeader()
 	{
 		this->data = splitBuff.second;
 		this->parseBody();
-	}
-}
-
-// Check what we need to do next such as POST methods
-void ft::Request::checkHeader()
-{
-	const size_t size = std::stoul(this->headers["Content-Length"]);
-
-	if (/* condition */)
-	{
-		/* code */
 	}
 }
 
