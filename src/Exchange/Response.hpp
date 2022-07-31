@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:07:33 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/31 15:19:03 by fbes          ########   odam.nl         */
+/*   Updated: 2022/07/31 17:10:13 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,8 @@
 
 namespace ft {
 
+struct Connection;
+
 /**
  * A Response is from the outgoing server.
  *
@@ -36,8 +38,8 @@ namespace ft {
 class Response final : public ft::Exchange
 {
 public: // Ctor ~ Dtor
-	Response() = default;
-	~Response();
+	~Response() = default;
+	Response(const ft::Connection& conn);
 
 public: // Functions
 
@@ -48,7 +50,7 @@ public: // Functions
 	 * @param socket The client socket.
 	 * @return ft::Response::Status The status if we are done or not.
 	 */
-	ft::Response::Status (ft::Response::*send)(int32_t socket); // Pointer to whatever Response needs to do next
+	ft::Response::Status (ft::Response::*sendRes)(int32_t socket); // Pointer to whatever Response needs to do next
 
 	/**
 	 * @brief Let the response generate a response page out of a given status code.
@@ -60,6 +62,11 @@ public: // Functions
 	void generateStatus(int32_t status);
 
 private:
+
+	void deleteMethod(const std::string& filePath);
+	void postMethod(const std::string& filePath);
+	void getMethod(const std::string& filePath);
+
 	/**
 	 * @brief Use sendStatic if a header and a body need to be sent in one go. This only occurs if there is no fd.
 	 *
@@ -87,10 +94,6 @@ private:
 	void writeStatusLine(int32_t status);
 	void writeHeaders(void);
 
-	void deleteMethod(const std::string& filePath);
-	void postMethod(const std::string& filePath);
-	void getMethod(const std::string& filePath);
-
 private: // Attributes
 
 	// Copy of the configuration of the current server.
@@ -99,6 +102,8 @@ private: // Attributes
 	// The file to send as a body, else nullptr.
 	FILE* file;
 	size_t fileSize;
+
+	ft::Connection& conn;
 
 };
 }

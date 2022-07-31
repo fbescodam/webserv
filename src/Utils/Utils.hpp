@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 10:40:21 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/31 15:22:41 by fbes          ########   odam.nl         */
+/*   Updated: 2022/07/31 17:09:23 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,19 @@
 #ifndef UTILS_HPP
 # define UTILS_HPP
 # define WHITESPACE " \t\r\n\t\f\v"
+# define NONE 0
+# define GREEN "\033[32;1m"
+# define BLACK "\033[30;1m"
+# define RED "\033[31;1m"
+# define RESET "\033[0m"
+# define BUFF_SIZE 4096
+# define CONN_TIMEOUT 30 // in seconds
+# define MAX_CLIENTS 60
+# define IPV4 PF_INET
+# define TCP SOCK_STREAM
+# define MASTER_SOCKET 0
+# define WRITE 1
+# define READ 0
 # include <string>
 # include <poll.h>
 # include <netinet/in.h>
@@ -29,14 +42,6 @@
 # include <algorithm>
 # include "Exceptions.hpp"
 # include "SocketAddress.hpp"
-# define NONE 0
-# define GREEN "\033[32;1m"
-# define BLACK "\033[30;1m"
-# define RED "\033[31;1m"
-# define RESET "\033[0m"
-# define BUFF_SIZE 4096
-# define CONN_TIMEOUT 30 // in seconds
-
 namespace ft {
 
 typedef int32_t fd_t;
@@ -64,7 +69,7 @@ void trim(std::string& string);
 void slice(const std::string& string, std::string delim, std::pair<std::string, std::string>& output);
 
 /**
- * @brief
+ * @brief Split a string into many parts
  *
  * @param string
  * @param delim
@@ -72,8 +77,22 @@ void slice(const std::string& string, std::string delim, std::pair<std::string, 
  */
 void split(const std::string& string, char delim, std::vector<std::string>& outVec);
 
-/***/
+/**
+ * @brief Check if a string ends with another string
+ *
+ * @param value
+ * @param ending
+ * @return true
+ * @return false
+ */
 bool endsWith(const std::string& value, const std::string& ending);
+
+/**
+ * @brief Make a string all-lowercase
+ *
+ * @param string
+ */
+void tolower(std::string& string);
 
 //////////////////////////////////////////
 // NETWORK
@@ -106,6 +125,22 @@ int32_t setSocketOption(int32_t socket, int32_t level, int32_t optionName, bool 
 // Inet_ntop
 std::string inet_ntop(SocketAddress& address);
 
+//////////////////////////////////////////
+// UNIX
+//////////////////////////////////////////
+
+// pipe wrapper.
+void pipe(int32_t fds[2]);
+
+// fork wrapper.
+int32_t fork(void);
+
+// Execve wrapper.
+int32_t execve(const std::string& file, char* const* argv, char* const* envp);
+
+// dup2 wrapper.
+int32_t dup2(int32_t fdsA, int32_t fdsB);
+
 // Provides for control over descriptors.  The argument fildes is a descriptor to be operated on by cmd as follows
 template<typename... Args>
 int32_t fcntl(int32_t fd, int32_t cmd, Args... args)
@@ -114,6 +149,10 @@ int32_t fcntl(int32_t fd, int32_t cmd, Args... args)
 	if (Value < 0) throw ft::GenericErrnoException();
 	return (Value);
 }
+
+//////////////////////////////////////////
+// MISC
+//////////////////////////////////////////
 
 /**
  * @brief Get the list of exisiting status codes.

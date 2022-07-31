@@ -6,11 +6,16 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:07:35 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/31 15:35:47 by fbes          ########   odam.nl         */
+/*   Updated: 2022/07/31 17:08:28 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Response.hpp"
+
+ft::Response::Response(const ft::Connection conn)
+{
+	this->conn = conn;
+}
 
 //////////////////////////////////////////
 
@@ -51,7 +56,7 @@ void ft::Response::generateStatus(int32_t status)
 		this->headers["Content-Type"] = ft::getContentType(filePath);
 		this->writeHeaders();
 		this->fileSize = ft::filesystem::getFileSize(this->file);
-		this->send = &ft::Response::sendHeaders;
+		this->sendRes = &ft::Response::sendHeaders;
 		return;
 	}
 
@@ -72,7 +77,7 @@ void ft::Response::generateStatus(int32_t status, const std::string& content)
 
 	// Build content
 	this->data += content;
-	this->send = &ft::Response::sendStatic;
+	this->sendRes = &ft::Response::sendStatic;
 }
 
 //////////////////////////////////////////
@@ -80,19 +85,17 @@ void ft::Response::generateStatus(int32_t status, const std::string& content)
 void ft::Response::deleteMethod(const std::string& filePath)
 {
 	if (!ft::filesystem::fileExists(filePath))
-		this->generateStatus(404); return;
+		return (this->generateStatus(404));
 
 	if (std::remove(filePath.c_str()) != 0)
-		this->generateStatus(500, "File deletion failed!");
-	else
-		this->generateStatus(200, "File deleted");
+		return (this->generateStatus(500, "File deletion failed!"));
+	this->generateStatus(200, "File deleted");
 }
 
 //////////////////////////////////////////
 
 void ft::Response::postMethod(const std::string& filePath)
 {
-	// TODO: Only support single cgi ?
 	std::list<std::string> cgiBin;
 
 	if (!ft::filesystem::fileExists(filePath))
@@ -100,10 +103,13 @@ void ft::Response::postMethod(const std::string& filePath)
 	else if (this->config.getValueAsList("cgi_bin", cgiBin) && endsWith(filePath, cgiBin.front()))
 	{
 		std::string out;
-		if (!ft::CGI::runCGI(*this, filePath, out, cgiBin.back()))
-			this->generateStatus(500); return;
+		if (!ft::CGI::runCGI(this->conn, filePath, out, cgiBin.back()))
+		{
+			this->generateStatus(500);
+			return;
+		}
 		this->data = out;
-		this->send = &ft::Response::sendStatic;
+		this->sendRes = &ft::Response::sendStatic;
 		return;
 	}
 
@@ -117,13 +123,13 @@ void ft::Response::postMethod(const std::string& filePath)
 void ft::Response::getMethod(const std::string& filePath)
 {
 	if (!ft::filesystem::fileExists(filePath))
-		this->generateStatus(404); return;
+		return (this->generateStatus(404));
 
 	if ((this->file = fopen(filePath.c_str(), "r")) == nullptr)
-		this->generateStatus(500); return;
+		return (this->generateStatus(500));
 
 	this->fileSize = ft::filesystem::getFileSize(this->file);
-	this->send = &ft::Response::sendHeaders;
+	this->sendRes = &ft::Response::sendHeaders;
 }
 
 //////////////////////////////////////////
@@ -136,7 +142,7 @@ ft::Response::Status ft::Response::sendStatic(int32_t socket)
 		this->data.erase(0, bsent);
 		return (ft::Response::Status::NOT_DONE);
 	}
-	this->send = nullptr; // Everything was sent, nothing more to do
+	this->sendRes = nullptr; // Everything was sent, nothing more to do
 	return (ft::Response::Status::DONE);
 }
 
@@ -150,8 +156,8 @@ ft::Response::Status ft::Response::sendHeaders(int32_t socket)
 		this->data.erase(0, bsent);
 		return (ft::Response::Status::NOT_DONE);
 	}
-	this->send = &ft::Response::sendFile; // Everything was sent, now continue with sending the file
-	return (ft::Response::Status::DONE);
+	this->sendRes = &ft::Response::sendFile; // Everything was sent, now continue with sending the file
+	return (ft::Response::Status::NOT_DONE); // Actually not done yet! We now need to send the file
 }
 
 //////////////////////////////////////////
@@ -169,7 +175,7 @@ ft::Response::Status ft::Response::sendFile(int32_t socket)
 
 	if (offset >= this->fileSize)
 	{
-		this->send = nullptr; // Everything was sent, nothing more to do
+		this->sendRes = nullptr; // Everything was sent, nothing more to do
 		return (ft::Response::Status::DONE);
 	}
 	return (ft::Response::Status::NOT_DONE);

@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 10:41:28 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/31 14:27:49 by fbes          ########   odam.nl         */
+/*   Updated: 2022/07/31 17:08:13 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,10 +37,17 @@ void ft::split(const std::string& string, char delim, std::vector<std::string>& 
 		outVec.push_back(tmp);
 }
 
-bool endsWith(const std::string& value, const std::string& ending)
+bool ft::endsWith(const std::string& value, const std::string& ending)
 {
-    if (ending.size() > value.size()) return false;
-    return std::equal(ending.rbegin(), ending.rend(), value.rbegin());
+	if (ending.size() > value.size()) return false;
+	return std::equal(ending.rbegin(), ending.rend(), value.rbegin());
+}
+
+void ft::tolower(std::string &string)
+{
+	std::locale loc;
+	for (size_t i = 0; i < string.length(); i++)
+		std::tolower(str[i], loc);
 }
 
 //////////////////////////////////////////
@@ -103,6 +110,50 @@ std::string ft::inet_ntop(SocketAddress& address)
 		return "";
 	return std::string(buf);
 }
+
+//////////////////////////////////////////
+
+void ft::pipe(int32_t fds[2])
+{
+	if (::pipe(fds) == -1)
+	{
+		fds[0] = -1;
+		fds[1] = -1;
+		throw ft::GenericErrnoException();
+	}
+}
+
+int32_t ft::fork(void)
+{
+	pid_t pid = ::fork();
+
+	if (pid == -1)
+		throw ft::GenericErrnoException();
+
+	return (pid);
+}
+
+int32_t ft::execve(const std::string& file, char* const* argv, char* const* envp)
+{
+	int32_t val = ::execve(file.c_str(), argv, envp);
+
+	if (val == -1)
+		throw ft::GenericErrnoException();
+
+	return (val);
+}
+
+int32_t ft::dup2(int32_t fdsA, int32_t fdsB)
+{
+	int32_t val = ::dup2(fdsA, fdsB);
+
+	if (val == -1)
+		throw ft::GenericErrnoException();
+
+	return (val);
+}
+
+//////////////////////////////////////////
 
 const std::map<uint16_t, std::string>& ft::getStatusCodes()
 {

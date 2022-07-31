@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 17:39:03 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/31 14:05:59 by fbes          ########   odam.nl         */
+/*   Updated: 2022/07/31 15:50:09 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,8 +86,8 @@ int32_t main(int32_t argc, const char* argv[])
 	ft::Poller poller(servers, config);
 
 	std::cout << BLACK << "Webserv: Running" << RESET << std::endl;
-	do { poller.pollAll(); usleep(420); } while (true);
-
-	std::cout << "Webserv: Shutting down" << std::endl;
-	return (EXIT_SUCCESS);
+	while (true) {
+		poller.pollAll();
+		usleep(420);
+	}
 }

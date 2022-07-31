@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:08:42 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/31 14:16:50 by fbes          ########   odam.nl         */
+/*   Updated: 2022/07/31 16:17:44 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,12 +26,12 @@ void ft::Server::respondWithStatus(pollfd* poll, int32_t statusCode)
 	// poll->events = POLLOUT;
 }
 
-void ft::Server::setSocket(const ft::Poller::Socket* socket)
+void ft::Server::setSocket(const ft::Socket* socket)
 {
-	this->socket = const_cast<ft::Poller::Socket*>(socket);
+	this->socket = const_cast<ft::Socket*>(socket);
 }
 
-const ft::Poller::Socket* ft::Server::getSocket(void) const
+const ft::Socket* ft::Server::getSocket(void) const
 {
 	return (this->socket);
 }

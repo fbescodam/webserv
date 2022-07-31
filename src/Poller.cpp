@@ -6,17 +6,18 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/28 15:48:13 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/31 14:42:31 by fbes          ########   odam.nl         */
+/*   Updated: 2022/07/31 17:11:25 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Poller.hpp"
 
-const ft::Poller::Socket* ft::Poller::createSocket(const uint16_t port)
+const ft::Socket* ft::Poller::createSocket(const uint16_t port)
 {
+	ft::Socket* socket = new ft::Socket();
+
 	try
 	{
-		ft::Poller::Socket* socket = new ft::Poller::Socket();
 		socket->fd = ft::socket(IPV4, TCP, NONE); // Create a new socket fd
 		socket->addr = ft::SocketAddress(AF_INET, htons(port), INADDR_ANY); // Create a new address on the defined port
 
@@ -38,6 +39,8 @@ const ft::Poller::Socket* ft::Poller::createSocket(const uint16_t port)
 		std::cerr << RED << "Webserv: " << e.what() << RESET << std::endl;
 		exit(EXIT_FAILURE);
 	}
+
+	return (socket);
 }
 
 //////////////////////////////////////////
@@ -56,14 +59,25 @@ ft::Poller::Poller(std::vector<ft::Server>& servers, const ft::GlobalConfig& glo
 		if (std::find(ports.begin(), ports.end(), port) == ports.end()) // port has no socket yet
 		{
 			const Socket* socket = this->createSocket(port);
-
-			// Link socket to server
-			servers[i].setSocket(this->sockets.back());
-
-
+			servers[i].setSocket(this->sockets.back()); // Link socket to server
 		}
 		else
 			servers[i].setSocket(this->getSocketByPort(port)); // Socket already exists, link it to the server
+	}
+}
+
+//////////////////////////////////////////
+
+ft::Poller::~Poller()
+{
+	for (const ft::Socket* socket : this->sockets)
+		delete socket;
+	for (const ft::Connection conn : this->connections)
+	{
+		if (conn.request)
+			delete conn.request;
+		if (conn.response)
+			delete conn.response;
 	}
 }
 
@@ -84,7 +98,7 @@ void ft::Poller::pollAll(void)
 		pollfd* fd = this->connections[i].poll;
 		if (!fd)
 			continue; // No pollfd for this connection, assume it is not in use
-		Connection& conn = this->connections[i];
+		ft::Connection& conn = this->connections[i];
 
 		// First few polls are the listening thingies (one for each server), attaches new clients to a pollfd.
 		// When a POLLIN event happens here, we need to specify which pollfd to use for this connection.
@@ -151,7 +165,7 @@ bool ft::Poller::acceptIncoming(const ft::Server& server)
 				this->connections[i].poll = fd;
 				this->connections[i].lastActivity = std::time(nullptr);
 				this->connections[i].server = nullptr; // don't know yet
-				this->connections[i].ipv4 = ft::inet_ntop(server.getAddress());
+				this->connections[i].ipv4 = ft::inet_ntop(*const_cast<ft::SocketAddress*>(&server.getSocket()->addr));
 
 				// Increment the active connection count
 				this->activeClients++;
@@ -172,9 +186,12 @@ bool ft::Poller::acceptIncoming(const ft::Server& server)
 
 //////////////////////////////////////////
 
-void ft::Poller::pollInEvent(Connection& conn)
+void ft::Poller::pollInEvent(ft::Connection& conn)
 {
 	ssize_t		brecv;		// Bytes received
+
+	// Clear the current response, as a request is now being made.
+	// TODO
 
 	bzero(this->buffer, BUFF_SIZE); // Clear the buffer
 	brecv = recv(conn.poll->fd, this->buffer, BUFF_SIZE, NONE);
@@ -192,14 +209,36 @@ void ft::Poller::pollInEvent(Connection& conn)
 
 //////////////////////////////////////////
 
-void ft::Poller::pollOutEvent(Connection& conn)
+void ft::Poller::pollOutEvent(ft::Connection& conn)
 {
 	conn.lastActivity = std::time(nullptr);
+
+	// WTFFFFFF
+	if (!conn.response->sendRes || (conn.response->*(conn.response->sendRes))(conn.poll->fd) == ft::Response::Status::DONE)
+	{
+		this->resolveConnection(conn);
+	}
 }
 
 //////////////////////////////////////////
 
-void ft::Poller::closeConnection(Connection& conn)
+void ft::Poller::resolveConnection(ft::Connection& conn)
+{
+	std::cout << GREEN << "Connection resolved, response has been sent " << RESET << std::endl;
+	if (!conn.response && conn.response->headers["Connection"] == "keep-alive")
+	{
+		this->clearReqRes(conn); // Clear the request and response to be ready for the next request
+		conn.poll->events = POLLIN;
+		std::cout << "Connection kept alive" << std::endl;
+		return;
+	}
+	std::cout << "Connection closed" << std::endl;
+	this->closeConnection(conn);
+}
+
+//////////////////////////////////////////
+
+void ft::Poller::closeConnection(ft::Connection& conn)
 {
 	if (conn.poll) // Double-check if a pollfd exists in this connection. If not, you actually want to call resetConnection(conn).
 	{
@@ -211,8 +250,21 @@ void ft::Poller::closeConnection(Connection& conn)
 
 //////////////////////////////////////////
 
-void ft::Poller::resetConnection(Connection& conn)
+void ft::Poller::clearReqRes(ft::Connection& conn)
 {
+	if (conn.request)
+		delete conn.request;
+	conn.request = new ft::Request();
+	if (conn.response)
+		delete conn.response;
+	conn.response = new ft::Response();
+}
+
+//////////////////////////////////////////
+
+void ft::Poller::resetConnection(ft::Connection& conn)
+{
+	this->clearReqRes(conn);
 	conn.lastActivity = NONE;
 	conn.server = nullptr;
 	conn.ipv4 = nullptr;
@@ -220,11 +272,12 @@ void ft::Poller::resetConnection(Connection& conn)
 
 //////////////////////////////////////////
 
-const ft::Poller::Socket* ft::Poller::getSocketByPort(const uint16_t port) const
+const ft::Socket* ft::Poller::getSocketByPort(const uint16_t port) const
 {
-	for(Socket *socket : this->sockets)
+	for(ft::Socket* socket : this->sockets)
 	{
 		if (socket->addr.port == port)
 			return (socket);
 	}
+	return (nullptr);
 }

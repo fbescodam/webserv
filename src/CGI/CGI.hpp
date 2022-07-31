@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 10:13:49 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/31 15:35:21 by fbes          ########   odam.nl         */
+/*   Updated: 2022/07/31 17:07:08 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,9 @@
 
 #ifndef CGI_HPP
 # define CGI_HPP
+# include <iostream>
 # include "Utils.hpp"
+# include "Connection.hpp"
 
 namespace ft {
 
@@ -35,7 +37,7 @@ namespace CGI
 	 * @param request The incoming request.
 	 * @param path The file path to execute.
 	 */
-	bool runCGI(const ft::Response& request, const std::string& path, std::string &out, const std::string &cgiBin);
+	bool runCGI(const ft::Connection& conn, const std::string& path, std::string& out, const std::string& cgiBin);
 }
 
 }
