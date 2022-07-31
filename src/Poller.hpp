@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/28 15:48:18 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/31 16:39:31 by fbes          ########   odam.nl         */
+/*   Updated: 2022/07/31 17:40:40 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ private: // Functions
 	void pollOutEvent(ft::Connection& conn);
 	void closeConnection(ft::Connection& conn);		// Close, then reset a connection
 	void resetConnection(ft::Connection& conn);		// Reset a connection without setting the pollfd to -1
-	void clearReqRes(ft::Connection& conn);			// Reset request and response instances for connection
+	void deleteReqRes(ft::Connection& conn);		// Reset request and response instances for connection
 	void resolveConnection(ft::Connection& conn);	// Resolve a connection: close it or keep it alive based on the headers in the response
 	const ft::Socket* createSocket(const uint16_t port);
 	const ft::Socket* getSocketByPort(const uint16_t port) const;

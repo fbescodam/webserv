@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/28 15:48:13 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/31 17:24:51 by fbes          ########   odam.nl         */
+/*   Updated: 2022/07/31 17:42:59 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -142,7 +142,8 @@ bool ft::Poller::acceptIncoming(const ft::Server& server)
 		for (size_t i = this->servers.size() - 1; i < this->pollfds.size(); i++)
 		{
 			// Already in use, skip
-			if (this->pollfds[i].fd != -1) continue;
+			if (this->pollfds[i].fd != -1)
+				continue;
 
 			// Populate pollfd
 			fd = &this->pollfds[i];
@@ -159,7 +160,8 @@ bool ft::Poller::acceptIncoming(const ft::Server& server)
 			for (size_t i = this->servers.size() - 1; i < this->connections.size(); i++)
 			{
 				// Already in use, skip
-				if (this->connections[i].poll) continue;
+				if (this->connections[i].poll)
+					continue;
 
 				// Populate the connection struct
 				this->connections[i].poll = fd;
@@ -191,7 +193,9 @@ void ft::Poller::pollInEvent(ft::Connection& conn)
 	ssize_t		brecv;		// Bytes received
 
 	// Clear the current response, as a request is now being made.
-	// TODO
+	delete conn.response;
+	if (!conn.request)
+		conn.request = new Request();
 
 	bzero(this->buffer, BUFF_SIZE); // Clear the buffer
 	brecv = recv(conn.poll->fd, this->buffer, BUFF_SIZE, NONE);
@@ -204,6 +208,8 @@ void ft::Poller::pollInEvent(ft::Connection& conn)
 		this->closeConnection(conn);
 		return;
 	}
+	if (conn.request->appendBuffer(this->buffer) == ft::Exchange::Status::DONE)
+		conn.response = new Response(conn);
 	conn.lastActivity = std::time(nullptr);
 }
 
@@ -215,9 +221,9 @@ void ft::Poller::pollOutEvent(ft::Connection& conn)
 
 	// WTFFFFFF
 	if (!conn.response->sendRes || (conn.response->*(conn.response->sendRes))(conn.poll->fd) == ft::Response::Status::DONE)
-	{
 		this->resolveConnection(conn);
-	}
+	else
+		std::cout << "Partially sent a response" << std::endl;
 }
 
 //////////////////////////////////////////
@@ -227,7 +233,7 @@ void ft::Poller::resolveConnection(ft::Connection& conn)
 	std::cout << GREEN << "Connection resolved, response has been sent " << RESET << std::endl;
 	if (!conn.response && conn.response->headers["Connection"] == "keep-alive")
 	{
-		this->clearReqRes(conn); // Clear the request and response to be ready for the next request
+		this->deleteReqRes(conn); // Clear the request and response to be ready for the next request
 		conn.poll->events = POLLIN;
 		std::cout << "Connection kept alive" << std::endl;
 		return;
@@ -244,27 +250,24 @@ void ft::Poller::closeConnection(ft::Connection& conn)
 	{
 		close(conn.poll->fd);
 		conn.poll->fd = -1;
+		conn.poll->events = POLLIN | POLLOUT;
 	}
 	this->resetConnection(conn);
 }
 
 //////////////////////////////////////////
 
-void ft::Poller::clearReqRes(ft::Connection& conn)
+void ft::Poller::deleteReqRes(ft::Connection& conn)
 {
-	if (conn.request)
-		delete conn.request;
-	conn.request = new ft::Request();
-	if (conn.response)
-		delete conn.response;
-	conn.response = new ft::Response(conn);
+	delete conn.request;
+	delete conn.response;
 }
 
 //////////////////////////////////////////
 
 void ft::Poller::resetConnection(ft::Connection& conn)
 {
-	this->clearReqRes(conn);
+	this->deleteReqRes(conn);
 	conn.lastActivity = NONE;
 	conn.server = nullptr;
 	conn.ipv4 = nullptr;

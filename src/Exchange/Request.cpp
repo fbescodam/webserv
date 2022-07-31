@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:07:39 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/31 17:20:39 by fbes          ########   odam.nl         */
+/*   Updated: 2022/07/31 17:38:32 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 
 ft::Request::Request(void) noexcept {
 	this->buffer = "";
+	this->done = false;
 }
 
 //////////////////////////////////////////
@@ -30,7 +31,15 @@ ft::Exchange::Status ft::Request::appendBuffer(const std::string& buffer)
 	this->data += buffer;
 
 	// No body, ask to continue.
-	return (this->buffer.find("\r\n\r\n") != std::string::npos ? ft::Exchange::Status::DONE : ft::Exchange::Status::NOT_DONE);
+	this->done = this->buffer.find("\r\n\r\n") != std::string::npos;
+	return (this->done ? ft::Exchange::Status::DONE : ft::Exchange::Status::NOT_DONE);
+}
+
+//////////////////////////////////////////
+
+bool ft::Request::isDone(void) const
+{
+	return (this->done);
 }
 
 //////////////////////////////////////////
