@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 10:41:28 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/31 17:08:13 by fbes          ########   odam.nl         */
+/*   Updated: 2022/07/31 17:23:55 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,9 +45,8 @@ bool ft::endsWith(const std::string& value, const std::string& ending)
 
 void ft::tolower(std::string &string)
 {
-	std::locale loc;
 	for (size_t i = 0; i < string.length(); i++)
-		std::tolower(str[i], loc);
+		string[i] = std::tolower(string[i]);
 }
 
 //////////////////////////////////////////
@@ -90,6 +89,15 @@ int32_t ft::poll(pollfd* fds, size_t size, int32_t timeout)
 	if (ret < 0)
 		throw ft::GenericErrnoException();
 	return (ret);
+}
+
+// Send a message to a socket.
+ssize_t ft::send(int32_t socket, const void* buffer, size_t length, int32_t flags)
+{
+	ssize_t Value = ::send(socket, buffer, length, flags);
+	if (Value == -1)
+		throw ft::GenericErrnoException(); // TODO WE CAN ABSOLUTELY NOT DO THIS
+	return (Value);
 }
 
 int32_t ft::setSocketOption(ft::fd_t socket, int32_t level, int32_t optionName, bool optionValue, size_t optionLen)

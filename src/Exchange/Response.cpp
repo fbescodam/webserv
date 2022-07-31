@@ -6,15 +6,15 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:07:35 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/31 17:08:28 by fbes          ########   odam.nl         */
+/*   Updated: 2022/07/31 17:24:35 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Response.hpp"
 
-ft::Response::Response(const ft::Connection conn)
+ft::Response::Response(const ft::Connection& conn) : conn(conn)
 {
-	this->conn = conn;
+
 }
 
 //////////////////////////////////////////

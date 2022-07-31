@@ -6,7 +6,7 @@
 /*   By: fbes <fbes@student.codam.nl>                 +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/31 16:27:42 by fbes          #+#    #+#                 */
-/*   Updated: 2022/07/31 17:04:42 by fbes          ########   odam.nl         */
+/*   Updated: 2022/07/31 17:22:14 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ static std::vector<const char*> c_arr(const std::vector<std::string> &v)
 	return (c_arr);
 }
 
-bool runCGI(const ft::Connection& conn, const std::string& path, std::string& out, const std::string& cgiBin)
+bool ft::CGI::runCGI(const ft::Connection& conn, const std::string& path, std::string& out, const std::string& cgiBin)
 {
 	std::vector<std::string> argv = {cgiBin, path};
 	std::vector<std::string> envp;

@@ -6,13 +6,13 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:07:39 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/31 17:11:34 by fbes          ########   odam.nl         */
+/*   Updated: 2022/07/31 17:20:39 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Request.hpp"
 
-ft::Request::Request(void) {
+ft::Request::Request(void) noexcept {
 	this->buffer = "";
 }
 
@@ -73,6 +73,7 @@ void ft::Request::parseHeader()
 
 		if (header.first.empty() || header.second.empty())
 			throw ft::BadRequest();
+		ft::tolower(header.first);
 		this->headers[header.first] = header.second;
 	}
 

@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:22:23 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/31 16:32:55 by fbes          ########   odam.nl         */
+/*   Updated: 2022/07/31 17:18:23 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,11 +15,12 @@
 #ifndef CONNECTION_HPP
 # define CONNECTION_HPP
 # include <time.h>
-# include "Server.hpp"
-# include "Request.hpp"
-# include "Response.hpp"
 
 namespace ft {
+
+class Server;
+class Request;
+class Response;
 
 // A connection to a client for example.
 struct Connection

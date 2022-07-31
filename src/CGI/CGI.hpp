@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 10:13:49 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/31 17:07:08 by fbes          ########   odam.nl         */
+/*   Updated: 2022/07/31 17:19:24 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 # include <iostream>
 # include "Utils.hpp"
 # include "Connection.hpp"
+# include "Request.hpp"
 
 namespace ft {
 

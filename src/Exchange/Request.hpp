@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:07:36 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/31 15:24:13 by fbes          ########   odam.nl         */
+/*   Updated: 2022/07/31 17:21:44 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,10 +35,9 @@ namespace ft {
 class Request final : public ft::Exchange
 {
 public: // Ctor ~ Dtor
-	Request(void);
+	Request() noexcept;
 
 public: // Functions
-
 	ft::Exchange::Status appendBuffer(const std::string& buffer);
 	void parseHeader();
 

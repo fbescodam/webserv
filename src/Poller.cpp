@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/28 15:48:13 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/31 17:11:25 by fbes          ########   odam.nl         */
+/*   Updated: 2022/07/31 17:24:51 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -257,7 +257,7 @@ void ft::Poller::clearReqRes(ft::Connection& conn)
 	conn.request = new ft::Request();
 	if (conn.response)
 		delete conn.response;
-	conn.response = new ft::Response();
+	conn.response = new ft::Response(conn);
 }
 
 //////////////////////////////////////////

@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:07:33 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/31 17:10:13 by fbes          ########   odam.nl         */
+/*   Updated: 2022/07/31 17:24:38 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,8 +38,8 @@ struct Connection;
 class Response final : public ft::Exchange
 {
 public: // Ctor ~ Dtor
-	~Response() = default;
 	Response(const ft::Connection& conn);
+	~Response() = default;
 
 public: // Functions
 
@@ -103,7 +103,7 @@ private: // Attributes
 	FILE* file;
 	size_t fileSize;
 
-	ft::Connection& conn;
+	const ft::Connection& conn;
 
 };
 }
