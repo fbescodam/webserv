@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:08:47 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/28 21:28:07 by fbes          ########   odam.nl         */
+/*   Updated: 2022/07/31 14:15:49 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 # define SERVER_HPP
 # include "ServerSection.hpp"
 # include "Utils.hpp"
+# include "Poller.hpp"
 # define IPV4 PF_INET
 # define TCP SOCK_STREAM
 # define MASTER_SOCKET 0
@@ -30,10 +31,8 @@ public: // Ctor ~ Dtor
 	Server(ft::ServerSection& inConfig);
 
 public: // Functions
-	void setSocket(const ft::fd_t& socket);
-	ft::fd_t getSocket(void) const;
-	void setAddress(const ft::SocketAddress& address);
-	ft::SocketAddress& getAddress(void) const;
+	void setSocket(const ft::Poller::Socket* socket);
+	const ft::Poller::Socket* getSocket(void) const;
 
 public: // Functions
 	/**
@@ -56,8 +55,7 @@ public: // Attributes
 private:
 
 	// Network part
-	ft::fd_t			socket;
-	ft::SocketAddress	address;
+	ft::Poller::Socket*	socket;
 };
 }
 #endif

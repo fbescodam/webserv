@@ -6,7 +6,7 @@
 /*   By: fbes <fbes@student.codam.nl>                 +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/20 20:09:48 by fbes          #+#    #+#                 */
-/*   Updated: 2022/07/20 21:32:50 by fbes          ########   odam.nl         */
+/*   Updated: 2022/07/31 15:23:37 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,7 @@ void ft::KeyValueVerifier::run(VERIFIER_PARAMS)
 	static std::unordered_map<std::string, ft::KeyValueVerifier::parserFunc> fieldParseFunctions;
 	if (fieldParseFunctions.empty())
 	{
-		// fieldParseFunctions.emplace("limit_body_size", &ft::KeyValueVerifier::parseInt);
-		fieldParseFunctions["limit_body_size"] = &ft::KeyValueVerifier::parseInt;
+		// fieldParseFunctions.emplace("limit_body_size", &ft::KeyValueVerifier::parseInt); // TODO this fucking breaks xcode or something
+		// fieldParseFunctions["limit_body_size"] = &ft::KeyValueVerifier::parseInt; // this one gives a more readable error and essentially does the same thing
 	}
 }

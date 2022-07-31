@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:08:42 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/28 21:31:06 by fbes          ########   odam.nl         */
+/*   Updated: 2022/07/31 14:16:50 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,33 +26,19 @@ void ft::Server::respondWithStatus(pollfd* poll, int32_t statusCode)
 	// poll->events = POLLOUT;
 }
 
-void ft::Server::setSocket(const ft::fd_t& socket)
+void ft::Server::setSocket(const ft::Poller::Socket* socket)
 {
-	this->socket = socket;
+	this->socket = const_cast<ft::Poller::Socket*>(socket);
 }
 
-ft::fd_t ft::Server::getSocket(void) const
+const ft::Poller::Socket* ft::Server::getSocket(void) const
 {
 	return (this->socket);
 }
 
-void ft::Server::setAddress(const ft::SocketAddress& address)
-{
-	this->address = address;
-}
-
-ft::SocketAddress& ft::Server::getAddress(void) const
-{
-	return (this->address);
-}
-
 //////////////////////////////////////////
 
-/**
- * @brief To receive
- *
- * @param poll
- */
+/*
 void ft::Server::pollInEvent(pollfd* poll)
 {
 	std::cout << BLACK << "Incoming Request" << RESET << std::endl;
@@ -105,11 +91,6 @@ void ft::Server::pollInEvent(pollfd* poll)
 	poll->events = POLLOUT;
 }
 
-/**
- * @brief
- *
- * @param poll
- */
 void ft::Server::pollOutEvent(pollfd* poll)
 {
 	// TODO: Prevent timeout!
@@ -117,6 +98,7 @@ void ft::Server::pollOutEvent(pollfd* poll)
 
 	std::cout << "\033[30;1m" << "Sent Response" << "\033[0m" << std::endl;
 }
+*/
 
 /*
 void ft::Server::run(pollfd* fds, size_t size)

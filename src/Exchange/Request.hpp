@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:07:36 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/31 13:34:57 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/07/31 15:24:13 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,23 +35,24 @@ namespace ft {
 class Request final : public ft::Exchange
 {
 public: // Ctor ~ Dtor
-    Request(const std::string& buffer);
+	Request(void);
 
 public: // Functions
 
-    ft::Exchange::Status appendBuffer(const std::string& buffer);
-    void ft::Request::parseHeader();
+	ft::Exchange::Status appendBuffer(const std::string& buffer);
+	void parseHeader();
 
 private:
-    void parseStatusLine(const std::string& buffer);
+	void parseBody();
+	void parseStatusLine(const std::string& buffer);
 
 public: // Attributes
-    ft::Exchange::Method method;
-    std::string path;
-    std::string version;
-    
+	ft::Exchange::Method method;
+	std::string path;
+	std::string version;
+
 private:
-    std::string buffer;
+	std::string buffer;
 };
 
 }

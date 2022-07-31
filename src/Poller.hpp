@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/28 15:48:18 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/28 21:34:33 by fbes          ########   odam.nl         */
+/*   Updated: 2022/07/31 14:34:27 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ namespace ft {
 class Poller
 {
 public: // Ctor ~ Dtor
-	Poller(const std::vector<ft::Server>& servers, const ft::GlobalConfig& globalConfig);
+	Poller(std::vector<ft::Server>& servers, const ft::GlobalConfig& globalConfig);
 	~Poller();
 
 public: // Types
@@ -62,14 +62,15 @@ private: // Functions
 	void pollOutEvent(Connection& conn);
 	void closeConnection(Connection& conn);		// Close, then reset a connection
 	void resetConnection(Connection& conn);		// Reset a connection without setting the pollfd to -1
-	const Socket& getSocketByPort(const ushort port) const;
+	const ft::Poller::Socket* createSocket(const uint16_t port);
+	const ft::Poller::Socket* getSocketByPort(const uint16_t port) const;
 
 private: // Attributes
-	const std::vector<ft::Server>&		servers;				// A reference to the vector list of servers defined in main
+	std::vector<ft::Server>&			servers;				// A reference to the vector list of servers defined in main
 	const ft::GlobalConfig&				globalConfig;			// A reference to the global configuration for webserv defined in main
 	size_t								activeClients;			// The amount of active client connections right now.
 	size_t								reservedSocketAmount;	// The amount of sockets that are reserved for incoming requests to servers
-	std::vector<Socket>					sockets;				// A vector containing all the sockets (one per defined port in the config file)
+	std::vector<Socket*>				sockets;				// A vector containing all the sockets (one per defined port in the config file)
 	std::array<Connection, MAX_CLIENTS>	connections;			// An array containing all our connections. The first few are reserved for incoming connections for the server, one per server.
 	std::array<pollfd, MAX_CLIENTS>		pollfds;				// An array containing all pollfds. The first few are reserved for incoming connections for the server, one per server.
 	char								buffer[BUFF_SIZE];		// The buffer for reading from a pollInEvent

@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 17:39:03 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/28 21:08:04 by fbes          ########   odam.nl         */
+/*   Updated: 2022/07/31 14:05:59 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,8 +76,8 @@ static void setupServers(const std::string& configPath, ft::GlobalConfig& config
  */
 int32_t main(int32_t argc, const char* argv[])
 {
-	ft::GlobalConfig						config;	 					// Contains the entire configuration for the whole application/
-	std::vector<ft::Server>					servers; 					// A vector list that contains all of the servers.
+	ft::GlobalConfig		config;	 	// Contains the entire configuration for the whole application/
+	std::vector<ft::Server>	servers; 	// A vector list that contains all of the servers.
 
 	verifyArguments(argc);
 

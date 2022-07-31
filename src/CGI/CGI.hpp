@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 10:13:49 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/27 11:06:58 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/07/31 15:35:21 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,10 +14,11 @@
 
 #ifndef CGI_HPP
 # define CGI_HPP
-# include <strstream>
-# include <unordered_map>
-# include <signal.h>
+# include "Utils.hpp"
+
 namespace ft {
+
+class Response;
 
 /**
  * Responsible of executing incoming requests and process an outgoing response.
@@ -30,7 +31,7 @@ namespace CGI
 {
 	/**
 	 * Executes whatever the input file is.
-	 * 
+	 *
 	 * @param request The incoming request.
 	 * @param path The file path to execute.
 	 */

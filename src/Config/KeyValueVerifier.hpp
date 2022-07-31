@@ -6,7 +6,7 @@
 /*   By: fbes <fbes@student.codam.nl>                 +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/20 20:13:53 by fbes          #+#    #+#                 */
-/*   Updated: 2022/07/20 21:26:50 by fbes          ########   odam.nl         */
+/*   Updated: 2022/07/31 14:20:21 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,10 +14,11 @@
 
 #ifndef SECTION_HPP
 # define SECTION_HPP
-# include "Common.hpp"
+# include "Utils.hpp"
 # include "Exceptions.hpp"
 # define VERIFIER_PARAMS  uint32_t lineNum,  std::string& key,  std::string& value
-FT_BEGIN
+
+namespace ft {
 
 // A KeyValueVerifier verifies that a key-value pair is set up correctly
 class KeyValueVerifier
@@ -68,5 +69,5 @@ private: // Functions
 	void parseCGIBin(VERIFIER_PARAMS) ;
 };
 
-FT_END
+}
 #endif

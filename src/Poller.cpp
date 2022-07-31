@@ -6,54 +6,64 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/28 15:48:13 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/28 21:37:22 by fbes          ########   odam.nl         */
+/*   Updated: 2022/07/31 14:42:31 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Poller.hpp"
 
-ft::Poller::Poller(const std::vector<ft::Server>& servers, const ft::GlobalConfig& globalConfig) : servers(servers), globalConfig(globalConfig)
+const ft::Poller::Socket* ft::Poller::createSocket(const uint16_t port)
+{
+	try
+	{
+		ft::Poller::Socket* socket = new ft::Poller::Socket();
+		socket->fd = ft::socket(IPV4, TCP, NONE); // Create a new socket fd
+		socket->addr = ft::SocketAddress(AF_INET, htons(port), INADDR_ANY); // Create a new address on the defined port
+
+		ft::setSocketOption(socket->fd, SOL_SOCKET, SO_REUSEADDR, true, sizeof(int32_t)); // Make kernel release socket after exit
+		ft::bind(socket->fd, &socket->addr); // Bind the socket to an address
+		ft::listen(socket->fd, MAX_CLIENTS); // Allow the socket to listen, set the maximum amount of clients
+		ft::fcntl(socket->fd, F_SETFL, O_NONBLOCK); // Set to non-blocking mode for use with poll
+
+		this->sockets.push_back(socket); // Add (copy/move) the newly created socket to the list of sockets
+
+		// Set up a new pollfd for this serversocket
+		this->connections[this->reservedSocketAmount].poll = &this->pollfds[this->reservedSocketAmount];
+		this->connections[this->reservedSocketAmount].poll->fd = socket->fd;
+		this->connections[this->reservedSocketAmount].poll->events = POLLIN;
+		this->reservedSocketAmount++;
+	}
+	catch(const std::exception& e)
+	{
+		std::cerr << RED << "Webserv: " << e.what() << RESET << std::endl;
+		exit(EXIT_FAILURE);
+	}
+}
+
+//////////////////////////////////////////
+
+ft::Poller::Poller(std::vector<ft::Server>& servers, const ft::GlobalConfig& globalConfig) : servers(servers), globalConfig(globalConfig)
 {
 	std::list<uint16_t>		ports;
 	uint16_t				port;
 
-	// first few pollfds are reserved for the server sockets, initialize them here
-	// only one server socket per defined port in the config
+	// First few pollfds are reserved for the server sockets, initialize them here
+	// Only one server socket per defined port in the config
 	this->reservedSocketAmount = 0;
 	for (size_t i = 0; i < this->servers.size(); i++)
 	{
 		port = (uint16_t) this->servers[i].config.returnValueAsInt("listen");
-		if (std::find(ports.begin(), ports.end(), port) == ports.end())
+		if (std::find(ports.begin(), ports.end(), port) == ports.end()) // port has no socket yet
 		{
-			try
-			{
-				Socket socket;
-				socket.fd = ft::socket(IPV4, TCP, NONE); // Create a new socket fd
-				socket.addr = ft::SocketAddress(AF_INET, htons(port), INADDR_ANY); // Create a new address on the defined port
+			const Socket* socket = this->createSocket(port);
 
-				ft::setSocketOption(socket.fd, SOL_SOCKET, SO_REUSEADDR, true, sizeof(int32_t)); // Make kernel release socket after exit
-				ft::bind(socket.fd, &socket.addr); // Bind the socket to an address
-				ft::listen(socket.fd, MAX_CLIENTS); // Allow the socket to listen, set the maximum amount of clients
-				ft::fcntl(socket.fd, F_SETFL, O_NONBLOCK); // Set to non-blocking mode for use with poll
+			// Link socket to server
+			servers[i].setSocket(this->sockets.back());
 
-				this->sockets.push_back(socket); // Add the newly created socket to the list of sockets
-			}
-			catch(const std::exception& e)
-			{
-				std::cerr << RED << "Webserv: " << e.what() << RESET << std::endl;
-				exit(EXIT_FAILURE);
-			}
 
-			// set up a new pollfd for this serversocket
-			this->connections[this->reservedSocketAmount].poll = &this->pollfds[i];
-			this->connections[this->reservedSocketAmount].poll->fd = servers.at(i).getSocket();
-			this->connections[this->reservedSocketAmount].poll->events = POLLIN;
-			this->reservedSocketAmount++;
 		}
 		else
-		{
-			// Socket on this port already exists, add it to this server
-		}
+			servers[i].setSocket(this->getSocketByPort(port)); // Socket already exists, link it to the server
 	}
 }
 
@@ -108,7 +118,9 @@ bool ft::Poller::acceptIncoming(const ft::Server& server)
 	{
 		// Accept this connection.
 		std::cout << GREEN << "Accepting incoming connection" << RESET << std::endl;
-		ft::fd_t clientSocket = ft::accept(server.getSocket(), &server.getAddress()); // Assign new connection a clientSocket, which is connected to a server's socket
+		const Socket *serverSocket = server.getSocket();
+		// Assign new connection a clientSocket, which is connected to a server's socket
+		ft::fd_t clientSocket = ft::accept(serverSocket->fd, const_cast<ft::SocketAddress*>(&serverSocket->addr));
 		ft::fcntl(clientSocket, F_SETFL, O_NONBLOCK); // Set the clientSocket to non-blocking mode for use with poll
 
 		// Find available pollfd
@@ -208,11 +220,11 @@ void ft::Poller::resetConnection(Connection& conn)
 
 //////////////////////////////////////////
 
-const ft::Poller::Socket& ft::Poller::getSocketByPort(const uint16_t port) const
+const ft::Poller::Socket* ft::Poller::getSocketByPort(const uint16_t port) const
 {
-	for(Socket socket : this->sockets)
+	for(Socket *socket : this->sockets)
 	{
-		if (socket.addr.port == port)
+		if (socket->addr.port == port)
 			return (socket);
 	}
 }

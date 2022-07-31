@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 10:41:28 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/31 13:43:32 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/07/31 14:27:49 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,12 @@ void ft::split(const std::string& string, char delim, std::vector<std::string>& 
 
 	while (std::getline(ss, tmp, delim))
 		outVec.push_back(tmp);
+}
+
+bool endsWith(const std::string& value, const std::string& ending)
+{
+    if (ending.size() > value.size()) return false;
+    return std::equal(ending.rbegin(), ending.rend(), value.rbegin());
 }
 
 //////////////////////////////////////////

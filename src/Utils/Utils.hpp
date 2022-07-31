@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 10:40:21 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/31 13:41:03 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/07/31 15:22:41 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@
 # include <map>
 # include <sstream>
 # include <vector>
+# include <algorithm>
 # include "Exceptions.hpp"
 # include "SocketAddress.hpp"
 # define NONE 0
@@ -63,13 +64,16 @@ void trim(std::string& string);
 void slice(const std::string& string, std::string delim, std::pair<std::string, std::string>& output);
 
 /**
- * @brief 
- * 
- * @param string 
- * @param delim 
- * @param outVec 
+ * @brief
+ *
+ * @param string
+ * @param delim
+ * @param outVec
  */
-void ft::split(const std::string& string, char delim, std::vector<std::string>& outVec);
+void split(const std::string& string, char delim, std::vector<std::string>& outVec);
+
+/***/
+bool endsWith(const std::string& value, const std::string& ending);
 
 //////////////////////////////////////////
 // NETWORK

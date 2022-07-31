@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:07:33 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/31 12:16:55 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/07/31 15:19:03 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,12 +42,13 @@ public: // Ctor ~ Dtor
 public: // Functions
 
 	/**
-	 * @brief Send the current response object onto the socket.
+	 * @brief Send the current response object onto the socket. It will call whatever job is left to run for sending.
+	 * It will always point to sendStatic, sendHeader or sendFile (private member functions).
 	 *
 	 * @param socket The client socket.
 	 * @return ft::Response::Status The status if we are done or not.
 	 */
-	ft::Response::Status send(int32_t socket);
+	ft::Response::Status (ft::Response::*send)(int32_t socket); // Pointer to whatever Response needs to do next
 
 	/**
 	 * @brief Let the response generate a response page out of a given status code.
@@ -59,13 +60,36 @@ public: // Functions
 	void generateStatus(int32_t status);
 
 private:
+	/**
+	 * @brief Use sendStatic if a header and a body need to be sent in one go. This only occurs if there is no fd.
+	 *
+	 * @param socket
+	 * @return ft::Response::Status
+	 */
+	ft::Response::Status sendStatic(int32_t socket);
+
+	/**
+	 * @brief Use sendHeader if we only want to send the headers using send, and then a file (fd) using sendfile.
+	 *
+	 * @param socket
+	 * @return ft::Response::Status
+	 */
+	ft::Response::Status sendHeaders(int32_t socket);
+
+	/**
+	 * @brief Use sendFile after using sendHeader. Now it's time to send the contents of a file using C's built-in sendfile method.
+	 *
+	 * @param socket
+	 * @return ft::Response::Status
+	 */
+	ft::Response::Status sendFile(int32_t socket);
 
 	void writeStatusLine(int32_t status);
 	void writeHeaders(void);
 
 	void deleteMethod(const std::string& filePath);
 	void postMethod(const std::string& filePath);
-	void getMethod(void);
+	void getMethod(const std::string& filePath);
 
 private: // Attributes
 
@@ -74,6 +98,7 @@ private: // Attributes
 
 	// The file to send as a body, else nullptr.
 	FILE* file;
+	size_t fileSize;
 
 };
 }

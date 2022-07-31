@@ -6,13 +6,15 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:07:39 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/31 13:51:08 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/07/31 15:25:18 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Request.hpp"
 
-ft::Request::Request() { }
+ft::Request::Request(void) {
+	this->buffer = "";
+}
 
 //////////////////////////////////////////
 
@@ -35,9 +37,8 @@ ft::Exchange::Status ft::Request::appendBuffer(const std::string& buffer)
 
 void ft::Request::parseBody()
 {
-	if (this->method != ft::Method::POST)
+	if (this->method != ft::Exchange::Method::POST)
 		return;
-
 	if (this->data.size() > 100000)
 		throw ft::BadRequest();
 }
@@ -68,7 +69,7 @@ void ft::Request::parseHeader()
 		if (line.find(':') == std::string::npos)
 			throw ft::BadRequest();
 
-		ft::slice(line, ':', header);
+		ft::slice(line, ":", header);
 
 		if (header.first.empty() || header.second.empty())
 			throw ft::BadRequest();
@@ -76,7 +77,7 @@ void ft::Request::parseHeader()
 	}
 
 	// Check which server this request belongs to
-	std::string* host = this->getHeaderValue("Host");
+	const std::string* host = this->getHeaderValue("Host");
 	if (host)
 	{
 		// TODO: request belongs to first server on this port
@@ -113,7 +114,7 @@ void ft::Request::checkHeader()
 void ft::Request::parseStatusLine(const std::string& line)
 {
 	std::vector<std::string> values;
-	ft::split(line, " ", values);
+	ft::split(line, ' ', values);
 
 	if (values.size() != 3) throw ft::BadRequest();
 
