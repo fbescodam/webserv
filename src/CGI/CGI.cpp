@@ -27,12 +27,12 @@ bool ft::CGI::runCGI(const ft::Connection& conn, const std::string& path, std::s
 	std::vector<std::string> argv = {cgiBin, path};
 	std::vector<std::string> envp;
 	envp.push_back("GATEWAY_INTERFACE=CGI/1.1");
-	envp.push_back("REMOTE_ADDR=" + conn.ipv4); // TODO: Ipv
+	envp.push_back("REMOTE_ADDR=" + conn.ipv4);
 	envp.push_back("REQUEST_METHOD=POST");
 	envp.push_back("SCRIPT_NAME=" + path);
 	envp.push_back("SERVER_NAME=localhost");
 	envp.push_back("SERVER_PROTOCOL=HTTP/1.1");
-	envp.push_back("PATH_INFO=~/work/webserv/examples/www/post/fileupload.sh");
+	envp.push_back("PATH_INFO=~/work/webserv/examples/www/post/fileupload.sh"); // TODO: Remove abs path
 	envp.push_back("CONTENT_LENGTH=" + conn.request->headers["content-length"]);
 
 	pid_t pid;
@@ -50,16 +50,17 @@ bool ft::CGI::runCGI(const ft::Connection& conn, const std::string& path, std::s
 	{
 		try
 		{
+			ft::dup2(0, STDIN_FILENO);
 			ft::dup2(fds[WRITE], STDOUT_FILENO);
 			ft::dup2(fds[WRITE], STDERR_FILENO);
-			/* code */
+
+			ft::execve(cgiBin.c_str(), const_cast<char *const *>(c_arr(argv).data()), const_cast<char *const *>(c_arr(envp).data()));
 		}
 		catch(const std::exception& e)
 		{
-			std::cerr << e.what() << '\n';
+			std::cerr << RED << e.what() << BLACK << std::endl;
 			exit(EXIT_FAILURE);
 		}
-
 	}
 	else // Parent
 	{

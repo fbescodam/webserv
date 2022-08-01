@@ -74,10 +74,8 @@ ft::Poller::~Poller()
 		delete socket;
 	for (const ft::Connection conn : this->connections)
 	{
-		if (conn.request)
-			delete conn.request;
-		if (conn.response)
-			delete conn.response;
+		delete conn.request;
+		delete conn.response;
 	}
 }
 
@@ -95,10 +93,9 @@ void ft::Poller::pollAll(void)
 	// Check the result for all the pollers
 	for (size_t i = 0; i < this->connections.size(); i++)
 	{
-		pollfd* fd = this->connections[i].poll;
-		if (!fd)
-			continue; // No pollfd for this connection, assume it is not in use
 		ft::Connection& conn = this->connections[i];
+		pollfd* fd = conn.poll;
+		if (!fd) continue; // No pollfd for this connection, assume it is not in use
 
 		// First few polls are the listening thingies (one for each server), attaches new clients to a pollfd.
 		// When a POLLIN event happens here, we need to specify which pollfd to use for this connection.
@@ -166,7 +163,7 @@ bool ft::Poller::acceptIncoming(const ft::Server& server)
 				// Populate the connection struct
 				this->connections[i].poll = fd;
 				this->connections[i].lastActivity = std::time(nullptr);
-				this->connections[i].server = nullptr; // don't know yet
+				this->connections[i].server = nullptr; // TODO: don't know yet
 				this->connections[i].ipv4 = ft::inet_ntop(*const_cast<ft::SocketAddress*>(&server.getSocket()->addr));
 
 				// Increment the active connection count
