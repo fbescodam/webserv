@@ -12,7 +12,7 @@
 
 #include "Request.hpp"
 
-ft::Request::Request(void) noexcept {
+ft::Request::Request() noexcept {
 	this->buffer = "";
 	this->done = false;
 }
@@ -48,7 +48,7 @@ void ft::Request::parseBody()
 {
 	if (this->method != ft::Exchange::Method::POST)
 		return;
-	if (this->data.size() > 100000)
+	if (this->data.size() > 100000) // TODO: Get from config
 		throw ft::BadRequest();
 }
 
@@ -87,16 +87,14 @@ void ft::Request::parseHeader()
 	}
 
 	// Check which server this request belongs to
-	const std::string* host = this->getHeaderValue("Host");
-	if (host)
+	const std::string* host;
+	if ((host = this->getHeaderValue("Host")))
 	{
-
-		//TODO: request belongs to the first server with this name, OR IF IT DOES NOT EXIST, the first server on this port
+		// Check if name matches that of any of our servers.
+		// Ignore port and just pick first match, and if no match is found pick first server.
+		// Somehow add this request to the sever's queue of requests
 	}
-	else
-	{
-		// TODO: request belongs to first server on this port
-	}
+	else throw ft::BadRequest(); // for HTTP/1.1 Host NEEDS to be present!!!
 
 	// Empty the data
 	this->data.empty();

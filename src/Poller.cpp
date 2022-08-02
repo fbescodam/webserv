@@ -47,8 +47,8 @@ const ft::Socket* ft::Poller::createSocket(const uint16_t port)
 
 ft::Poller::Poller(std::vector<ft::Server>& servers, const ft::GlobalConfig& globalConfig) : servers(servers), globalConfig(globalConfig)
 {
-	std::list<uint16_t>		ports;
 	uint16_t				port;
+	std::list<uint16_t>		ports;
 
 	// First few pollfds are reserved for the server sockets, initialize them here
 	// Only one server socket per defined port in the config
