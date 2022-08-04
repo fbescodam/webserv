@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/28 15:48:13 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/04 16:48:09 by fbes          ########   odam.nl         */
+/*   Updated: 2022/08/04 19:00:27 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,7 +66,7 @@ ft::Poller::Poller(std::vector<ft::Server>& servers, const ft::GlobalConfig& glo
 	{
 		fd.fd = -1;
 		fd.events = POLLIN;
-		fd.revents = 0;
+		fd.revents = NONE;
 	}
 
 	// First few pollfds are reserved for the server sockets, initialize them here
@@ -106,7 +106,7 @@ void ft::Poller::pollAll(void)
 	catch (GenericErrnoException& e)
 	{
 		std::cerr << RED << "Webserv: " << e.what() << RESET << std::endl;
-		exit(EXIT_FAILURE);;;
+		exit(EXIT_FAILURE);
 	}
 
 	// Check the result for all the pollers
@@ -335,7 +335,7 @@ void ft::Poller::resetConnection(ft::Connection& conn)
 	{
 		conn.poll->fd = -1;
 		conn.poll->events = POLLIN;
-		conn.poll->revents = 0;
+		conn.poll->revents = NONE;
 		conn.poll = nullptr;
 	}
 }

@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:07:35 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/04 17:16:10 by fbes          ########   odam.nl         */
+/*   Updated: 2022/08/04 19:02:02 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -141,6 +141,8 @@ void ft::Response::getMethod(const std::string& filePath)
 			this->headers["content-type"] = "text/html";
 			this->writeHeaders();
 			this->data += dirListing;
+			std::cout << BLACK << "Set sendRes to sendDynamic" << RESET << std::endl;
+			this->sendRes = &ft::Response::sendDynamic;
 			return;
 		}
 		catch(const std::exception& e)
@@ -148,7 +150,7 @@ void ft::Response::getMethod(const std::string& filePath)
 			std::cerr << RED << "Webserv: " << e.what() << RESET << std::endl;
 
 			try { return (this->generateStatus(500)); }
-			catch(const std::exception& e) { exit (EXIT_FAILURE); }
+			catch (const std::exception& e) { exit (EXIT_FAILURE); }
 		}
 	}
 
@@ -171,7 +173,7 @@ void ft::Response::getMethod(const std::string& filePath)
 
 		// We should NEVER have to reach this point ...
 		try { return (this->generateStatus(500)); }
-		catch(const std::exception& e) { exit (EXIT_FAILURE); }
+		catch (const std::exception& e) { exit (EXIT_FAILURE); }
 	}
 }
 
