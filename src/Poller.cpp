@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/28 15:48:13 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/03 12:28:39 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/08/04 15:58:42 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,25 @@ ft::Poller::Poller(std::vector<ft::Server>& servers, const ft::GlobalConfig& glo
 	uint16_t				port;
 	std::list<uint16_t>		ports;
 
+	this->activeClients = 0;
+
+	// Init connections TODO: Move to constructor
+	for (ft::Connection& conn : this->connections)
+	{
+		conn.response = nullptr;
+		conn.request = nullptr;
+		conn.poll = nullptr;
+		resetConnection(conn);
+	}
+
+	// Init pollfds
+	for (pollfd& fd : this->pollfds)
+	{
+		fd.fd = -1;
+		fd.events = POLLIN;
+		fd.revents = 0;
+	}
+
 	// First few pollfds are reserved for the server sockets, initialize them here
 	// Only one server socket per defined port in the config
 	this->reservedSocketAmount = 0;
@@ -72,7 +91,7 @@ ft::Poller::~Poller()
 {
 	for (const ft::Socket* socket : this->sockets)
 		delete socket;
-	for (const ft::Connection conn : this->connections)
+	for (const ft::Connection& conn : this->connections)
 	{
 		delete conn.request;
 		delete conn.response;
@@ -191,6 +210,7 @@ void ft::Poller::pollInEvent(ft::Connection& conn)
 
 	// Clear the current response, as a request is now being made.
 	delete conn.response;
+	conn.response = nullptr;
 	if (!conn.request)
 		conn.request = new Request(this->servers);
 
@@ -209,9 +229,9 @@ void ft::Poller::pollInEvent(ft::Connection& conn)
 	{
 		// Once we have the full request, parse the header and check which server.
 		// Pass connection to server for it to parse the request and generate an appropriate response.
-		try 
-		{ 
-			conn.request->parseHeader(conn); 
+		try
+		{
+			conn.request->parseHeader(conn);
 			conn.server->handleRequest(conn);
 
 			// TODO: Connection now has a response set, now what?
@@ -272,7 +292,9 @@ void ft::Poller::closeConnection(ft::Connection& conn)
 void ft::Poller::deleteReqRes(ft::Connection& conn)
 {
 	delete conn.request;
+	conn.request = nullptr;
 	delete conn.response;
+	conn.response = nullptr;
 }
 
 //////////////////////////////////////////
@@ -282,7 +304,14 @@ void ft::Poller::resetConnection(ft::Connection& conn)
 	this->deleteReqRes(conn);
 	conn.lastActivity = NONE;
 	conn.server = nullptr;
-	conn.ipv4 = nullptr;
+	conn.ipv4 = "";
+	if (conn.poll)
+	{
+		conn.poll->fd = -1;
+		conn.poll->events = POLLIN;
+		conn.poll->revents = 0;
+		conn.poll = nullptr;
+	}
 }
 
 //////////////////////////////////////////
@@ -291,7 +320,7 @@ const ft::Socket* ft::Poller::getSocketByPort(const uint16_t port) const
 {
 	for(ft::Socket* socket : this->sockets)
 	{
-		if (socket->addr.port == port)
+		if (ntohs(socket->addr.port) == port)
 			return (socket);
 	}
 	return (nullptr);
