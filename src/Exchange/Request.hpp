@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:07:36 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/31 17:39:19 by fbes          ########   odam.nl         */
+/*   Updated: 2022/08/03 10:51:36 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,8 @@
 # include "Exchange.hpp"
 # include "Exceptions.hpp"
 # include "ServerSection.hpp"
+# include "Connection.hpp"
+# include "Server.hpp"
 
 namespace ft {
 
@@ -35,11 +37,11 @@ namespace ft {
 class Request final : public ft::Exchange
 {
 public: // Ctor ~ Dtor
-	Request() noexcept;
+	Request(const std::vector<ft::Server>& servers) noexcept;
 
 public: // Functions
 	ft::Exchange::Status appendBuffer(const std::string& buffer);
-	void parseHeader();
+	void parseHeader(ft::Connection& conn);
 	bool isDone(void) const;
 
 private:
@@ -52,6 +54,7 @@ public: // Attributes
 	std::string version;
 
 private:
+	const std::vector<ft::Server>& servers;
 	std::string buffer;
 	bool		done;
 };

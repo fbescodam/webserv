@@ -16,6 +16,9 @@
 # define SERVER_HPP
 # include "Socket.hpp"
 # include "ServerSection.hpp"
+# include "Connection.hpp"
+# include "Response.hpp"
+# include "Request.hpp"
 
 namespace ft {
 
@@ -36,7 +39,8 @@ public: // Functions
 	 * @param poll The current connection.
 	 * @param statusCode The status code to send back.
 	 */
-	void respondWithStatus(pollfd* poll, int32_t statusCode);
+	void respondWithStatus(ft::Connection& conn, int32_t statusCode);
+	void handleRequest(ft::Connection& conn);
 
 private:
 	void pollListen(void);

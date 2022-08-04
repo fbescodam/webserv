@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:08:42 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/31 16:17:44 by fbes          ########   odam.nl         */
+/*   Updated: 2022/08/04 11:52:15 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,14 +16,16 @@ ft::Server::Server(ft::ServerSection& inConfig) : config(inConfig) {}
 
 //////////////////////////////////////////
 
-void ft::Server::respondWithStatus(pollfd* poll, int32_t statusCode)
+// Direclty creates a whole new response.
+void ft::Server::respondWithStatus(ft::Connection& conn, int32_t statusCode)
 {
-	// if (this->responses.find(poll->fd) != this->responses.end())
-	// 	delete this->responses[poll->fd];
+	// Yeet out whatever response we had before.
+	delete conn.response;
 
-	// this->responses[poll->fd] = new ft::Response(code, &(this->config));
-	// std::cout << "Pollout now" << std::endl;
-	// poll->events = POLLOUT;
+	conn.response = new ft::Response(conn);
+	conn.response->generateStatus(statusCode);
+
+	// TODO: Do something will poll ?
 }
 
 void ft::Server::setSocket(const ft::Socket* socket)
@@ -34,6 +36,11 @@ void ft::Server::setSocket(const ft::Socket* socket)
 const ft::Socket* ft::Server::getSocket(void) const
 {
 	return (this->socket);
+}
+
+void ft::Server::handleRequest(ft::Connection& conn)
+{
+	// TODO: Actually handle requests lol
 }
 
 //////////////////////////////////////////

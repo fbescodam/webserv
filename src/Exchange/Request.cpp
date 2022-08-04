@@ -6,13 +6,14 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:07:39 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/31 17:38:32 by fbes          ########   odam.nl         */
+/*   Updated: 2022/08/03 12:31:41 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Request.hpp"
 
-ft::Request::Request() noexcept {
+ft::Request::Request(const std::vector<ft::Server>& servers) noexcept : servers(servers)
+{
 	this->buffer = "";
 	this->done = false;
 }
@@ -55,7 +56,7 @@ void ft::Request::parseBody()
 //////////////////////////////////////////
 
 // Extracts the headeran d parses it into the request object
-void ft::Request::parseHeader()
+void ft::Request::parseHeader(ft::Connection& conn)
 {
 	size_t pos;
 	if ((pos = this->buffer.find("\r\n\r\n")) == std::string::npos)
@@ -90,9 +91,29 @@ void ft::Request::parseHeader()
 	const std::string* host;
 	if ((host = this->getHeaderValue("Host")))
 	{
+		// Fist: Name | Second: Port
+		std::pair<std::string, std::string> output;
+		ft::slice(*host, ":", output);
+
+		for (auto& server : this->servers)
+		{
+			auto host = server.config.getValue("server_name");
+			auto port = server.config.getValue("listen");
+			if (port && host)
+			{
+				// TODO: Check port, can be optional
+				if (*host == output.first)
+				{
+					conn.server = const_cast<ft::Server*>(&server);
+					break;
+				}
+				// Not the right server, keep going...
+			}
+			else throw std::exception(); // Not set ?
+		}
 		// Check if name matches that of any of our servers.
 		// Ignore port and just pick first match, and if no match is found pick first server.
-		// Somehow add this request to the sever's queue of requests
+		// Figure out how give back the right server, maybe set in connection struct
 	}
 	else throw ft::BadRequest(); // for HTTP/1.1 Host NEEDS to be present!!!
 

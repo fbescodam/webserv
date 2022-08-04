@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/28 15:48:13 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/31 17:42:59 by fbes          ########   odam.nl         */
+/*   Updated: 2022/08/03 12:28:39 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,7 +87,7 @@ void ft::Poller::pollAll(void)
 	catch (GenericErrnoException& e)
 	{
 		std::cerr << RED << "Webserv: " << e.what() << RESET << std::endl;
-		exit(EXIT_FAILURE);
+		exit(EXIT_FAILURE);;;
 	}
 
 	// Check the result for all the pollers
@@ -163,7 +163,7 @@ bool ft::Poller::acceptIncoming(const ft::Server& server)
 				// Populate the connection struct
 				this->connections[i].poll = fd;
 				this->connections[i].lastActivity = std::time(nullptr);
-				this->connections[i].server = nullptr; // TODO: don't know yet
+				this->connections[i].server = nullptr; // Don't know yet
 				this->connections[i].ipv4 = ft::inet_ntop(*const_cast<ft::SocketAddress*>(&server.getSocket()->addr));
 
 				// Increment the active connection count
@@ -192,7 +192,7 @@ void ft::Poller::pollInEvent(ft::Connection& conn)
 	// Clear the current response, as a request is now being made.
 	delete conn.response;
 	if (!conn.request)
-		conn.request = new Request();
+		conn.request = new Request(this->servers);
 
 	bzero(this->buffer, BUFF_SIZE); // Clear the buffer
 	brecv = recv(conn.poll->fd, this->buffer, BUFF_SIZE, NONE);
@@ -206,7 +206,22 @@ void ft::Poller::pollInEvent(ft::Connection& conn)
 		return;
 	}
 	if (conn.request->appendBuffer(this->buffer) == ft::Exchange::Status::DONE)
-		conn.response = new Response(conn);
+	{
+		// Once we have the full request, parse the header and check which server.
+		// Pass connection to server for it to parse the request and generate an appropriate response.
+		try 
+		{ 
+			conn.request->parseHeader(conn); 
+			conn.server->handleRequest(conn);
+
+			// TODO: Connection now has a response set, now what?
+		}
+		catch(const std::exception& e)
+		{
+			// TODO: Request was bad, now what? How do we send it?
+			std::cerr << RED << e.what() << RESET << std::endl;
+		}
+	}
 	conn.lastActivity = std::time(nullptr);
 }
 
