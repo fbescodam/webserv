@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/28 15:48:13 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/04 20:42:33 by fbes          ########   odam.nl         */
+/*   Updated: 2022/08/04 20:48:40 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -151,6 +151,7 @@ bool ft::Poller::acceptIncoming(const ft::Server& server)
 		const Socket *serverSocket = server.getSocket();
 		// Assign new connection a clientSocket, which is connected to a server's socket
 		ft::fd_t clientSocket = ft::accept(serverSocket->fd, const_cast<ft::SocketAddress*>(&serverSocket->addr));
+		ft::setSocketOption(clientSocket, SOL_SOCKET, SO_REUSEADDR, true, sizeof(int32_t)); // Make kernel release socket after exit
 		ft::fcntl(clientSocket, F_SETFL, O_NONBLOCK); // Set the clientSocket to non-blocking mode for use with poll
 
 		// Find available pollfd
