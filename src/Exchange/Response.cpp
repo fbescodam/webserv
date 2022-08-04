@@ -16,6 +16,7 @@ ft::Response::Response(const ft::Connection& conn) : conn(conn)
 {
 	std::cout << BLACK << "Set sendRes to nullptr (in constructor)" << RESET << std::endl;
 	this->sendRes = nullptr;
+	this->file = nullptr;
 	this->offset = 0;
 	this->headers["server"] = "Breadserv";
 	if (conn.request->headers["connection"] == "keep-alive")
