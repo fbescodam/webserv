@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:07:35 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/31 17:44:20 by fbes          ########   odam.nl         */
+/*   Updated: 2022/08/04 12:20:10 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,6 +120,21 @@ void ft::Response::postMethod(const std::string& filePath)
 // Simply open the file and send it over.
 void ft::Response::getMethod(const std::string& filePath)
 {
+	// Check if filepath ends with /, if so, dir listing.
+	if (filePath.back() == '/')
+	{
+		std::string dirListing;
+		ft::DirectoryFactory::buildContentFromDir(filePath, dirListing);
+
+		this->writeStatusLine(200);
+		this->headers["Content-Length"] = std::to_string(dirListing.size());
+		this->headers["Content-Type"] = "text/html";
+		this->writeHeaders();
+		this->data += dirListing;
+		return;
+	}
+
+	// No, its just a file
 	if (!ft::filesystem::fileExists(filePath))
 		return (this->generateStatus(404));
 

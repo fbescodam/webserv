@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:07:33 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/31 17:24:38 by fbes          ########   odam.nl         */
+/*   Updated: 2022/08/04 12:00:42 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,11 +61,10 @@ public: // Functions
 	void generateStatus(int32_t status, const std::string& content);
 	void generateStatus(int32_t status);
 
-private:
-
 	void deleteMethod(const std::string& filePath);
 	void postMethod(const std::string& filePath);
 	void getMethod(const std::string& filePath);
+private:
 
 	/**
 	 * @brief Use sendStatic if a header and a body need to be sent in one go. This only occurs if there is no fd.

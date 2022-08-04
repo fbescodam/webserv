@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:08:42 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/04 11:52:15 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/08/04 12:11:16 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,38 @@ const ft::Socket* ft::Server::getSocket(void) const
 
 void ft::Server::handleRequest(ft::Connection& conn)
 {
-	// TODO: Actually handle requests lol
+	std::string filePath;
+
+	try
+	{
+		conn.response = new ft::Response(conn);
+		filePath = *this->config.getValue("path") + conn.request->path;
+	}
+	catch(const std::exception& e)
+	{
+		std::cerr << RED << e.what() << RESET << std::endl;
+
+		// Try to send a response, allocation might fail so if it happens
+		// again we will just have to die.
+		try { this->respondWithStatus(conn, 500); }
+		catch(const std::exception& e) 
+		{
+			std::cerr << RED << "Unable to generate response, check host!" << RESET << std::endl;
+			exit(EXIT_FAILURE);
+		}
+	}
+
+	// If somethin fails within the GET, POST or DELETE methods
+	// they set the appropriate content.
+	switch (conn.request->method)
+	{
+		case ft::Exchange::Method::GET:
+			return (conn.response->getMethod(filePath));
+		case ft::Exchange::Method::POST:
+			return (conn.response->postMethod(filePath));
+		case ft::Exchange::Method::DELETE:
+			return (conn.response->deleteMethod(filePath));
+	}
 }
 
 //////////////////////////////////////////
