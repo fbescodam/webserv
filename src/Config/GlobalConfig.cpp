@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 14:59:11 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/03 12:33:08 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/08/04 15:33:53 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -142,7 +142,7 @@ void ft::GlobalConfig::readFile(const std::string& filePath)
 				if (currentSection->getAmountOfFields() == 0)
 					throw ft::EmptySectionException(lineNum);
 				if (currentSection->getName() == "server")
-					if (!currentSection->keyExists("path") || !currentSection->keyExists("server_names") || !currentSection->keyExists("listen"))
+					if (!currentSection->keyExists("path") || !currentSection->keyExists("server_name") || !currentSection->keyExists("listen"))
 						throw ft::MissingFieldException(lineNum);
 			}
 

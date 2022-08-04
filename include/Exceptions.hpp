@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 18:05:00 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/28 20:47:59 by fbes          ########   odam.nl         */
+/*   Updated: 2022/08/04 15:33:53 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -123,7 +123,7 @@ struct MissingFieldException : public ft::ConfigException
 {
 public:
 	MissingFieldException(int32_t on) {
-		this->err = std::string("Missing field found in config before line ") + std::to_string(on) + std::string(" of your configuration file (every server needs a path, server_names and listen field)");
+		this->err = std::string("Missing field found in config before line ") + std::to_string(on) + std::string(" of your configuration file (every server needs a path, server_name and listen field)");
 	}
 };
 

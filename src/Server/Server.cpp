@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:08:42 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/04 14:35:27 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/08/04 15:31:10 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,12 +47,12 @@ void ft::Server::handleRequest(ft::Connection& conn)
 		conn.response = new ft::Response(conn);
 		filePath = *this->config.getValue("path") + conn.request->path;
 	}
-	catch(const std::exception& e)
+	catch (const std::exception& e)
 	{
 		std::cerr << RED << e.what() << RESET << std::endl;
 
 		try { this->respondWithStatus(conn, 500); }
-		catch(const std::exception& e) { exit(EXIT_FAILURE); }
+		catch (const std::exception& e) { exit(EXIT_FAILURE); }
 	}
 
 	// If something fails within the GET, POST or DELETE methods
