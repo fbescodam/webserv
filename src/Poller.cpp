@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/28 15:48:13 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/04 15:58:42 by fbes          ########   odam.nl         */
+/*   Updated: 2022/08/04 16:48:09 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -221,27 +221,51 @@ void ft::Poller::pollInEvent(ft::Connection& conn)
 		if (brecv < 0)
 			std::cerr << RED << "Receive function has failed!" << RESET << std::endl;
 		else
-			std::cout << "Connection closed by peer" << std::endl;
+			std::cout << BLACK << "Connection closed by peer" << RESET << std::endl;
 		this->closeConnection(conn);
 		return;
 	}
 	if (conn.request->appendBuffer(this->buffer) == ft::Exchange::Status::DONE)
 	{
+		std::cout << BLACK << "[DEBUG] Buffer is complete!" << RESET << std::endl;
+
 		// Once we have the full request, parse the header and check which server.
 		// Pass connection to server for it to parse the request and generate an appropriate response.
 		try
 		{
 			conn.request->parseHeader(conn);
 			conn.server->handleRequest(conn);
-
-			// TODO: Connection now has a response set, now what?
 		}
-		catch(const std::exception& e)
+		catch (const ft::BadRequest& e)
 		{
-			// TODO: Request was bad, now what? How do we send it?
+			conn.response = new ft::Response(conn);
+			conn.response->generateStatus(400);
+		}
+		catch (const ft::PayloadTooLarge& e)
+		{
+			conn.response = new ft::Response(conn);
+			conn.response->generateStatus(413);
+		}
+		catch (const ft::NotImplemented& e)
+		{
+			conn.response = new ft::Response(conn);
+			conn.response->generateStatus(501);
+		}
+		catch (const std::exception& e)
+		{
 			std::cerr << RED << e.what() << RESET << std::endl;
+			conn.response = new ft::Response(conn);
+			conn.response->generateStatus(500);
 		}
 	}
+	else
+	{
+		std::cout << BLACK << "[DEBUG] Buffer is incomplete." << RESET << std::endl;
+		conn.response = new ft::Response(conn);
+		conn.response->generateStatus(100);
+	}
+	std::cout << "Pollout now" << std::endl;
+	conn.poll->events = POLLOUT;
 	conn.lastActivity = std::time(nullptr);
 }
 
@@ -252,6 +276,8 @@ void ft::Poller::pollOutEvent(ft::Connection& conn)
 	conn.lastActivity = std::time(nullptr);
 
 	// WTFFFFFF
+	if (!conn.response)
+		std::cout << RED << "Warning: response points to nothing in a PollOutEvent" << RESET << std::endl;
 	if (!conn.response->sendRes || (conn.response->*(conn.response->sendRes))(conn.poll->fd) == ft::Response::Status::DONE)
 		this->resolveConnection(conn);
 	else

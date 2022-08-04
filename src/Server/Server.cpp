@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:08:42 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/04 15:31:10 by fbes          ########   odam.nl         */
+/*   Updated: 2022/08/04 16:39:43 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,10 +42,12 @@ void ft::Server::handleRequest(ft::Connection& conn)
 {
 	std::string filePath;
 
+	std::cout << BLACK << "Now handling the request" << RESET << std::endl;
+
 	try
 	{
 		conn.response = new ft::Response(conn);
-		filePath = *this->config.getValue("path") + conn.request->path;
+		filePath = *(this->config.getValue("path")) + conn.request->path;
 	}
 	catch (const std::exception& e)
 	{

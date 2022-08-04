@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:07:35 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/04 12:37:02 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/08/04 16:35:49 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ ft::Response::Response(const ft::Connection& conn) : conn(conn) { } // TODO: Res
 void ft::Response::writeStatusLine(int32_t status)
 {
 	this->data += "HTTP/1.1 " + std::to_string(status) + ft::getStatusCodes().at(status);
-	this->headers["Server"] = "Breadserv";
+	this->headers["server"] = "Breadserv";
 }
 
 //////////////////////////////////////////
@@ -50,8 +50,8 @@ void ft::Response::generateStatus(int32_t status)
 			goto generic;
 
 		this->writeStatusLine(status);
-		this->headers["Content-Length"] = std::to_string(ft::filesystem::getFileSize(this->file));
-		this->headers["Content-Type"] = ft::getContentType(filePath);
+		this->headers["content-length"] = std::to_string(ft::filesystem::getFileSize(this->file));
+		this->headers["content-type"] = ft::getContentType(filePath);
 		this->writeHeaders();
 		this->fileSize = ft::filesystem::getFileSize(this->file);
 		this->sendRes = &ft::Response::sendHeaders;
@@ -69,8 +69,8 @@ void ft::Response::generateStatus(int32_t status, const std::string& content)
 {
 	// Build header and fields
 	this->writeStatusLine(status);
-	this->headers["Content-Length"] = std::to_string(content.length());
-	this->headers["Content-Type"] = "text/html";
+	this->headers["content-length"] = std::to_string(content.length());
+	this->headers["content-type"] = "text/html";
 	this->writeHeaders();
 
 	// Build content
@@ -129,8 +129,8 @@ void ft::Response::getMethod(const std::string& filePath)
 			ft::DirectoryFactory::buildContentFromDir(filePath, dirListing);
 
 			this->writeStatusLine(200);
-			this->headers["Content-Length"] = std::to_string(dirListing.size());
-			this->headers["Content-Type"] = "text/html";
+			this->headers["content-length"] = std::to_string(dirListing.size());
+			this->headers["content-type"] = "text/html";
 			this->writeHeaders();
 			this->data += dirListing;
 			return;

@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:07:36 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/03 10:51:36 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/08/04 16:15:25 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,6 @@ public: // Attributes
 
 private:
 	const std::vector<ft::Server>& servers;
-	std::string buffer;
 	bool		done;
 };
 

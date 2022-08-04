@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:07:39 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/03 12:31:41 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/08/04 16:48:34 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 ft::Request::Request(const std::vector<ft::Server>& servers) noexcept : servers(servers)
 {
-	this->buffer = "";
+	this->data = "";
 	this->done = false;
 }
 
@@ -26,13 +26,18 @@ ft::Exchange::Status ft::Request::appendBuffer(const std::string& buffer)
 	// Check if request is malformed.
 	if (buffer.size() < 1)
 		throw ft::BadRequest();
-	else if (!isalpha(buffer.at(0)))
-		throw ft::BadRequest();
+	//else if (!isalpha(buffer.at(0)))
+	//	throw ft::BadRequest(); // TODO: move to header parser, this is for invalid requests (HTTPS, for example)
 
 	this->data += buffer;
 
+	std::cout << BLACK << "[DEBUG] Data: " << this->data << RESET << std::endl;
+
+	if (this->data.size() > 100000) // TODO: Get from config
+		throw ft::PayloadTooLarge();
+
 	// No body, ask to continue.
-	this->done = this->buffer.find("\r\n\r\n") != std::string::npos;
+	this->done = this->data.find("\r\n\r\n") != std::string::npos;
 	return (this->done ? ft::Exchange::Status::DONE : ft::Exchange::Status::NOT_DONE);
 }
 
@@ -49,8 +54,6 @@ void ft::Request::parseBody()
 {
 	if (this->method != ft::Exchange::Method::POST)
 		return;
-	if (this->data.size() > 100000) // TODO: Get from config
-		throw ft::BadRequest();
 }
 
 //////////////////////////////////////////
@@ -59,8 +62,11 @@ void ft::Request::parseBody()
 void ft::Request::parseHeader(ft::Connection& conn)
 {
 	size_t pos;
-	if ((pos = this->buffer.find("\r\n\r\n")) == std::string::npos)
+	if ((pos = this->data.find("\r\n\r\n")) == std::string::npos)
+	{
+		std::cout << RED << "Request header end not found" << RESET << std::endl;
 		throw std::exception(); // there is no body! run!!
+	}
 
 	// We have gotten the data up until the body, we can now parse the header
 	// BuffA = Header | BuffB = Body
@@ -76,6 +82,7 @@ void ft::Request::parseHeader(ft::Connection& conn)
 	std::pair<std::string, std::string> header;
 	while (std::getline(iss, line))
 	{
+		std::cout << BLACK << "Parsing line " << line << RESET << std::endl;
 		if (line.find(':') == std::string::npos)
 			throw ft::BadRequest();
 
@@ -89,12 +96,14 @@ void ft::Request::parseHeader(ft::Connection& conn)
 
 	// Check which server this request belongs to
 	const std::string* host;
-	if ((host = this->getHeaderValue("Host")))
+	if ((host = this->getHeaderValue("host")))
 	{
 		// Fist: Name | Second: Port
 		std::pair<std::string, std::string> output;
 		ft::slice(*host, ":", output);
 
+		// Check if name matches that of any of our servers.
+		// Ignore port and just pick first match, and if no match is found pick first server.
 		for (auto& server : this->servers)
 		{
 			auto host = server.config.getValue("server_name");
@@ -111,11 +120,14 @@ void ft::Request::parseHeader(ft::Connection& conn)
 			}
 			else throw std::exception(); // Not set ?
 		}
-		// Check if name matches that of any of our servers.
-		// Ignore port and just pick first match, and if no match is found pick first server.
-		// Figure out how give back the right server, maybe set in connection struct
+		if (!conn.server) // TODO: take into account the port
+			conn.server = const_cast<ft::Server*>(&this->servers.front());
 	}
-	else throw ft::BadRequest(); // for HTTP/1.1 Host NEEDS to be present!!!
+	else
+	{
+		std::cout << RED << "Host not set in header" << RESET << std::endl;
+		throw ft::BadRequest(); // for HTTP/1.1 Host NEEDS to be present!!!
+	}
 
 	// Empty the data
 	this->data.empty();
@@ -148,4 +160,11 @@ void ft::Request::parseStatusLine(const std::string& line)
 
 	this->path = values[1];
 	this->version = values[2];
+	ft::trim(this->path);
+	ft::trim(this->version);
+
+	if (this->path[0] != '/')
+		throw ft::BadRequest(); // Path should always start with a /
+	if (this->version != "HTTP/1.1")
+		throw ft::BadRequest(); // TODO: change to 505 HTTP version not supported
 }
