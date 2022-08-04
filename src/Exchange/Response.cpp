@@ -17,8 +17,12 @@ ft::Response::Response(const ft::Connection& conn) : conn(conn)
 	std::cout << BLACK << "Set sendRes to nullptr (in constructor)" << RESET << std::endl;
 	this->sendRes = nullptr;
 	this->offset = 0;
-} // TODO: Response should take a status code and config as well
-// TODO: Second constructor for request, config and conn
+}
+
+ft::Response::~Response()
+{
+	fclose(this->file);
+}
 
 //////////////////////////////////////////
 

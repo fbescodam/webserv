@@ -39,7 +39,7 @@ class Response final : public ft::Exchange
 {
 public: // Ctor ~ Dtor
 	Response(const ft::Connection& conn);
-	~Response() = default;
+	~Response();
 
 public: // Functions
 
