@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:07:35 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/04 19:05:48 by fbes          ########   odam.nl         */
+/*   Updated: 2022/08/04 19:12:09 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -183,11 +183,9 @@ ft::Response::Status ft::Response::sendDynamic(ft::fd_t socket)
 {
 	std::cout << BLACK << "Sending everything in one go (dynamically generated page)..." << RESET << std::endl;
 	size_t bsent = ft::send(socket, this->data.data(), this->data.length(), NONE); // Send as much as possible
+	this->data.erase(0, bsent); // Delete data that has been sent
 	if (bsent < this->data.length()) // Not everything was sent, send more in the next poll
-	{
-		this->data.erase(0, bsent);
 		return (ft::Response::Status::NOT_DONE);
-	}
 	std::cout << BLACK << "Set sendRes to nullptr" << RESET << std::endl;
 	this->sendRes = nullptr; // Everything was sent, nothing more to do
 	return (ft::Response::Status::DONE);
@@ -199,11 +197,9 @@ ft::Response::Status ft::Response::sendHeaders(ft::fd_t socket)
 {
 	std::cout << BLACK << "Sending headers..." << RESET << std::endl;
 	size_t bsent = ft::send(socket, this->data.data(), this->data.length(), NONE);
+	this->data.erase(0, bsent); // Delete data that has been sent
 	if (bsent < this->data.length()) // Not everything was sent, send more in the next poll
-	{
-		this->data.erase(0, bsent);
 		return (ft::Response::Status::NOT_DONE);
-	}
 	std::cout << BLACK << "Set sendRes to sendFile" << RESET << std::endl;
 	this->sendRes = &ft::Response::sendFile; // Everything was sent, now continue with sending the file
 	return (ft::Response::Status::NOT_DONE); // Actually not done yet! We now need to send the file
