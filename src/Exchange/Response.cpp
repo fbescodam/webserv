@@ -163,7 +163,11 @@ void ft::Response::getMethod(const std::string& filePath)
 		if ((this->file = fopen(filePath.c_str(), "r")) == nullptr)
 			return (this->generateStatus(500));
 
+		this->writeStatusLine(200);
 		this->fileSize = ft::filesystem::getFileSize(this->file);
+		this->headers["content-length"] = std::to_string(this->fileSize);
+		this->headers["content-type"] = ft::getContentType(filePath);
+		this->writeHeaders();
 		std::cout << BLACK << "Set sendRes to sendHeaders" << RESET << std::endl;
 		this->sendRes = &ft::Response::sendHeaders;
 	}
@@ -209,23 +213,23 @@ ft::Response::Status ft::Response::sendHeaders(ft::fd_t socket)
 
 ft::Response::Status ft::Response::sendFile(ft::fd_t socket)
 {
-	std::cout << BLACK << "Sending file..." << RESET << std::endl;
 	off_t bsent = 0;
 	static off_t offset = 0;
 
 	if (this->file == nullptr)
 		throw std::exception();
 
+	std::cout << BLACK << "Sending file..." << RESET << std::endl;
 	sendfile(fileno(this->file), socket, offset, &bsent, NULL, NONE);
 	offset += bsent;
 
-	if (offset >= this->fileSize)
-	{
-		std::cout << BLACK << "Set sendRes to nullptr" << RESET << std::endl;
-		this->sendRes = nullptr; // Everything was sent, nothing more to do
-		return (ft::Response::Status::DONE);
-	}
-	return (ft::Response::Status::NOT_DONE);
+	if (offset < this->fileSize)
+		return (ft::Response::Status::NOT_DONE);
+
+	// Everything was sent, nothing more to do
+	std::cout << BLACK << "Set sendRes to nullptr" << RESET << std::endl;
+	this->sendRes = nullptr;
+	return (ft::Response::Status::DONE);
 }
 
 //////////////////////////////////////////

@@ -158,7 +158,7 @@ struct NoServersException : public std::exception
 struct IOException : public std::exception
 {
 	const char* what() const throw() override {
-		return ("IO Error on file. Is it actually a file? And is it reabable? Who knows...");
+		return ("IO Error on file. Is it actually a file?");
 	}
 };
 }
