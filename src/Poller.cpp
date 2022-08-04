@@ -237,32 +237,21 @@ void ft::Poller::pollInEvent(ft::Connection& conn)
 			conn.server->handleRequest(conn);
 		}
 		catch (const ft::BadRequest& e)
-		{
-			conn.response = new ft::Response(conn);
-			conn.response->generateStatus(400);
-		}
+		{ ft::Response::generateResponse(conn, 400); }
 		catch (const ft::PayloadTooLarge& e)
-		{
-			conn.response = new ft::Response(conn);
-			conn.response->generateStatus(413);
-		}
+		{ ft::Response::generateResponse(conn, 413); }
 		catch (const ft::NotImplemented& e)
-		{
-			conn.response = new ft::Response(conn);
-			conn.response->generateStatus(501);
-		}
+		{ ft::Response::generateResponse(conn, 501); }
 		catch (const std::exception& e)
 		{
 			std::cerr << RED << e.what() << RESET << std::endl;
-			conn.response = new ft::Response(conn);
-			conn.response->generateStatus(500);
+			ft::Response::generateResponse(conn, 500);
 		}
 	}
 	else
 	{
 		std::cout << BLACK << "[DEBUG] Buffer is incomplete." << RESET << std::endl;
-		conn.response = new ft::Response(conn);
-		conn.response->generateStatus(100);
+		ft::Response::generateResponse(conn, 100);
 	}
 	std::cout << "Pollout now" << std::endl;
 	conn.poll->events = POLLOUT;

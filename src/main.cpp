@@ -86,7 +86,8 @@ int32_t main(int32_t argc, const char* argv[])
 	ft::Poller poller(servers, config);
 
 	std::cout << BLACK << "Webserv: Running" << RESET << std::endl;
-	while (true) {
+	while (true) 
+	{
 		poller.pollAll();
 		usleep(420);
 	}
