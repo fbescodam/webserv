@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:07:35 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/04 19:23:30 by fbes          ########   odam.nl         */
+/*   Updated: 2022/08/04 19:56:45 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@ ft::Response::Response(const ft::Connection& conn) : conn(conn)
 {
 	std::cout << BLACK << "Set sendRes to nullptr (in constructor)" << RESET << std::endl;
 	this->sendRes = nullptr;
+	this->offset = 0;
 } // TODO: Response should take a status code and config as well
 // TODO: Second constructor for request, config and conn
 
@@ -222,16 +223,15 @@ ft::Response::Status ft::Response::sendHeaders(ft::fd_t socket)
 ft::Response::Status ft::Response::sendFile(ft::fd_t socket)
 {
 	off_t bsent = 0;
-	static off_t offset = 0;
 
 	if (this->file == nullptr)
 		throw std::exception();
 
 	std::cout << BLACK << "Sending file..." << RESET << std::endl;
 	sendfile(fileno(this->file), socket, offset, &bsent, NULL, NONE);
-	offset += bsent;
+	this->offset += bsent;
 
-	if (offset < this->fileSize)
+	if (this->offset < this->fileSize)
 		return (ft::Response::Status::NOT_DONE);
 
 	// Everything was sent, nothing more to do

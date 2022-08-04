@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:07:33 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/04 19:05:48 by fbes          ########   odam.nl         */
+/*   Updated: 2022/08/04 19:56:18 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,8 +101,9 @@ private: // Attributes
 	ft::Section config;
 
 	// The file to send as a body, else nullptr.
-	FILE* file;
-	size_t fileSize;
+	FILE*	file;
+	size_t	fileSize;
+	off_t	offset;
 
 	const ft::Connection& conn;
 
