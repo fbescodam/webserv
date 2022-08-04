@@ -27,7 +27,7 @@ CC		:=	clang++
 NAME	:=	webserv
 HEADERS :=	$(addprefix -I , $(shell find ./src -iname '*.hpp' | sed -E "s|/[^/]+$$||" | uniq)) -I include
 # Project requires you do it in 98, frankly we don't care (We asked)
-CFLAGS	:= -std=c++17 -Wextra -Wall -Werror -Wunreachable-code -Wno-char-subscripts -Wno-unused-variable -Wno-unused-parameter -Wno-unused-function -Wno-sign-compare
+CFLAGS	:= -std=c++17 -Wextra -Wall -Werror -Wunreachable-code -Wno-char-subscripts -Wno-unused-variable -Wno-unused-parameter -Wno-unused-function -Wno-sign-compare -Ofast
 ifdef DEBUG
 	CFLAGS	+=	-g3
 else

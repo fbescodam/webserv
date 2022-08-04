@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:07:35 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/04 20:36:52 by fbes          ########   odam.nl         */
+/*   Updated: 2022/08/04 20:44:03 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,13 @@ ft::Response::Response(const ft::Connection& conn) : conn(conn)
 		this->headers["connection"] = "keep-alive";
 		this->headers["keep-alive"] = "timeout=" + std::to_string(CONN_TIMEOUT);
 	}
+}
+
+//////////////////////////////////////////
+
+ft::Response::~Response()
+{
+	fclose(this->file);
 }
 
 //////////////////////////////////////////
