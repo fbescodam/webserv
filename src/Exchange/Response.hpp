@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:07:33 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/04 12:00:42 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/08/04 17:16:15 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ public: // Functions
 
 	/**
 	 * @brief Send the current response object onto the socket. It will call whatever job is left to run for sending.
-	 * It will always point to sendStatic, sendHeader or sendFile (private member functions).
+	 * It will always point to sendDynamic, sendHeader or sendFile (private member functions).
 	 *
 	 * @param socket The client socket.
 	 * @return ft::Response::Status The status if we are done or not.
@@ -67,12 +67,12 @@ public: // Functions
 private:
 
 	/**
-	 * @brief Use sendStatic if a header and a body need to be sent in one go. This only occurs if there is no fd.
+	 * @brief Use sendDynamic if a header and a body need to be sent in one go. This only occurs if there is no fd.
 	 *
 	 * @param socket
 	 * @return ft::Response::Status
 	 */
-	ft::Response::Status sendStatic(int32_t socket);
+	ft::Response::Status sendDynamic(int32_t socket);
 
 	/**
 	 * @brief Use sendHeader if we only want to send the headers using send, and then a file (fd) using sendfile.

@@ -6,13 +6,17 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:07:35 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/04 16:35:49 by fbes          ########   odam.nl         */
+/*   Updated: 2022/08/04 17:16:10 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Response.hpp"
 
-ft::Response::Response(const ft::Connection& conn) : conn(conn) { } // TODO: Response should take a status code and config as well
+ft::Response::Response(const ft::Connection& conn) : conn(conn)
+{
+	std::cout << BLACK << "Set sendRes to nullptr (in constructor)" << RESET << std::endl;
+	this->sendRes = nullptr;
+} // TODO: Response should take a status code and config as well
 // TODO: Second constructor for request, config and conn
 
 //////////////////////////////////////////
@@ -54,7 +58,8 @@ void ft::Response::generateStatus(int32_t status)
 		this->headers["content-type"] = ft::getContentType(filePath);
 		this->writeHeaders();
 		this->fileSize = ft::filesystem::getFileSize(this->file);
-		this->sendRes = &ft::Response::sendHeaders;
+		std::cout << BLACK << "Set sendRes to sendDynamic" << RESET << std::endl;
+		this->sendRes = &ft::Response::sendDynamic;
 		return;
 	}
 
@@ -75,7 +80,8 @@ void ft::Response::generateStatus(int32_t status, const std::string& content)
 
 	// Build content
 	this->data += content;
-	this->sendRes = &ft::Response::sendStatic;
+	std::cout << BLACK << "Set sendRes to sendDynamic" << RESET << std::endl;
+	this->sendRes = &ft::Response::sendDynamic;
 }
 
 //////////////////////////////////////////
@@ -107,7 +113,8 @@ void ft::Response::postMethod(const std::string& filePath)
 			return;
 		}
 		this->data = out;
-		this->sendRes = &ft::Response::sendStatic;
+		std::cout << BLACK << "Set sendRes to sendDynamic" << RESET << std::endl;
+		this->sendRes = &ft::Response::sendDynamic;
 		return;
 	}
 
@@ -120,6 +127,7 @@ void ft::Response::postMethod(const std::string& filePath)
 // Simply open the file and send it over.
 void ft::Response::getMethod(const std::string& filePath)
 {
+	std::cout << BLACK << "Receiving GET method. Responding now." << RESET << std::endl;
 	// Check if filepath ends with /, if so, dir listing.
 	if (filePath.back() == '/')
 	{
@@ -154,6 +162,7 @@ void ft::Response::getMethod(const std::string& filePath)
 			return (this->generateStatus(500));
 
 		this->fileSize = ft::filesystem::getFileSize(this->file);
+		std::cout << BLACK << "Set sendRes to sendHeaders" << RESET << std::endl;
 		this->sendRes = &ft::Response::sendHeaders;
 	}
 	catch(const std::exception& e)
@@ -168,14 +177,16 @@ void ft::Response::getMethod(const std::string& filePath)
 
 //////////////////////////////////////////
 
-ft::Response::Status ft::Response::sendStatic(int32_t socket)
+ft::Response::Status ft::Response::sendDynamic(int32_t socket)
 {
+	std::cout << BLACK << "Sending everything in one go (dynamically generated page)..." << RESET << std::endl;
 	size_t bsent = ft::send(socket, this->data.data(), this->data.length(), NONE); // Send as much as possible
 	if (bsent < this->data.length()) // Not everything was sent, send more in the next poll
 	{
 		this->data.erase(0, bsent);
 		return (ft::Response::Status::NOT_DONE);
 	}
+	std::cout << BLACK << "Set sendRes to nullptr" << RESET << std::endl;
 	this->sendRes = nullptr; // Everything was sent, nothing more to do
 	return (ft::Response::Status::DONE);
 }
@@ -184,12 +195,14 @@ ft::Response::Status ft::Response::sendStatic(int32_t socket)
 
 ft::Response::Status ft::Response::sendHeaders(int32_t socket)
 {
+	std::cout << BLACK << "Sending headers..." << RESET << std::endl;
 	size_t bsent = ft::send(socket, this->data.data(), this->data.length(), NONE);
 	if (bsent < this->data.length()) // Not everything was sent, send more in the next poll
 	{
 		this->data.erase(0, bsent);
 		return (ft::Response::Status::NOT_DONE);
 	}
+	std::cout << BLACK << "Set sendRes to sendFile" << RESET << std::endl;
 	this->sendRes = &ft::Response::sendFile; // Everything was sent, now continue with sending the file
 	return (ft::Response::Status::NOT_DONE); // Actually not done yet! We now need to send the file
 }
@@ -198,6 +211,7 @@ ft::Response::Status ft::Response::sendHeaders(int32_t socket)
 
 ft::Response::Status ft::Response::sendFile(int32_t socket)
 {
+	std::cout << BLACK << "Sending file..." << RESET << std::endl;
 	off_t bsent = 0;
 	static off_t offset = 0;
 
@@ -209,6 +223,7 @@ ft::Response::Status ft::Response::sendFile(int32_t socket)
 
 	if (offset >= this->fileSize)
 	{
+		std::cout << BLACK << "Set sendRes to nullptr" << RESET << std::endl;
 		this->sendRes = nullptr; // Everything was sent, nothing more to do
 		return (ft::Response::Status::DONE);
 	}
