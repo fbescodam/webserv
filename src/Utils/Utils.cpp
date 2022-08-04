@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 10:41:28 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/04 19:05:48 by fbes          ########   odam.nl         */
+/*   Updated: 2022/08/04 19:31:54 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -243,7 +243,7 @@ const std::map<uint16_t, std::string>& ft::getStatusCodes()
 	return (list);
 }
 
-std::string& ft::getContentType(std::string ext)
+std::string& ft::getContentType(std::string path)
 {
 	static std::map<std::string, std::string> list = {
 		{"html",	"text/html"},
@@ -305,7 +305,7 @@ std::string& ft::getContentType(std::string ext)
 	};
 
 	// Find the damn thing
-	auto reslt = list.find(ext.substr(ext.find_last_of(".") + 1));
+	auto reslt = list.find(path.substr(path.find_last_of(".") + 1));
 
 	if (reslt == list.end())
 		return (list["html"]); // Default
