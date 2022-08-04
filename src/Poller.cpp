@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/28 15:48:13 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/04 19:00:27 by fbes          ########   odam.nl         */
+/*   Updated: 2022/08/04 19:52:24 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,7 +102,7 @@ ft::Poller::~Poller()
 
 void ft::Poller::pollAll(void)
 {
-	try { ft::poll(this->pollfds.data(), this->pollfds.size(), -1); }
+	try { ft::poll(this->pollfds.data(), this->pollfds.size(), 100); }
 	catch (GenericErrnoException& e)
 	{
 		std::cerr << RED << "Webserv: " << e.what() << RESET << std::endl;
@@ -128,7 +128,7 @@ void ft::Poller::pollAll(void)
 
 	// Go over each connection and look for timeouts
 	time_t now = std::time(nullptr);
-	for (size_t i = 0; i < MAX_CLIENTS; i++)
+	for (size_t i = this->reservedSocketAmount; i < MAX_CLIENTS; i++)
 	{
 		if (now - this->connections[i].lastActivity > CONN_TIMEOUT)
 			this->closeConnection(this->connections.at(i));
@@ -293,6 +293,7 @@ void ft::Poller::resolveConnection(ft::Connection& conn)
 	{
 		this->deleteReqRes(conn); // Clear the request and response to be ready for the next request
 		conn.poll->events = POLLIN;
+		conn.poll->revents = NONE;
 		std::cout << "Connection kept alive" << std::endl;
 		return;
 	}
@@ -309,6 +310,7 @@ void ft::Poller::closeConnection(ft::Connection& conn)
 		close(conn.poll->fd);
 		conn.poll->fd = -1;
 		conn.poll->events = POLLIN | POLLOUT;
+		conn.poll->revents = NONE;
 	}
 	this->resetConnection(conn);
 }
@@ -332,12 +334,7 @@ void ft::Poller::resetConnection(ft::Connection& conn)
 	conn.server = nullptr;
 	conn.ipv4 = "";
 	if (conn.poll)
-	{
-		conn.poll->fd = -1;
-		conn.poll->events = POLLIN;
-		conn.poll->revents = NONE;
 		conn.poll = nullptr;
-	}
 }
 
 //////////////////////////////////////////
