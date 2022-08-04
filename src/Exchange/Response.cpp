@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:07:35 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/04 12:20:10 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/08/04 12:37:02 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -123,26 +123,47 @@ void ft::Response::getMethod(const std::string& filePath)
 	// Check if filepath ends with /, if so, dir listing.
 	if (filePath.back() == '/')
 	{
-		std::string dirListing;
-		ft::DirectoryFactory::buildContentFromDir(filePath, dirListing);
+		try
+		{
+			std::string dirListing;
+			ft::DirectoryFactory::buildContentFromDir(filePath, dirListing);
 
-		this->writeStatusLine(200);
-		this->headers["Content-Length"] = std::to_string(dirListing.size());
-		this->headers["Content-Type"] = "text/html";
-		this->writeHeaders();
-		this->data += dirListing;
-		return;
+			this->writeStatusLine(200);
+			this->headers["Content-Length"] = std::to_string(dirListing.size());
+			this->headers["Content-Type"] = "text/html";
+			this->writeHeaders();
+			this->data += dirListing;
+			return;
+		}
+		catch(const std::exception& e)
+		{
+			std::cerr << RED << "Webserv: " << e.what() << RESET << std::endl;
+
+			try { return (this->generateStatus(500)); }
+			catch(const std::exception& e) { exit (EXIT_FAILURE); }
+		}
 	}
 
-	// No, its just a file
-	if (!ft::filesystem::fileExists(filePath))
-		return (this->generateStatus(404));
+	try
+	{
+		// No, its just a file
+		if (!ft::filesystem::fileExists(filePath))
+			return (this->generateStatus(404));
 
-	if ((this->file = fopen(filePath.c_str(), "r")) == nullptr)
-		return (this->generateStatus(500));
+		if ((this->file = fopen(filePath.c_str(), "r")) == nullptr)
+			return (this->generateStatus(500));
 
-	this->fileSize = ft::filesystem::getFileSize(this->file);
-	this->sendRes = &ft::Response::sendHeaders;
+		this->fileSize = ft::filesystem::getFileSize(this->file);
+		this->sendRes = &ft::Response::sendHeaders;
+	}
+	catch(const std::exception& e)
+	{
+		std::cerr << RED << "Webserv: " << e.what() << RESET << std::endl;
+
+		// We should NEVER have to reach this point ...
+		try { return (this->generateStatus(500)); }
+		catch(const std::exception& e) { exit (EXIT_FAILURE); }
+	}
 }
 
 //////////////////////////////////////////

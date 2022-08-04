@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:08:42 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/04 12:11:16 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/08/04 12:41:40 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,18 +51,12 @@ void ft::Server::handleRequest(ft::Connection& conn)
 	{
 		std::cerr << RED << e.what() << RESET << std::endl;
 
-		// Try to send a response, allocation might fail so if it happens
-		// again we will just have to die.
 		try { this->respondWithStatus(conn, 500); }
-		catch(const std::exception& e) 
-		{
-			std::cerr << RED << "Unable to generate response, check host!" << RESET << std::endl;
-			exit(EXIT_FAILURE);
-		}
+		catch(const std::exception& e) { exit(EXIT_FAILURE); }
 	}
 
-	// If somethin fails within the GET, POST or DELETE methods
-	// they set the appropriate content.
+	// If something fails within the GET, POST or DELETE methods
+	// they set the appropriate content, worst case they kill the app.
 	switch (conn.request->method)
 	{
 		case ft::Exchange::Method::GET:
