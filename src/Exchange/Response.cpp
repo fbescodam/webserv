@@ -38,6 +38,14 @@ void ft::Response::writeHeaders(void)
 
 //////////////////////////////////////////
 
+void ft::Response::generateResponse(ft::Connection& conn, int32_t status)
+{
+	conn.response = new ft::Response(conn);
+	conn.response->generateStatus(status);
+}
+
+//////////////////////////////////////////
+
 void ft::Response::generateStatus(int32_t status)
 {
 	// Find custom page

@@ -60,10 +60,12 @@ public: // Functions
 	 */
 	void generateStatus(int32_t status, const std::string& content);
 	void generateStatus(int32_t status);
+	static void generateResponse(ft::Connection& conn, int32_t status);
 
 	void deleteMethod(const std::string& filePath);
 	void postMethod(const std::string& filePath);
 	void getMethod(const std::string& filePath);
+
 private:
 
 	/**
