@@ -6,7 +6,7 @@
 /*   By: fbes <fbes@student.codam.nl>                 +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/31 16:27:42 by fbes          #+#    #+#                 */
-/*   Updated: 2022/07/31 17:22:14 by fbes          ########   odam.nl         */
+/*   Updated: 2022/08/04 19:06:57 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ bool ft::CGI::runCGI(const ft::Connection& conn, const std::string& path, std::s
 	envp.push_back("CONTENT_LENGTH=" + conn.request->headers["content-length"]);
 
 	pid_t pid;
-	int32_t fds[2];
+	ft::fd_t fds[2];
 	try { ft::pipe(fds); pid = ft::fork();}
 	catch(const std::exception& e)
 	{
