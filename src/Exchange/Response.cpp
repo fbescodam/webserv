@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:07:35 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/04 19:02:02 by fbes          ########   odam.nl         */
+/*   Updated: 2022/08/04 19:05:48 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -179,7 +179,7 @@ void ft::Response::getMethod(const std::string& filePath)
 
 //////////////////////////////////////////
 
-ft::Response::Status ft::Response::sendDynamic(int32_t socket)
+ft::Response::Status ft::Response::sendDynamic(ft::fd_t socket)
 {
 	std::cout << BLACK << "Sending everything in one go (dynamically generated page)..." << RESET << std::endl;
 	size_t bsent = ft::send(socket, this->data.data(), this->data.length(), NONE); // Send as much as possible
@@ -195,7 +195,7 @@ ft::Response::Status ft::Response::sendDynamic(int32_t socket)
 
 //////////////////////////////////////////
 
-ft::Response::Status ft::Response::sendHeaders(int32_t socket)
+ft::Response::Status ft::Response::sendHeaders(ft::fd_t socket)
 {
 	std::cout << BLACK << "Sending headers..." << RESET << std::endl;
 	size_t bsent = ft::send(socket, this->data.data(), this->data.length(), NONE);
@@ -211,7 +211,7 @@ ft::Response::Status ft::Response::sendHeaders(int32_t socket)
 
 //////////////////////////////////////////
 
-ft::Response::Status ft::Response::sendFile(int32_t socket)
+ft::Response::Status ft::Response::sendFile(ft::fd_t socket)
 {
 	std::cout << BLACK << "Sending file..." << RESET << std::endl;
 	off_t bsent = 0;

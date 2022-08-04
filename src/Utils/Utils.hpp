@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 10:40:21 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/31 17:09:23 by fbes          ########   odam.nl         */
+/*   Updated: 2022/08/04 19:05:48 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -114,13 +114,13 @@ ft::fd_t accept(int32_t socketFD, SocketAddress* address);
 int32_t poll(struct pollfd fds[], size_t size, int32_t timeout);
 
 // Send a message from a socket.
-ssize_t send(int32_t socket, const void* buffer, size_t length, int32_t flags);
+ssize_t send(ft::fd_t socket, const void* buffer, size_t length, int32_t flags);
 
 // Receive a message from a socket.
-ssize_t receive(int32_t socket, void* buffer, size_t length, int32_t flags);
+ssize_t receive(ft::fd_t socket, void* buffer, size_t length, int32_t flags);
 
 // Manipulate the options associated with a socket.
-int32_t setSocketOption(int32_t socket, int32_t level, int32_t optionName, bool optionValue, size_t optionLen);
+int32_t setSocketOption(ft::fd_t socket, int32_t level, int32_t optionName, bool optionValue, size_t optionLen);
 
 // Inet_ntop
 std::string inet_ntop(SocketAddress& address);

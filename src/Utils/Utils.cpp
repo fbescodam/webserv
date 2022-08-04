@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 10:41:28 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/31 17:23:55 by fbes          ########   odam.nl         */
+/*   Updated: 2022/08/04 19:05:48 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,7 +92,7 @@ int32_t ft::poll(pollfd* fds, size_t size, int32_t timeout)
 }
 
 // Send a message to a socket.
-ssize_t ft::send(int32_t socket, const void* buffer, size_t length, int32_t flags)
+ssize_t ft::send(ft::fd_t socket, const void* buffer, size_t length, int32_t flags)
 {
 	ssize_t Value = ::send(socket, buffer, length, flags);
 	if (Value == -1)

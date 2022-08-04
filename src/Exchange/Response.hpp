@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:07:33 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/04 17:16:15 by fbes          ########   odam.nl         */
+/*   Updated: 2022/08/04 19:05:48 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ public: // Functions
 	 * @param socket The client socket.
 	 * @return ft::Response::Status The status if we are done or not.
 	 */
-	ft::Response::Status (ft::Response::*sendRes)(int32_t socket); // Pointer to whatever Response needs to do next
+	ft::Response::Status (ft::Response::*sendRes)(ft::fd_t socket); // Pointer to whatever Response needs to do next
 
 	/**
 	 * @brief Let the response generate a response page out of a given status code.
@@ -72,7 +72,7 @@ private:
 	 * @param socket
 	 * @return ft::Response::Status
 	 */
-	ft::Response::Status sendDynamic(int32_t socket);
+	ft::Response::Status sendDynamic(ft::fd_t socket);
 
 	/**
 	 * @brief Use sendHeader if we only want to send the headers using send, and then a file (fd) using sendfile.
@@ -80,7 +80,7 @@ private:
 	 * @param socket
 	 * @return ft::Response::Status
 	 */
-	ft::Response::Status sendHeaders(int32_t socket);
+	ft::Response::Status sendHeaders(ft::fd_t socket);
 
 	/**
 	 * @brief Use sendFile after using sendHeader. Now it's time to send the contents of a file using C's built-in sendfile method.
@@ -88,7 +88,7 @@ private:
 	 * @param socket
 	 * @return ft::Response::Status
 	 */
-	ft::Response::Status sendFile(int32_t socket);
+	ft::Response::Status sendFile(ft::fd_t socket);
 
 	void writeStatusLine(int32_t status);
 	void writeHeaders(void);
