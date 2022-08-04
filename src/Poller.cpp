@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/28 15:48:13 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/04 19:52:24 by fbes          ########   odam.nl         */
+/*   Updated: 2022/08/04 20:06:23 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -130,7 +130,7 @@ void ft::Poller::pollAll(void)
 	time_t now = std::time(nullptr);
 	for (size_t i = this->reservedSocketAmount; i < MAX_CLIENTS; i++)
 	{
-		if (now - this->connections[i].lastActivity > CONN_TIMEOUT)
+		if (this->connections[i].lastActivity > 0 && now - this->connections[i].lastActivity > CONN_TIMEOUT)
 			this->closeConnection(this->connections.at(i));
 	}
 }
@@ -301,6 +301,10 @@ void ft::Poller::closeConnection(ft::Connection& conn)
 		conn.poll->events = POLLIN | POLLOUT;
 		conn.poll->revents = NONE;
 	}
+	if (this->activeClients > 0)
+		this->activeClients--;
+	else
+		std::cout << RED << "[WARNING] activeClients = 0, while a connection was trying to be closed" << RESET << std::endl;
 	this->resetConnection(conn);
 }
 
