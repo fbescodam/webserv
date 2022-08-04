@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/28 15:48:13 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/04 20:06:23 by fbes          ########   odam.nl         */
+/*   Updated: 2022/08/04 20:42:33 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -278,15 +278,15 @@ void ft::Poller::pollOutEvent(ft::Connection& conn)
 void ft::Poller::resolveConnection(ft::Connection& conn)
 {
 	std::cout << GREEN << "Connection resolved, response has been sent " << RESET << std::endl;
-	if (!conn.response && conn.response->headers["Connection"] == "keep-alive")
+	if (conn.response && conn.response->headers["connection"] == "keep-alive")
 	{
 		this->deleteReqRes(conn); // Clear the request and response to be ready for the next request
 		conn.poll->events = POLLIN;
 		conn.poll->revents = NONE;
-		std::cout << "Connection kept alive" << std::endl;
+		std::cout << BLACK << "Connection kept alive" << RESET << std::endl;
 		return;
 	}
-	std::cout << "Connection closed" << std::endl;
+	std::cout << BLACK << "Connection closed" << RESET << std::endl;
 	this->closeConnection(conn);
 }
 

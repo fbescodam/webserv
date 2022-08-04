@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:07:39 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/04 16:48:34 by fbes          ########   odam.nl         */
+/*   Updated: 2022/08/04 20:35:14 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,6 +91,8 @@ void ft::Request::parseHeader(ft::Connection& conn)
 		if (header.first.empty() || header.second.empty())
 			throw ft::BadRequest();
 		ft::tolower(header.first);
+		ft::trim(header.first);
+		ft::trim(header.second);
 		this->headers[header.first] = header.second;
 	}
 

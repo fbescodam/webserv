@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:07:35 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/04 19:56:45 by fbes          ########   odam.nl         */
+/*   Updated: 2022/08/04 20:36:52 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,15 +17,19 @@ ft::Response::Response(const ft::Connection& conn) : conn(conn)
 	std::cout << BLACK << "Set sendRes to nullptr (in constructor)" << RESET << std::endl;
 	this->sendRes = nullptr;
 	this->offset = 0;
-} // TODO: Response should take a status code and config as well
-// TODO: Second constructor for request, config and conn
+	this->headers["server"] = "Breadserv";
+	if (conn.request->headers["connection"] == "keep-alive")
+	{
+		this->headers["connection"] = "keep-alive";
+		this->headers["keep-alive"] = "timeout=" + std::to_string(CONN_TIMEOUT);
+	}
+}
 
 //////////////////////////////////////////
 
 void ft::Response::writeStatusLine(int32_t status)
 {
 	this->data += "HTTP/1.1 " + std::to_string(status) + " " + ft::getStatusCodes().at(status) + "\r\n";
-	this->headers["server"] = "Breadserv";
 }
 
 //////////////////////////////////////////
