@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:07:35 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/04 19:12:09 by fbes          ########   odam.nl         */
+/*   Updated: 2022/08/04 19:23:30 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ ft::Response::Response(const ft::Connection& conn) : conn(conn)
 
 void ft::Response::writeStatusLine(int32_t status)
 {
-	this->data += "HTTP/1.1 " + std::to_string(status) + ft::getStatusCodes().at(status);
+	this->data += "HTTP/1.1 " + std::to_string(status) + " " + ft::getStatusCodes().at(status) + "\r\n";
 	this->headers["server"] = "Breadserv";
 }
 
@@ -32,8 +32,8 @@ void ft::Response::writeStatusLine(int32_t status)
 void ft::Response::writeHeaders(void)
 {
 	for (const auto [key, value] : this->headers)
-		this->data += key + " : " + value + '\n';
-	this->data += "\n";
+		this->data += key + ": " + value + "\r\n";
+	this->data += "\r\n";
 }
 
 //////////////////////////////////////////
