@@ -21,22 +21,6 @@
 // --header for custom headers ala "header:123"
 
 /**
- * @brief Verify arguments.
- *
- * @param[in] argc Argument count.
- */
-static void verifyArguments(const int32_t argc)
-{
-	// Check arguments
-	if (argc != 2)
-	{
-		std::cerr << "\nWebserv: Invalid arguments\n" << std::endl;
-		std::cerr << "Usage: ./webserv <Configuration Filepath>\n" << std::endl;
-		exit(EXIT_FAILURE);
-	}
-}
-
-/**
  * @brief
  *
  * @param[in] configPath path to a config file
@@ -56,15 +40,13 @@ static void setupServers(const std::string& configPath, ft::GlobalConfig& config
 	try { config.readFile(configPath); }
 	catch (const std::exception& e)
 	{
-		std::cerr << e.what() << std::endl;
+		std::cerr << RED << e.what() << RESET << std::endl;
 		exit(EXIT_FAILURE);
 	}
 
 	std::cout << BLACK << "Webserv: Creating servers" << RESET << std::endl;
 	for (ft::ServerSection& serverSection : config.serverSections)
-	{
 		servers.push_back(ft::Server(serverSection));
-	}
 }
 
 /**
@@ -79,7 +61,12 @@ int32_t main(int32_t argc, const char* argv[])
 	ft::GlobalConfig		config;	 	// Contains the entire configuration for the whole application/
 	std::vector<ft::Server>	servers; 	// A vector list that contains all of the servers.
 
-	verifyArguments(argc);
+	if (argc != 2)
+	{
+		std::cerr << "\nWebserv: Invalid arguments\n" << std::endl;
+		std::cerr << "Usage: ./webserv <Configuration Filepath>\n" << std::endl;
+		return (EXIT_FAILURE);
+	}
 
 	std::cout << BLACK << "Webserv: Starting" << RESET << std::endl;
 	setupServers(argv[1], config, servers);

@@ -14,19 +14,11 @@
 
 const ft::Socket* ft::Poller::createSocket(const uint16_t port)
 {
-	ft::Socket* socket = new ft::Socket();
-
+	ft::Socket* socket;
 	try
 	{
-		socket->fd = ft::socket(IPV4, TCP, NONE); // Create a new socket fd
-		socket->addr = ft::SocketAddress(AF_INET, htons(port), INADDR_ANY); // Create a new address on the defined port
-
-		ft::setSocketOption(socket->fd, SOL_SOCKET, SO_REUSEADDR, true, sizeof(int32_t)); // Make kernel release socket after exit
-		ft::bind(socket->fd, &socket->addr); // Bind the socket to an address
-		ft::listen(socket->fd, MAX_CLIENTS); // Allow the socket to listen, set the maximum amount of clients
-		ft::fcntl(socket->fd, F_SETFL, O_NONBLOCK); // Set to non-blocking mode for use with poll
-
-		this->sockets.push_back(socket); // Add (copy/move) the newly created socket to the list of sockets
+		// Add a new socket
+		this->sockets.push_back((socket = new ft::Socket(port, MAX_CLIENTS)));
 
 		// Set up a new pollfd for this serversocket
 		this->connections[this->reservedSocketAmount].poll = &this->pollfds[this->reservedSocketAmount];
@@ -39,7 +31,6 @@ const ft::Socket* ft::Poller::createSocket(const uint16_t port)
 		std::cerr << RED << "Webserv: " << e.what() << RESET << std::endl;
 		exit(EXIT_FAILURE);
 	}
-
 	return (socket);
 }
 
@@ -51,15 +42,6 @@ ft::Poller::Poller(std::vector<ft::Server>& servers, const ft::GlobalConfig& glo
 	std::list<uint16_t>		ports;
 
 	this->activeClients = 0;
-
-	// Init connections TODO: Move to constructor
-	for (ft::Connection& conn : this->connections)
-	{
-		conn.response = nullptr;
-		conn.request = nullptr;
-		conn.poll = nullptr;
-		resetConnection(conn);
-	}
 
 	// Init pollfds
 	for (pollfd& fd : this->pollfds)
@@ -269,9 +251,8 @@ void ft::Poller::pollOutEvent(ft::Connection& conn)
 	if (!conn.response)
 		std::cout << RED << "Warning: response points to nothing in a PollOutEvent" << RESET << std::endl;
 	if (!conn.response->sendRes || (conn.response->*(conn.response->sendRes))(conn.poll->fd) == ft::Response::Status::DONE)
-		this->resolveConnection(conn);
-	else
-		std::cout << "Partially sent a response" << std::endl;
+		return (this->resolveConnection(conn));
+	std::cout << GREEN << "Partially sent a response" << RED << std::endl;
 }
 
 //////////////////////////////////////////
@@ -281,7 +262,8 @@ void ft::Poller::resolveConnection(ft::Connection& conn)
 	std::cout << GREEN << "Connection resolved, response has been sent " << RESET << std::endl;
 	if (conn.response && conn.response->headers["connection"] == "keep-alive")
 	{
-		this->deleteReqRes(conn); // Clear the request and response to be ready for the next request
+		// Clear the request and response to be ready for the next request
+		this->deleteReqRes(conn);
 		conn.poll->events = POLLIN;
 		conn.poll->revents = NONE;
 		std::cout << BLACK << "Connection kept alive" << RESET << std::endl;

@@ -25,6 +25,23 @@ class Response;
 // A connection to a client for example.
 struct Connection
 {
+public: // Ctor
+
+	/**
+	 * @brief Construct a new Connection.
+	 * 
+	 */
+	Connection() 
+	{
+		this->response = nullptr;
+		this->request = nullptr;
+		this->poll = nullptr;
+		this->lastActivity = NONE;
+		this->server = nullptr;
+		this->ipv4 = "";
+	}
+
+public: // Attributes
 	pollfd*			poll;			// The pollfd used for this connection
 	ft::Server*		server;			// The server to which this connection belongs.
 	time_t			lastActivity;	// The timestamp pointing to the last time there was activity on this connection.
