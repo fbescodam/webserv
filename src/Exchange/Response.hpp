@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:07:33 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/09 15:30:56 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/08/09 16:04:26 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,7 +66,7 @@ public: // Functions
 	void postMethod(const std::string& filePath);
 	void getMethod(const std::string& filePath);
 
-	void importFieldsForPath(const std::string &filePath);
+	void importFieldsForPath();
 
 private:
 

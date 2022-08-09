@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:08:42 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/09 15:31:18 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/08/09 16:04:22 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ void ft::Server::handleRequest(ft::Connection& conn)
 	{
 		conn.response = new ft::Response(conn);
 		filePath = *(this->config.getValue("path")) + conn.request->path;
-		conn.response->importFieldsForPath(filePath);
+		conn.response->importFieldsForPath();
 	}
 	catch (const std::exception& e)
 	{

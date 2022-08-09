@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:07:35 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/09 15:43:52 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/08/09 16:06:27 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,15 +42,14 @@ static std::string basedir(const std::string& path)
 	return (base);
 }
 
-void ft::Response::importFieldsForPath(const std::string &filePath)
+void ft::Response::importFieldsForPath()
 {
-	this->pathConfig = ft::Section(basedir(filePath), "response", this->config);
-
-	std::cout << RED << basedir(filePath)<<std::endl;
+	this->pathConfig = ft::Section(this->config.getcwd(), "response", this->config);
+	std::string basePath = basedir(this->conn.request->path);
 
 	for (const auto &val: this->config.locations)
-		if (val.appliesForPath(filePath))
-			this->config.importFields(val.exportFields());	
+		if (val.appliesForPath(basePath))
+			this->pathConfig.importFields(val.exportFields());	
 }
 
 //////////////////////////////////////////
@@ -169,7 +168,7 @@ void ft::Response::postMethod(const std::string& filePath)
 void ft::Response::getMethod(const std::string& filePath)
 {
 	std::cout << BLACK << "Receiving GET method. Responding now." << RESET << std::endl;
-	this->pathConfig.print("AAAAAAA  ");
+
 	// Check if filepath ends with /, if so, dir listing.
 	if (filePath.back() == '/')
 	{
