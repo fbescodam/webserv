@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/12 16:02:40 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/27 11:04:37 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/08/09 15:32:16 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ void ft::DirectoryFactory::buildContentFromDir(const std::string &path, std::str
 
 	// Title and header
 	outContent += "<html><head><title>Index of " + path + "</title></head>";
-	outContent += "<body><h1>Index</h1><hr><pre>";
+	outContent += "<body><h1>Index of " + path + "</h1><hr><pre>";
 
 	DIR* dir;
 
@@ -28,7 +28,7 @@ void ft::DirectoryFactory::buildContentFromDir(const std::string &path, std::str
 		dirent* ent;
 		while ((ent = readdir(dir)) != NULL)
 		{
-			const bool isDir = ent->d_type == DT_DIR;
+			const bool isDir = ent->d_type == DT_DIR;			
 
 			outContent += "<a href=\"";
 			outContent += ent->d_name; // href where link points to

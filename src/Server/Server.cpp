@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:08:42 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/09 16:04:22 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/08/09 16:29:440 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,22 @@ const ft::Socket* ft::Server::getSocket(void) const
 	return (this->socket);
 }
 
+bool checkMethods(const std::list<std::string> &methods, ft::Exchange::Method reqMethod)
+{
+	const std::string shit[4] = {
+		"GET",
+		"POST",
+		"DELETE",
+		"MAX"
+	};
+	std::string reqMethodString = shit[static_cast<int32_t>(reqMethod)];
+
+	for (const std::string& val: methods)
+		if (val == reqMethodString)
+			return (true);
+	return (false);
+}
+
 void ft::Server::handleRequest(ft::Connection& conn)
 {
 	std::string filePath;
@@ -56,6 +72,51 @@ void ft::Server::handleRequest(ft::Connection& conn)
 
 		try { this->respondWithStatus(conn, 500); }
 		catch (const std::exception& e) { exit(EXIT_FAILURE); }
+	}
+
+	// TODO: Verify
+	if (!conn.response->pathConfig.returnValueAsBoolean("access"))
+		return (this->respondWithStatus(conn, 403));
+
+	// dir listing
+	struct stat stats;
+	stat(filePath.c_str(), &stats);
+	if (S_ISDIR(stats.st_mode) && conn.request->path.back() != '/')
+	{
+		// HACK: Redirect to dir ending in / to prevent server hanging
+		conn.response->headers["Location"] = conn.request->path + "/";
+		conn.response->generateStatus(308);
+		return;
+	}
+	if (conn.request->path.back() == '/')
+	{
+		std::string indexFile = *conn.response->pathConfig.getValue("index");
+		if (!ft::filesystem::fileExists(conn.request->path + indexFile))
+		{
+			if (!conn.response->pathConfig.returnValueAsBoolean("dir_listing") && conn.request->method != ft::Exchange::Method::POST)
+			{
+				conn.request->path += indexFile;
+				filePath = *(this->config.getValue("path")) + conn.request->path;
+			}
+		}
+	}
+
+	// Gets the allowed methods for path
+	std::list<std::string> methodList;
+	static std::list<std::string> methodGet = {{"GET"}};
+	bool methodRules = conn.response->pathConfig.getValueAsList("methods", methodList);
+	
+	// Checks if request method is in allowed methods
+	if (!checkMethods(methodRules ? methodList : methodGet, conn.request->method))
+		return(this->respondWithStatus(conn, 405));
+
+	// Check for redirect
+	std::list<std::string> redirInfo;
+	if (conn.response->pathConfig.getValueAsList("redir", redirInfo))
+	{
+		conn.response->headers["Location"] = conn.request->path + "/";
+		conn.response->generateStatus(std::stoi(redirInfo.front()));
+		return ;
 	}
 
 	// If something fails within the GET, POST or DELETE methods

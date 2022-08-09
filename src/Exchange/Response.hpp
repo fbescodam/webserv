@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:07:33 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/09 16:04:26 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/08/09 16:14:53 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,14 +97,14 @@ private:
 	void writeStatusLine(int32_t status);
 	void writeHeaders(void);
 
-private: // Attributes
-
+public: // Attributes
+	ft::Section pathConfig;
+private:
 	// The current connection this response is targeting.
 	const ft::Connection& conn;
 
 	// Copy of the configuration of the current server.
 	ft::ServerSection& config;
-	ft::Section pathConfig;
 
 	// The file to send as a body, else nullptr.
 	FILE*	file;

@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:08:47 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/31 16:16:56 by fbes          ########   odam.nl         */
+/*   Updated: 2022/08/09 16:40:09 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 # include "Connection.hpp"
 # include "Response.hpp"
 # include "Request.hpp"
+#include <sys/stat.h>
 
 namespace ft {
 

@@ -6,12 +6,13 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 17:39:03 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/31 15:50:09 by fbes          ########   odam.nl         */
+/*   Updated: 2022/08/09 16:33:37 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <list>
 #include <array>
+#include <termios.h>
 #include "Utils.hpp"
 #include "Poller.hpp"
 #include "Server.hpp"
@@ -67,6 +68,12 @@ int32_t main(int32_t argc, const char* argv[])
 		std::cerr << "Usage: ./webserv <Configuration Filepath>\n" << std::endl;
 		return (EXIT_FAILURE);
 	}
+
+	// Termcap, allowed ? Maybe ?
+	struct termios	raw;
+	tcgetattr(STDIN_FILENO, &raw);
+	raw.c_lflag &= ~(ECHOCTL);
+	tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
 
 	std::cout << BLACK << "Webserv: Starting" << RESET << std::endl;
 	setupServers(argv[1], config, servers);
