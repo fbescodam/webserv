@@ -97,16 +97,16 @@ private:
 
 private: // Attributes
 
+	// The current connection this response is targeting.
+	const ft::Connection& conn;
+
 	// Copy of the configuration of the current server.
-	ft::Section config;
+	ft::ServerSection& config;
 
 	// The file to send as a body, else nullptr.
 	FILE*	file;
 	size_t	fileSize;
 	off_t	offset;
-
-	const ft::Connection& conn;
-
 };
 }
 #endif

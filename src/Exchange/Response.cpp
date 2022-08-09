@@ -12,7 +12,7 @@
 
 #include "Response.hpp"
 
-ft::Response::Response(const ft::Connection& conn) : conn(conn)
+ft::Response::Response(const ft::Connection& conn) : conn(conn), config(this->conn.server->config)
 {
 	std::cout << BLACK << "Set sendRes to nullptr (in constructor)" << RESET << std::endl;
 	this->sendRes = nullptr;
@@ -63,7 +63,7 @@ void ft::Response::generateStatus(int32_t status)
 {
 	// Find custom page
 	std::string errorPage = "error_" + std::to_string(status);
-	if (!this->config.keyExists(errorPage))
+	if (this->config.keyExists(errorPage))
 	{
 		const std::string* path = this->config.getValue("path");
 		const std::string* page = this->config.getValue(errorPage);
@@ -129,10 +129,8 @@ void ft::Response::postMethod(const std::string& filePath)
 	{
 		std::string out;
 		if (!ft::CGI::runCGI(this->conn, filePath, out, cgiBin.back()))
-		{
-			this->generateStatus(500);
-			return;
-		}
+			return (this->generateStatus(500));
+
 		this->data = out;
 		std::cout << BLACK << "Set sendRes to sendDynamic" << RESET << std::endl;
 		this->sendRes = &ft::Response::sendDynamic;
@@ -149,6 +147,7 @@ void ft::Response::postMethod(const std::string& filePath)
 void ft::Response::getMethod(const std::string& filePath)
 {
 	std::cout << BLACK << "Receiving GET method. Responding now." << RESET << std::endl;
+
 	// Check if filepath ends with /, if so, dir listing.
 	if (filePath.back() == '/')
 	{
@@ -175,9 +174,8 @@ void ft::Response::getMethod(const std::string& filePath)
 		}
 	}
 
-	try
+	try // No, its just a file
 	{
-		// No, its just a file
 		if (!ft::filesystem::fileExists(filePath))
 			return (this->generateStatus(404));
 
