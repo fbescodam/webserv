@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:07:35 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/09 16:11:07 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/08/09 20:50:36 by W2Wizard      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,7 +64,7 @@ void ft::Response::writeStatusLine(int32_t status)
 
 void ft::Response::writeHeaders(void)
 {
-	for (const auto [key, value] : this->headers)
+	for (const auto& [key, value] : this->headers)
 		this->data += key + ": " + value + "\r\n";
 	this->data += "\r\n";
 }
