@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:07:35 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/04 20:44:03 by fbes          ########   odam.nl         */
+/*   Updated: 2022/08/09 15:43:52 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,27 @@ ft::Response::~Response()
 }
 
 //////////////////////////////////////////
+
+static std::string basedir(const std::string& path)
+{
+	std::string base = path;
+	base.erase(path.find_last_of('/'));
+	return (base);
+}
+
+void ft::Response::importFieldsForPath(const std::string &filePath)
+{
+	this->pathConfig = ft::Section(basedir(filePath), "response", this->config);
+
+	std::cout << RED << basedir(filePath)<<std::endl;
+
+	for (const auto &val: this->config.locations)
+		if (val.appliesForPath(filePath))
+			this->config.importFields(val.exportFields());	
+}
+
+//////////////////////////////////////////
+
 
 void ft::Response::writeStatusLine(int32_t status)
 {
@@ -65,11 +86,12 @@ void ft::Response::generateStatus(int32_t status)
 	std::string errorPage = "error_" + std::to_string(status);
 	if (this->config.keyExists(errorPage))
 	{
+		std::cout << RED << "here0"<<std::endl;
+
 		const std::string* path = this->config.getValue("path");
 		const std::string* page = this->config.getValue(errorPage);
 		if (!path || !page)
 			goto generic;
-
 		std::string filePath(*path + *page);
 		if ((this->file = fopen(filePath.c_str(), "r")) == nullptr)
 			goto generic;
@@ -79,8 +101,8 @@ void ft::Response::generateStatus(int32_t status)
 		this->headers["content-type"] = ft::getContentType(filePath);
 		this->writeHeaders();
 		this->fileSize = ft::filesystem::getFileSize(this->file);
-		std::cout << BLACK << "Set sendRes to sendDynamic" << RESET << std::endl;
-		this->sendRes = &ft::Response::sendDynamic;
+		std::cout << BLACK << "Set sendRes to sendHeaders" << RESET << std::endl;
+		this->sendRes = &ft::Response::sendHeaders;
 		return;
 	}
 
@@ -147,7 +169,7 @@ void ft::Response::postMethod(const std::string& filePath)
 void ft::Response::getMethod(const std::string& filePath)
 {
 	std::cout << BLACK << "Receiving GET method. Responding now." << RESET << std::endl;
-
+	this->pathConfig.print("AAAAAAA  ");
 	// Check if filepath ends with /, if so, dir listing.
 	if (filePath.back() == '/')
 	{

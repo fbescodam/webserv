@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:07:33 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/04 19:58:55 by fbes          ########   odam.nl         */
+/*   Updated: 2022/08/09 15:30:56 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,6 +66,8 @@ public: // Functions
 	void postMethod(const std::string& filePath);
 	void getMethod(const std::string& filePath);
 
+	void importFieldsForPath(const std::string &filePath);
+
 private:
 
 	/**
@@ -102,6 +104,7 @@ private: // Attributes
 
 	// Copy of the configuration of the current server.
 	ft::ServerSection& config;
+	ft::Section pathConfig;
 
 	// The file to send as a body, else nullptr.
 	FILE*	file;
