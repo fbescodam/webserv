@@ -64,7 +64,7 @@ void ft::Server::handleRequest(ft::Connection& conn)
 	{
 		conn.response = new ft::Response(conn);
 		filePath = *(this->config.getValue("path")) + conn.request->path;
-		conn.response->importFieldsForPath();
+		conn.response->importFieldsForPath(); //TODO: redir doesnt get import for some reason
 	}
 	catch (const std::exception& e)
 	{
@@ -114,7 +114,7 @@ void ft::Server::handleRequest(ft::Connection& conn)
 	std::list<std::string> redirInfo;
 	if (conn.response->pathConfig.getValueAsList("redir", redirInfo))
 	{
-		conn.response->headers["Location"] = conn.request->path + "/";
+		conn.response->headers["Location"] = redirInfo.back();
 		conn.response->generateStatus(std::stoi(redirInfo.front()));
 		return ;
 	}
