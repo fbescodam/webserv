@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 14:59:11 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/04 15:33:53 by fbes          ########   odam.nl         */
+/*   Updated: 2022/08/09 20:51:10 by W2Wizard      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -151,7 +151,7 @@ void ft::GlobalConfig::readFile(const std::string& filePath)
 				getSubSectionName(lineNum, line, sectionName, appliesToPath);
 				if (currentSection->getName() == "global")
 					throw ft::InvalidSubSectionPosition(lineNum);
-				for (const auto definedPath : definedPaths)
+				for (const auto& definedPath : definedPaths)
 					if (definedPath == appliesToPath)
 						throw ft::DuplicateSubSectionLocation(lineNum);
 				ft::ServerSection& currentServerSection = this->serverSections.back();
