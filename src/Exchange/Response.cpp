@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:07:35 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/11 16:07:50 by fbes          ########   odam.nl         */
+/*   Updated: 2022/08/11 16:28:50 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -188,7 +188,7 @@ void ft::Response::getMethod(const std::string& filePath)
 		try
 		{
 			std::string dirListing;
-			ft::DirectoryFactory::buildContentFromDir(filePath, dirListing);
+			ft::DirectoryFactory::buildContentFromDir(filePath, this->conn.request->path, dirListing);
 
 			this->writeStatusLine(200);
 			this->headers["content-length"] = std::to_string(dirListing.size());
