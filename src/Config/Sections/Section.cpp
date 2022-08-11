@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 15:39:35 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/11 16:03:04 by fbes          ########   odam.nl         */
+/*   Updated: 2022/08/11 16:06:12 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,6 @@ ft::Section::Section(const std::string& cwd, const std::string& name)
 {
 	this->cwd = cwd;
 	this->name = name;
-	std::cout << cwd << std::endl;
 }
 
 ft::Section::Section(const char* cwd, const std::string& name)
@@ -32,7 +31,6 @@ ft::Section::Section(const std::string& cwd, const std::string& name, const std:
 	this->cwd = cwd;
 	this->name = name;
 	this->appliesToPath = appliesToPath;
-	std::cout << cwd << std::endl;
 }
 
 ft::Section::Section(const std::string& cwd, const std::string& name, ft::Section& inherit)
@@ -40,7 +38,6 @@ ft::Section::Section(const std::string& cwd, const std::string& name, ft::Sectio
 	this->cwd = cwd;
 	this->name = name;
 	this->fields = inherit.fields;
-	std::cout << cwd << std::endl;
 }
 
 //////////////////////////////////////////
@@ -145,13 +142,13 @@ uint32_t ft::Section::getAmountOfFields() const
 
 void ft::Section::print(std::string prefix) const
 {
-	std::cout << BLACK << "" << prefix << ">>>> SECTION NAME " << this->name << " <<<<" << std::endl;
+	std::cout << BLACK << prefix << ">>>> SECTION NAME " << this->name << " <<<<" << std::endl;
 
 	if (!this->appliesToPath.empty())
-		std::cout << "" << prefix << ">>>> APPLIES TO PATH " << this->appliesToPath << " <<<<" << std::endl;
+		std::cout << prefix << ">>>> APPLIES TO PATH " << this->appliesToPath << " <<<<" << std::endl;
 
 	for (auto& i : this->fields)
-		std::cout << "" << prefix <<  i.first << " = " << i.second << std::endl;
+		std::cout << prefix << i.first << " = " << i.second << std::endl;
 
 	std::cout << RESET << std::endl;;
 }

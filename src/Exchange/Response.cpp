@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:07:35 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/11 16:04:24 by fbes          ########   odam.nl         */
+/*   Updated: 2022/08/11 16:07:50 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,7 +97,7 @@ void ft::Response::generateStatus(int32_t status)
 	std::string errorPage = "error_" + std::to_string(status);
 	if (this->config.keyExists(errorPage))
 	{
-		std::cout << RED << "here0"<<std::endl;
+		std::cout << BLACK << "A custom error page exists for status " << status << RESET << std::endl;
 
 		const std::string* path = this->config.getValue("path");
 		const std::string* page = this->config.getValue(errorPage);
@@ -118,6 +118,7 @@ void ft::Response::generateStatus(int32_t status)
 	}
 
 generic: // Send generic built-in page.
+	std::cout << BLACK << "Generating status page for " << status << RESET << std::endl;
 	std::string statusText(ft::getStatusCodes().at(status)); // TODO: Retrieve pig image.
 	this->generateStatus(status, "<!DOCTYPE html><html><head><title>" + statusText + "</title></head><body><h1>" + std::to_string(status) + " " + statusText + "</h1></body></html>");
 }

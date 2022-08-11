@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/28 15:48:13 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/04 20:48:40 by fbes          ########   odam.nl         */
+/*   Updated: 2022/08/11 16:05:22 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -210,7 +210,7 @@ void ft::Poller::pollInEvent(ft::Connection& conn)
 	}
 	if (conn.request->appendBuffer(this->buffer) == ft::Exchange::Status::DONE)
 	{
-		std::cout << BLACK << "[DEBUG] Buffer is complete!" << RESET << std::endl;
+		std::cout << BLACK << "Buffer is complete!" << RESET << std::endl;
 
 		// Once we have the full request, parse the header and check which server.
 		// Pass connection to server for it to parse the request and generate an appropriate response.
@@ -233,10 +233,10 @@ void ft::Poller::pollInEvent(ft::Connection& conn)
 	}
 	else
 	{
-		std::cout << BLACK << "[DEBUG] Buffer is incomplete." << RESET << std::endl;
+		std::cout << BLACK << "Buffer is incomplete." << RESET << std::endl;
 		ft::Response::generateResponse(conn, 100);
 	}
-	std::cout << "Pollout now" << std::endl;
+	std::cout << BLACK << "Pollout now" << RESET << std::endl;
 	conn.poll->events = POLLOUT;
 	conn.lastActivity = std::time(nullptr);
 }

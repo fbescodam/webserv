@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:07:39 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/04 20:35:14 by fbes          ########   odam.nl         */
+/*   Updated: 2022/08/11 16:01:33 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ ft::Exchange::Status ft::Request::appendBuffer(const std::string& buffer)
 
 	this->data += buffer;
 
-	std::cout << BLACK << "[DEBUG] Data: " << this->data << RESET << std::endl;
+	std::cout << BLACK << "Data: " << this->data << RESET << std::endl;
 
 	if (this->data.size() > 100000) // TODO: Get from config
 		throw ft::PayloadTooLarge();
