@@ -6,15 +6,18 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/12 16:02:40 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/11 16:28:07 by fbes          ########   odam.nl         */
+/*   Updated: 2022/08/11 19:28:27 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "DirectoryFactory.hpp"
 
 // Fuck macos 14
-void ft::DirectoryFactory::buildContentFromDir(const std::string &actualPath, const std::string &requestedPath, std::string &outContent)
+void ft::DirectoryFactory::buildContentFromDir(const std::string& actualPath, const std::string& requestedPath, std::string& outContent)
 {
+	std::string requestedPathCopy = requestedPath;
+	if (requestedPathCopy.back() != '/')
+		requestedPathCopy += "/";
 	outContent.clear();
 
 	// Title and header
@@ -31,7 +34,7 @@ void ft::DirectoryFactory::buildContentFromDir(const std::string &actualPath, co
 			const bool isDir = ent->d_type == DT_DIR;
 
 			outContent += "<a href=\"";
-			outContent += ent->d_name; // href where link points to
+			outContent += requestedPathCopy + ent->d_name; // href where link points to
 			if (isDir) outContent += "/";
 			outContent += "\">";
 			outContent += ent->d_name; // actual visible printed name
