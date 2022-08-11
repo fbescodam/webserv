@@ -69,6 +69,8 @@
 		"stack": "cpp",
 		"strstream": "cpp",
 		"list": "cpp",
-		"__memory": "cpp"
+		"__memory": "cpp",
+		"numeric": "cpp",
+		"random": "cpp"
 	}
 }

@@ -8,7 +8,7 @@
 void trimQoutes(std::string &body)
 {
 	body.erase(0, body.find_first_not_of("\""));
-	body.erase(body.find_last_not_of("\"") + 1);
+	body.erase(body.find_last_not_of("\""));
 }
 
 bool fileExists(const std::string& path)
@@ -24,13 +24,12 @@ void parseMultipart(std::string data, std::string cType)
 	auto boundaryIt = cType.find_first_of("=");
 	std::string boundary = "--" + cType.substr(boundaryIt + 1, cType.find("\n") - boundaryIt -1);
 
-	std::string body = data.substr(data.find("\n\n"));
+	std::string body = data.substr(data.find("\r\n\r\n"));
 	body.erase(0, body.find_first_not_of("\r\n"));
 	std::stringstream bodyss;
 	bodyss.str(body);
 	std::string line;
 	std::getline(bodyss, line);
-
 lbl:
 	std::getline(bodyss, line);
 	auto name = line.find("filename=");
@@ -39,14 +38,18 @@ lbl:
 		fname = std::to_string(lol++);
 	else
 	{
-		fname = line.substr(name + 10, line.find("\n"));
+		fname = line.substr(name + 9, line.find("\n"));
 		trimQoutes(fname);	
+		if (fname.back()== '\"')
+			fname.pop_back();
 	}
+
 	std::fstream file;
-	file.open("../delete/" + fname, std::fstream::out);
+	file.open("examples/www/delete/" + fname, std::fstream::out);
 	if (!file.good())
 	{
-		std::cerr << "shits fucked"<<std::endl;
+		std::string fuck("example/www/delete/" + fname);
+		std::cerr << "HTTP/1.1 200 OK\nContent-type: text/html\nContent-length: "<<fuck.size()<<"\n\n"<<fuck;
 		exit(1);
 	}
 	std::getline(bodyss, line);
@@ -54,6 +57,7 @@ writeloop:
 	std::getline(bodyss, line);
 	if (line.find(boundary) != std::string::npos)
 	{
+		line.erase(line.find_last_not_of("\n"));
 		file.close();
 		if (line.back() == '-')
 			return;
@@ -70,7 +74,7 @@ void makeFile(std::string data)
 	file.open("../delete/" + std::to_string(std::time(0)), std::fstream::out);
 	if (!file.good())
 	{
-		std::cerr << "shits fucked"<<std::endl;
+		std::cerr << "HTTP/1.1 200 OK\nContent-type: text/html\nContent-length: 4\n\nfuck";
 		exit(1);
 	}
 	std::string body = data.substr(data.find("\r\n\r\n"));
@@ -81,17 +85,17 @@ void makeFile(std::string data)
 
 int main(int ac, char **av)
 {
-	if (ac != 2)
-	{
-		std::cerr << "shits fucked"<<std::endl;
-		exit(1);
-	}
+	std::istreambuf_iterator<char> begin(std::cin), end;
+	std::string data(begin, end);
 
-	std::string data(av[1]);
 	auto cTypeIt = data.find("Content-Type");
 	std::string cType = data.substr(cTypeIt, data.find("\r\n", cTypeIt) - cTypeIt);
 	if (cType.find("multipart/form-data") == std::string::npos)
 		makeFile(data);
 	else
 		parseMultipart(data, cType);
+
+	std::cout << "HTTP/1.1 302 Found\nLocation: /delete\n\n";
+
+
 }

@@ -35,6 +35,8 @@ bool ft::CGI::runCGI(const ft::Connection& conn, const std::string& path, std::s
 	envp.push_back("PATH_INFO=~/work/webserv/examples/www/post/fileupload.sh"); // TODO: Remove abs path
 	envp.push_back("CONTENT_LENGTH=" + conn.request->headers["content-length"]);
 
+	std::cout << RED << "Entering cgi"<<RESET<<std::endl;
+
 	int32_t fds[2];
 	int32_t body_pipe[2];
 	try { ft::pipe(fds); ft::pipe(body_pipe); }
@@ -79,8 +81,11 @@ bool ft::CGI::runCGI(const ft::Connection& conn, const std::string& path, std::s
 	}
 	else // Parent
 	{
+		std::string fullData = conn.request->header_data + "\r\n\r\n" + conn.request->data;
+		std::cout <<fullData;
+
 		if (!conn.request->data.empty())
-			size_t bread = write(body_pipe[WRITE], conn.request->data.data(), conn.request->data.size());
+			size_t bread = write(body_pipe[WRITE],fullData.data(),fullData.size());
 
 		close(body_pipe[WRITE]);
 		close(body_pipe[READ]);
@@ -95,5 +100,9 @@ bool ft::CGI::runCGI(const ft::Connection& conn, const std::string& path, std::s
 		}
 		close(fds[READ]);
 	}
+
+	std::cout << RED << "Exiting cgi"<<RESET<<std::endl;
+	std::cout << out<<std::endl;
+
 	return (true);
 }
