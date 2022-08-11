@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:07:35 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/11 16:28:50 by fbes          ########   odam.nl         */
+/*   Updated: 2022/08/11 17:02:40 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@ void ft::Response::importFieldsForPath(std::string& rootPath)
 		{
 			std::cout << BLACK << "Location " << location.getAppliedPath() << " applies for path " << rootPath << "!" << RESET << std::endl;
 			this->pathConfig.importFields(location.exportFields());
-			overridePath = const_cast<std::string*>(this->pathConfig.getValue("path"));
+			overridePath = const_cast<std::string*>(location.getValue("path"));
 			if (overridePath)
 			{
 				std::cout << BLACK << "rootPath before override: " << rootPath << RESET << std::endl;
