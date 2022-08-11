@@ -22,7 +22,7 @@ void ft::Server::respondWithStatus(ft::Connection& conn, int32_t statusCode)
 	// Yeet out whatever response we had before.
 	delete conn.response;
 
-	conn.response = new ft::Response(conn);
+	conn.response = new ft::Response(conn); // TODO try catch this maybe, if it fails, close the connection
 	conn.response->generateStatus(statusCode);
 
 	// TODO: Do something will poll ?
@@ -56,15 +56,16 @@ bool checkMethods(const std::list<std::string> &methods, ft::Exchange::Method re
 
 void ft::Server::handleRequest(ft::Connection& conn)
 {
-	std::string filePath;
+	std::string rootPath; // where the request is rooted
+	std::string filePath; // full path to the file requested (including server path)
 
 	std::cout << BLACK << "Now handling the request" << RESET << std::endl;
 
 	try
 	{
 		conn.response = new ft::Response(conn);
-		filePath = *(this->config.getValue("path")) + conn.request->path;
-		conn.response->importFieldsForPath(); //TODO: redir doesnt get import for some reason
+		rootPath = conn.request->path;
+		conn.response->importFieldsForPath(rootPath);
 	}
 	catch (const std::exception& e)
 	{
@@ -73,6 +74,10 @@ void ft::Server::handleRequest(ft::Connection& conn)
 		try { this->respondWithStatus(conn, 500); }
 		catch (const std::exception& e) { exit(EXIT_FAILURE); }
 	}
+	filePath = this->config.getcwd() + *(this->config.getValue("path")) + rootPath;
+	std::cout << BLACK << "filePath: " << filePath << RESET << std::endl;
+
+	conn.response->pathConfig.print("pathConfig\t");
 
 	// TODO: Verify
 	if (!conn.response->pathConfig.returnValueAsBoolean("access"))
@@ -81,34 +86,36 @@ void ft::Server::handleRequest(ft::Connection& conn)
 	// dir listing
 	struct stat stats;
 	stat(filePath.c_str(), &stats);
-	if (S_ISDIR(stats.st_mode) && conn.request->path.back() != '/')
+	if (S_ISDIR(stats.st_mode) && filePath.back() != '/')
+		filePath += "/";
+
+	if (filePath.back() == '/')
 	{
-		// HACK: Redirect to dir ending in / to prevent server hanging
-		conn.response->headers["Location"] = conn.request->path + "/";
-		conn.response->generateStatus(308);
-		return;
-	}
-	if (conn.request->path.back() == '/')
-	{
-		std::string indexFile = *conn.response->pathConfig.getValue("index");
-		if (!ft::filesystem::fileExists(conn.request->path + indexFile))
+		std::string indexFile = "index.html"; // default
+		if (conn.response->pathConfig.keyExists("index"))
+			indexFile = *conn.response->pathConfig.getValue("index");
+
+		std::cout << BLACK << "Requested path is a directory, checking if index file exists at " << filePath << indexFile << RESET << std::endl;
+		if (ft::filesystem::fileExists(filePath + indexFile))
+			filePath = filePath + indexFile;
+		else if (!conn.response->pathConfig.returnValueAsBoolean("dir_listing"))
 		{
-			if (!conn.response->pathConfig.returnValueAsBoolean("dir_listing") && conn.request->method != ft::Exchange::Method::POST)
-			{
-				conn.request->path += indexFile;
-				filePath = *(this->config.getValue("path")) + conn.request->path;
-			}
+			std::cout << BLACK << "Index file does not exist and dir_listing is not enabled, responding with 404" << RESET << std::endl;
+			return (this->respondWithStatus(conn, 404));
 		}
+		std::cout << BLACK << "Index file exists or dir_listing is enabled, new filePath is " << filePath << RESET << std::endl;
 	}
+
+	std::cout << BLACK << "Final filePath: " << filePath << RESET << std::endl;
 
 	// Gets the allowed methods for path
 	std::list<std::string> methodList;
 	static std::list<std::string> methodGet = {{"GET"}};
 	bool methodRules = conn.response->pathConfig.getValueAsList("methods", methodList);
-	
+
 	// Checks if request method is in allowed methods
 	if (!checkMethods(methodRules ? methodList : methodGet, conn.request->method))
-		return(this->respondWithStatus(conn, 405));
+		return (this->respondWithStatus(conn, 405));
 
 	// Check for redirect
 	std::list<std::string> redirInfo;

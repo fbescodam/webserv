@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/12 16:02:40 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/27 11:01:00 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/08/11 16:28:21 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,11 +22,11 @@ namespace DirectoryFactory
 {
 	/**
 	 * @brief Constructs the html directory navigation based on the current path.
-	 * 
+	 *
 	 * @param path The path to base the directory navigator of.
 	 * @param outContent The resulting html content.
 	 */
-	void buildContentFromDir(const std::string& path, std::string& outContent);
+	void buildContentFromDir(const std::string &actualPath, const std::string &requestedPath, std::string &outContent);
 }
 }
 #endif

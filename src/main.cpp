@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 17:39:03 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/10 11:34:34 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/08/11 16:09:16 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,12 +75,12 @@ int32_t main(int32_t argc, const char* argv[])
 	raw.c_lflag &= ~(ECHOCTL);
 	tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
 
-	std::cout << BLACK << "Webserv: Starting" << RESET << std::endl;
+	std::cout << "Webserv: Starting" << std::endl;
 	setupServers(argv[1], config, servers);
 	ft::Poller poller(servers, config);
 
-	std::cout << BLACK << "Webserv: Running" << RESET << std::endl;
-	while (true) 
+	std::cout << "Webserv: Running" << std::endl;
+	while (true)
 	{
 		poller.pollAll();
 		usleep(420);

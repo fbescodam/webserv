@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:07:39 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/10 15:03:19 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/08/11 16:12:57 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,6 +77,7 @@ bool ft::Request::isBodyDone(void) const
 
 void ft::Request::parseBody()
 {
+	// TODO: why is this commented?
 	//if (this->method != ft::Exchange::Method::POST)
 	//	return;
 	return;
