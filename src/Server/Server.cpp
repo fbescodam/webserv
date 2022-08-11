@@ -64,7 +64,9 @@ void ft::Server::handleRequest(ft::Connection& conn)
 	try
 	{
 		conn.response = new ft::Response(conn);
-		rootPath = conn.request->path;
+		std::cout << BLACK << "Requested path: " << conn.request->path << RESET << std::endl;
+		rootPath = conn.request->path.substr(0, conn.request->path.find_first_of('?'));
+		// Note: no need to split on #, the anchor/fragment identifier is not sent as part of the request
 		conn.response->importFieldsForPath(rootPath);
 	}
 	catch (const std::exception& e)
