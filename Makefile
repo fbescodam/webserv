@@ -6,7 +6,7 @@
 #    By: lde-la-h <lde-la-h@student.codam.nl>         +#+                      #
 #                                                    +#+                       #
 #    Created: 2022/05/13 11:36:28 by lde-la-h      #+#    #+#                  #
-#    Updated: 2022/08/11 19:39:59 by fbes          ########   odam.nl          #
+#    Updated: 2022/08/11 19:55:43 by fbes          ########   odam.nl          #
 #                                                                              #
 # **************************************************************************** #
 
@@ -60,4 +60,4 @@ re:	fclean all
 
 er: re # For Freek who cannot type on Sundays
 
-.PHONY: all clean fclean re
+.PHONY: all clean fclean re er
