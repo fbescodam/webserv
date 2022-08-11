@@ -86,6 +86,8 @@ void ft::Response::writeHeaders(void)
 void ft::Response::generateResponse(ft::Connection& conn, int32_t status)
 {
 	conn.response = new ft::Response(conn);
+	if (status == 100)
+		conn.response->headers["connection"] = "keep-alive";
 	conn.response->generateStatus(status);
 }
 
@@ -240,6 +242,7 @@ ft::Response::Status ft::Response::sendDynamic(ft::fd_t socket)
 {
 	std::cout << BLACK << "Sending everything in one go (dynamically generated page)..." << RESET << std::endl;
 	size_t bsent = ft::send(socket, this->data.data(), this->data.length(), NONE); // Send as much as possible
+	std::cout <<RED<<"argh: "<<bsent<<RESET<<std::endl;
 	this->data.erase(0, bsent); // Delete data that has been sent
 	if (bsent < this->data.length()) // Not everything was sent, send more in the next poll
 		return (ft::Response::Status::NOT_DONE);

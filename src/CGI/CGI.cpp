@@ -35,36 +35,65 @@ bool ft::CGI::runCGI(const ft::Connection& conn, const std::string& path, std::s
 	envp.push_back("PATH_INFO=~/work/webserv/examples/www/post/fileupload.sh"); // TODO: Remove abs path
 	envp.push_back("CONTENT_LENGTH=" + conn.request->headers["content-length"]);
 
-	pid_t pid;
-	ft::fd_t fds[2];
-	try { ft::pipe(fds); pid = ft::fork();}
+	int32_t fds[2];
+	int32_t body_pipe[2];
+	try { ft::pipe(fds); ft::pipe(body_pipe); }
 	catch(const std::exception& e)
 	{
 		close(fds[WRITE]);
 		close(fds[READ]);
+		close(body_pipe[READ]);
+		close(body_pipe[WRITE]);
 
-		std::cerr << RED << "Webserv: " << e.what() << RESET << std::endl;
+		std::cerr << e.what() << std::endl;
 		return (false);
 	}
+
+	pid_t pid;
+	try { pid = ft::fork(); }
+	catch (std::exception &e)
+	{
+		close(fds[WRITE]);
+		close(fds[READ]);
+
+		close(body_pipe[READ]);
+		close(body_pipe[WRITE]);
+
+		std::cerr << e.what() << std::endl;
+		return (false);
+	}
+
 	if (pid == 0) // Child
 	{
-		try
-		{
-			ft::dup2(0, STDIN_FILENO);
-			ft::dup2(fds[WRITE], STDOUT_FILENO);
-			ft::dup2(fds[WRITE], STDERR_FILENO);
+		::dup2(body_pipe[READ], STDIN_FILENO);
+		::dup2(fds[WRITE], STDOUT_FILENO);
+		::dup2(fds[WRITE], STDERR_FILENO);
+		
+		close(body_pipe[WRITE]);
+		close(fds[WRITE]);
+		close(fds[READ]);
 
-			ft::execve(cgiBin.c_str(), const_cast<char *const *>(c_arr(argv).data()), const_cast<char *const *>(c_arr(envp).data()));
-		}
-		catch(const std::exception& e)
-		{
-			std::cerr << RED << e.what() << BLACK << std::endl;
-			exit(EXIT_FAILURE);
-		}
+		::execve(cgiBin.c_str(), (char *const *)c_arr(argv).data(), (char *const *)c_arr(envp).data());
+		close(body_pipe[READ]);
+		exit(EXIT_FAILURE);
 	}
 	else // Parent
 	{
+		if (!conn.request->data.empty())
+			size_t bread = write(body_pipe[WRITE], conn.request->data.data(), conn.request->data.size());
+
+		close(body_pipe[WRITE]);
+		close(body_pipe[READ]);
+		close(fds[WRITE]);
+
 		wait(NULL);
+		char buff[4096] = {0};
+		while (read(fds[READ], buff, sizeof(buff)) > 0)
+		{
+			out += buff;
+			bzero(buff, sizeof(buff));
+		}
+		close(fds[READ]);
 	}
 	return (true);
 }
