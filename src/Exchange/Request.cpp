@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:07:39 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/11 16:01:33 by fbes          ########   odam.nl         */
+/*   Updated: 2022/08/11 16:12:57 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,13 +15,13 @@
 ft::Request::Request(const std::vector<ft::Server>& servers) noexcept : servers(servers)
 {
 	this->data = "";
-	this->done = false;
+	this->headerDone = this->headerParsed = false;
 }
 
 //////////////////////////////////////////
 
 // Appends up until it managed to append enough data to build the header.
-ft::Exchange::Status ft::Request::appendBuffer(const std::string& buffer)
+void ft::Request::appendBuffer(const std::string& buffer)
 {
 	// Check if request is malformed.
 	if (buffer.size() < 1)
@@ -36,30 +36,53 @@ ft::Exchange::Status ft::Request::appendBuffer(const std::string& buffer)
 	if (this->data.size() > 100000) // TODO: Get from config
 		throw ft::PayloadTooLarge();
 
+	// IF its a get request, we check for the \r\n\r\n
+	// IF its a post request we compare against the content-length instead.
+
 	// No body, ask to continue.
-	this->done = this->data.find("\r\n\r\n") != std::string::npos;
-	return (this->done ? ft::Exchange::Status::DONE : ft::Exchange::Status::NOT_DONE);
+	if (!this->headerDone)
+		this->headerDone = this->data.find("\r\n\r\n") != std::string::npos;
 }
 
 //////////////////////////////////////////
 
-bool ft::Request::isDone(void) const
+bool ft::Request::isHeaderDone(void) const
 {
-	return (this->done);
+	return (this->headerDone);
+}
+
+//////////////////////////////////////////
+
+bool ft::Request::isBodyDone(void) const
+{
+	// Do we even have the header.
+	if (!this->headerDone)
+		return (false);
+	// If we have the header we can check if the content length matches the data length.
+	else if (this->method == ft::Exchange::Method::POST)
+	{
+		int lol = std::stoi(this->headers.at("content-length"));
+		size_t lol2 = this->data.length();
+		return lol <= lol2;
+		// return (std::stoi(this->headers.at("content-length")) == this->data.length());
+	}
+	return (true);
 }
 
 //////////////////////////////////////////
 
 void ft::Request::parseBody()
 {
-	if (this->method != ft::Exchange::Method::POST)
-		return;
+	// TODO: why is this commented?
+	//if (this->method != ft::Exchange::Method::POST)
+	//	return;
+	return;
 }
 
 //////////////////////////////////////////
 
 // Extracts the headeran d parses it into the request object
-void ft::Request::parseHeader(ft::Connection& conn)
+void ft::Request:: parseHeader(ft::Connection& conn)
 {
 	size_t pos;
 	if ((pos = this->data.find("\r\n\r\n")) == std::string::npos)
@@ -132,11 +155,13 @@ void ft::Request::parseHeader(ft::Connection& conn)
 	}
 
 	// Empty the data
-	this->data.empty();
+	this->data.clear();
+	this->headerParsed = true;
 
 	// Now split the body from the data and parse that next
 	if (splitBuff.second.size() > 0)
 	{
+		splitBuff.second.erase(0, splitBuff.second.find_first_not_of(WHITESPACE)); // trim whitespace from left
 		this->data = splitBuff.second;
 		this->parseBody();
 	}

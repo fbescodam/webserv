@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/28 15:48:13 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/11 16:05:22 by fbes          ########   odam.nl         */
+/*   Updated: 2022/08/11 16:09:49 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -199,6 +199,7 @@ void ft::Poller::pollInEvent(ft::Connection& conn)
 
 	bzero(this->buffer, BUFF_SIZE); // Clear the buffer
 	brecv = recv(conn.poll->fd, this->buffer, BUFF_SIZE, NONE);
+	std::cout << this->buffer << std::endl;
 	if (brecv <= 0)
 	{
 		if (brecv < 0)
@@ -208,17 +209,16 @@ void ft::Poller::pollInEvent(ft::Connection& conn)
 		this->closeConnection(conn);
 		return;
 	}
-	if (conn.request->appendBuffer(this->buffer) == ft::Exchange::Status::DONE)
+	conn.request->appendBuffer(buffer);
+	if (conn.request->isHeaderDone() && !conn.request->headerParsed)
+		conn.request->parseHeader(conn);
+	if (conn.request->isBodyDone())
 	{
 		std::cout << BLACK << "Buffer is complete!" << RESET << std::endl;
 
 		// Once we have the full request, parse the header and check which server.
 		// Pass connection to server for it to parse the request and generate an appropriate response.
-		try
-		{
-			conn.request->parseHeader(conn);
-			conn.server->handleRequest(conn);
-		}
+		try { conn.server->handleRequest(conn); }
 		catch (const ft::BadRequest& e)
 		{ ft::Response::generateResponse(conn, 400); }
 		catch (const ft::PayloadTooLarge& e)
@@ -263,7 +263,8 @@ void ft::Poller::resolveConnection(ft::Connection& conn)
 	if (conn.response && conn.response->headers["connection"] == "keep-alive")
 	{
 		// Clear the request and response to be ready for the next request
-		this->deleteReqRes(conn);
+		if (conn.request->isBodyDone())
+			this->deleteReqRes(conn);
 		conn.poll->events = POLLIN;
 		conn.poll->revents = NONE;
 		std::cout << BLACK << "Connection kept alive" << RESET << std::endl;

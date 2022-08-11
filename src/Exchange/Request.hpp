@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:07:36 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/04 16:15:25 by fbes          ########   odam.nl         */
+/*   Updated: 2022/08/10 14:20:01 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,9 +40,11 @@ public: // Ctor ~ Dtor
 	Request(const std::vector<ft::Server>& servers) noexcept;
 
 public: // Functions
-	ft::Exchange::Status appendBuffer(const std::string& buffer);
+	void appendBuffer(const std::string& buffer);
 	void parseHeader(ft::Connection& conn);
-	bool isDone(void) const;
+	bool isHeaderDone(void) const;
+	bool isHeaderParsed(void) const;
+	bool isBodyDone(void) const;
 
 private:
 	void parseBody();
@@ -52,10 +54,11 @@ public: // Attributes
 	ft::Exchange::Method method;
 	std::string path;
 	std::string version;
+	bool headerParsed;
 
 private:
 	const std::vector<ft::Server>& servers;
-	bool		done;
+	bool headerDone;
 };
 
 }
