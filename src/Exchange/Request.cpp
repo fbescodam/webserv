@@ -97,6 +97,7 @@ void ft::Request:: parseHeader(ft::Connection& conn)
 	// BuffA = Header | BuffB = Body
 	std::pair<std::string, std::string> splitBuff(this->data.substr(0, pos), this->data.substr(pos));
 	std::istringstream iss(splitBuff.first);
+	this->header_data = splitBuff.first;
 
 	// Parse the status line
 	std::string line;

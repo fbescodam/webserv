@@ -157,6 +157,12 @@ void ft::Response::deleteMethod(const std::string& filePath)
 
 //////////////////////////////////////////
 
+// void ft::Response::fileUpload(std::string data)
+// {
+// 	std::cout << RED<<data<<std::endl;
+// 	exit(0);
+// }
+
 void ft::Response::postMethod(const std::string& filePath)
 {
 	std::list<std::string> cgiBin;
@@ -174,6 +180,10 @@ void ft::Response::postMethod(const std::string& filePath)
 		this->sendRes = &ft::Response::sendDynamic;
 		return;
 	}
+	// else
+	// {
+	// 	this->fileUpload(conn.request->header_data + conn.request->data);
+	// }
 
 	// Nothing to post so we treat it as a get method.
 	this->getMethod(filePath);
