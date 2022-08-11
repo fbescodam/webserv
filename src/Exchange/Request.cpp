@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:07:39 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/11 19:00:10 by fbes          ########   odam.nl         */
+/*   Updated: 2022/08/11 19:30:54 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,16 +16,21 @@ ft::Request::Request(const std::vector<ft::Server>& servers) noexcept : servers(
 {
 	this->data = "";
 	this->headerDone = this->headerParsed = false;
+	this->contentLength = 0;
 }
 
 //////////////////////////////////////////
 
 // Appends up until it managed to append enough data to build the header.
-void ft::Request::appendBuffer(char *buffer, int bread)
+void ft::Request::appendBuffer(char *buffer, int32_t bread)
 {
+	static int32_t maxBodySize = this->servers[0].config.returnValueAsInt("limit_body_size");
 	// Check if request is malformed.
 	//else if (!isalpha(buffer.at(0)))
 	//	throw ft::BadRequest(); // TODO: move to header parser, this is for invalid requests (HTTPS, for example)
+
+	if (this->contentLength > maxBodySize || bread > maxBodySize)
+		throw ft::PayloadTooLarge();
 
 	std::cout << BLACK << "Appending to buffer (original size " << this->data.size() << ", appending " << bread << " bytes" << RESET << std::endl;
 	this->data.append(buffer, bread);
@@ -33,7 +38,7 @@ void ft::Request::appendBuffer(char *buffer, int bread)
 
 	// std::cout << BLACK << "Data: " << this->data << RESET << std::endl;
 
-	if (this->data.size() > 100000) // TODO: Get from config
+	if (this->data.size() > maxBodySize)
 		throw ft::PayloadTooLarge();
 
 	// IF its a get request, we check for the \r\n\r\n
@@ -55,17 +60,13 @@ bool ft::Request::isHeaderDone(void) const
 
 bool ft::Request::isBodyDone(void) const
 {
-	// Do we even have the header.
-	if (!this->headerDone)
+	if (!this->headerDone) // Do we even have the header.
 		return (false);
-	// If we have the header we can check if the content length matches the data length.
-	else if (this->method == ft::Exchange::Method::POST)
+	else if (this->method == ft::Exchange::Method::POST) // If we have the header we can check if the content length matches the data length.
 	{
-		int lol = std::stoi(this->headers.at("content-length"));
-		size_t lol2 = this->data.length();
-		std::cout << RED<< "content-length expected " << lol << "---current size "<<lol2<<RESET<<std::endl;
-		return lol <= lol2;
-		// return (std::stoi(this->headers.at("content-length")) == this->data.length());
+		int32_t bodySize = (int32_t) this->data.length();
+		std::cout << BLACK << "content-length expected " << this->contentLength << ", current size " << bodySize <<RESET<<std::endl;
+		return (this->contentLength <= bodySize);
 	}
 	return (true);
 }
@@ -88,7 +89,7 @@ void ft::Request:: parseHeader(ft::Connection& conn)
 	size_t pos;
 	if ((pos = this->data.find("\r\n\r\n")) == std::string::npos)
 	{
-		std::cout << RED << "Request header end not found" << RESET << std::endl;
+		std::cout << RED << "Error: request header end not found" << RESET << std::endl;
 		throw std::exception(); // there is no body! run!!
 	}
 
@@ -154,6 +155,9 @@ void ft::Request:: parseHeader(ft::Connection& conn)
 		std::cout << RED << "Host not set in header" << RESET << std::endl;
 		throw ft::BadRequest(); // for HTTP/1.1 Host NEEDS to be present!!!
 	}
+
+	if (this->headers.count("content-length"))
+		this->contentLength = std::stoi(this->headers["content-length"]);
 
 	// Empty the data
 	this->data.clear();
