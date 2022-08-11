@@ -40,7 +40,7 @@ public: // Ctor ~ Dtor
 	Request(const std::vector<ft::Server>& servers) noexcept;
 
 public: // Functions
-	void appendBuffer(const std::string& buffer);
+	void appendBuffer(char *buffer, int bread);
 	void parseHeader(ft::Connection& conn);
 	bool isHeaderDone(void) const;
 	bool isHeaderParsed(void) const;

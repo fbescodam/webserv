@@ -21,17 +21,20 @@ ft::Request::Request(const std::vector<ft::Server>& servers) noexcept : servers(
 //////////////////////////////////////////
 
 // Appends up until it managed to append enough data to build the header.
-void ft::Request::appendBuffer(const std::string& buffer)
+void ft::Request::appendBuffer(char *buffer, int bread)
 {
 	// Check if request is malformed.
-	if (buffer.size() < 1)
-		throw ft::BadRequest();
 	//else if (!isalpha(buffer.at(0)))
 	//	throw ft::BadRequest(); // TODO: move to header parser, this is for invalid requests (HTTPS, for example)
 
-	this->data += buffer;
+	std::cout<<RED<<"Appending data"<<RESET<<std::endl;
+	std::cout<< RED<<this->data.size()<<RESET<<std::endl;
+	for (ssize_t i = 0; i < bread; i++)
+		this->data.push_back(buffer[i]);
+	std::cout<< RED<<this->data.size()<<RESET<<std::endl;
 
-	std::cout << BLACK << "[DEBUG] Data: " << this->data << RESET << std::endl;
+
+	// std::cout << BLACK << "[DEBUG] Data: " << this->data << RESET << std::endl;
 
 	if (this->data.size() > 100000) // TODO: Get from config
 		throw ft::PayloadTooLarge();
@@ -63,6 +66,7 @@ bool ft::Request::isBodyDone(void) const
 	{
 		int lol = std::stoi(this->headers.at("content-length"));
 		size_t lol2 = this->data.length();
+		std::cout << RED<< "content-length expected " << lol << "---current size "<<lol2<<RESET<<std::endl;
 		return lol <= lol2;
 		// return (std::stoi(this->headers.at("content-length")) == this->data.length());
 	}
@@ -80,7 +84,7 @@ void ft::Request::parseBody()
 
 //////////////////////////////////////////
 
-// Extracts the headeran d parses it into the request object
+// Extracts the header and parses it into the request object
 void ft::Request:: parseHeader(ft::Connection& conn)
 {
 	size_t pos;
@@ -104,7 +108,7 @@ void ft::Request:: parseHeader(ft::Connection& conn)
 	std::pair<std::string, std::string> header;
 	while (std::getline(iss, line))
 	{
-		std::cout << BLACK << "Parsing line " << line << RESET << std::endl;
+		// std::cout << BLACK << "Parsing line " << line << RESET << std::endl;
 		if (line.find(':') == std::string::npos)
 			throw ft::BadRequest();
 

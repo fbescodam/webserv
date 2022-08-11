@@ -199,7 +199,6 @@ void ft::Poller::pollInEvent(ft::Connection& conn)
 
 	bzero(this->buffer, BUFF_SIZE); // Clear the buffer
 	brecv = recv(conn.poll->fd, this->buffer, BUFF_SIZE, NONE);
-	std::cout << this->buffer << std::endl;
 	if (brecv <= 0)
 	{
 		if (brecv < 0)
@@ -209,9 +208,17 @@ void ft::Poller::pollInEvent(ft::Connection& conn)
 		this->closeConnection(conn);
 		return;
 	}
-	conn.request->appendBuffer(buffer);
+	try { conn.request->appendBuffer(buffer, brecv); }
+	catch (const ft::BadRequest& e)
+	{ ft::Response::generateResponse(conn, 400); goto pollout;}
+	catch (const ft::PayloadTooLarge& e)
+	{ ft::Response::generateResponse(conn, 413); goto pollout;}
+
 	if (conn.request->isHeaderDone() && !conn.request->headerParsed)
+	{
 		conn.request->parseHeader(conn);
+		std::cout << BLACK << "[DEBUG] Header Parsed" << RESET << std::endl;
+	}
 	if (conn.request->isBodyDone())
 	{
 		std::cout << BLACK << "[DEBUG] Buffer is complete!" << RESET << std::endl;
@@ -234,8 +241,15 @@ void ft::Poller::pollInEvent(ft::Connection& conn)
 	else
 	{
 		std::cout << BLACK << "[DEBUG] Buffer is incomplete." << RESET << std::endl;
-		ft::Response::generateResponse(conn, 100);
+		if (conn.request->headers["Expect"] == "100-continue")
+			ft::Response::generateResponse(conn, 100);
+		else
+		{
+			conn.lastActivity = std::time(nullptr);
+			return ;
+		}
 	}
+pollout:
 	std::cout << "Pollout now" << std::endl;
 	conn.poll->events = POLLOUT;
 	conn.lastActivity = std::time(nullptr);
