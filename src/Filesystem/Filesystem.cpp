@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/28 12:31:21 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/11 19:50:26 by fbes          ########   odam.nl         */
+/*   Updated: 2022/08/11 20:43:15 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,4 +44,14 @@ size_t ft::filesystem::getFileSize(FILE *f)
 	fseek(f, 0, SEEK_SET);
 
 	return (size);
+}
+
+bool ft::filesystem::getAbsolutePath(const std::string& path, std::string& absPath)
+{
+	char* realPath = realpath(path.c_str(), nullptr);
+	if (!realPath)
+		return (false);
+	absPath = realPath;
+	free(realPath);
+	return (true);
 }

@@ -83,7 +83,18 @@ void ft::Server::handleRequest(ft::Connection& conn)
 
 	// Get actual path used for IO
 	filePath = this->config.getcwd() + *(this->config.getValue("path")) + rootPath;
-	std::cout << BLACK << "filePath: " << filePath << RESET << std::endl;
+	std::cout << BLACK << "Relative filePath: " << filePath << RESET << std::endl;
+
+	// Get the absolute path to perform security checks
+	if (!ft::filesystem::getAbsolutePath(filePath.c_str(), filePath))
+		return (this->respondWithStatus(conn, 404)); // Likely a 404 error
+	std::cout << BLACK << "Absolute filePath: " << filePath << RESET << std::endl;
+
+	if (filePath.find(this->config.getcwd() + *this->config.getValue("path")) != 0)
+	{
+		std::cout << RED << "[WARNING] Requested path is outside of the root defined in the server config!" << RESET << std::endl;
+		return (this->respondWithStatus(conn, 403));
+	}
 
 	// Modify path for directory reading if path is a directory
 	if (ft::filesystem::isDir(filePath) && filePath.back() != '/')
@@ -109,10 +120,10 @@ void ft::Server::handleRequest(ft::Connection& conn)
 			std::cout << BLACK << "Index file does not exist, dir_listing is enabled, but directory does not exist, responding with 404" << RESET << std::endl;
 			return (this->respondWithStatus(conn, 404));
 		}
+		else
+			conn.response->isDirListing = true;
 		std::cout << BLACK << "Index file exists or dir_listing is enabled, new filePath is " << filePath << RESET << std::endl;
 	}
-
-	std::cout << BLACK << "Final filePath: " << filePath << RESET << std::endl;
 
 	// Gets the allowed methods for path
 	std::list<std::string> methodList;
