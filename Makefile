@@ -6,7 +6,7 @@
 #    By: lde-la-h <lde-la-h@student.codam.nl>         +#+                      #
 #                                                    +#+                       #
 #    Created: 2022/05/13 11:36:28 by lde-la-h      #+#    #+#                  #
-#    Updated: 2022/08/09 15:22:59 by lde-la-h      ########   odam.nl          #
+#    Updated: 2022/08/11 19:39:59 by fbes          ########   odam.nl          #
 #                                                                              #
 # **************************************************************************** #
 
@@ -30,6 +30,8 @@ HEADERS :=	$(addprefix -I , $(shell find ./src -iname '*.hpp' | sed -E "s|/[^/]+
 CFLAGS	:= -std=c++17 -Wextra -Wall -Werror -Wunreachable-code -Wno-char-subscripts -Wno-unused-variable -Wno-unused-parameter -Wno-unused-function -Wno-sign-compare
 ifdef DEBUG
 	CFLAGS	+=	-g3
+else ifdef FSAN
+	CFLAGS	+=	-fsanitize=address -DCMAKE_EXE_LINKER_FLAGS="-fsanitize=address"
 else
 	CFLAGS	+= -D NDEBUG -Ofast
 endif
@@ -44,7 +46,7 @@ all: # Multi threading badness because C++ is slow
 	@$(CC) $(CFLAGS) -o $@ -c $< $(HEADERS) && printf "$(GREEN)$(BOLD)\rCompiling: $(notdir $<)\r\e[35C[OK]\n$(RESET)"
 
 $(NAME): $(OBJS)
-	@$(CC) $(OBJS) -o $(NAME)
+	@$(CC) $(CFLAGS) $(OBJS) -o $(NAME)
 	@printf "$(GREEN)$(BOLD)Done\n$(RESET)"
 
 clean:
