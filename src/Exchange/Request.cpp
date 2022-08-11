@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:07:39 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/11 16:12:57 by fbes          ########   odam.nl         */
+/*   Updated: 2022/08/11 19:00:10 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,14 +27,11 @@ void ft::Request::appendBuffer(char *buffer, int bread)
 	//else if (!isalpha(buffer.at(0)))
 	//	throw ft::BadRequest(); // TODO: move to header parser, this is for invalid requests (HTTPS, for example)
 
-	std::cout<<RED<<"Appending data"<<RESET<<std::endl;
-	std::cout<< RED<<this->data.size()<<RESET<<std::endl;
-	for (ssize_t i = 0; i < bread; i++)
-		this->data.push_back(buffer[i]);
-	std::cout<< RED<<this->data.size()<<RESET<<std::endl;
+	std::cout << BLACK << "Appending to buffer (original size " << this->data.size() << ", appending " << bread << " bytes" << RESET << std::endl;
+	this->data.append(buffer, bread);
+	std::cout<< BLACK << "New buffer size: " << this->data.size() << RESET << std::endl;
 
-
-	// std::cout << BLACK << "[DEBUG] Data: " << this->data << RESET << std::endl;
+	// std::cout << BLACK << "Data: " << this->data << RESET << std::endl;
 
 	if (this->data.size() > 100000) // TODO: Get from config
 		throw ft::PayloadTooLarge();
@@ -42,7 +39,7 @@ void ft::Request::appendBuffer(char *buffer, int bread)
 	// IF its a get request, we check for the \r\n\r\n
 	// IF its a post request we compare against the content-length instead.
 
-	// No body, ask to continue.
+	// Check if we've received the full header
 	if (!this->headerDone)
 		this->headerDone = this->data.find("\r\n\r\n") != std::string::npos;
 }
