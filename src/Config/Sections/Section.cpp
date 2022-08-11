@@ -6,11 +6,12 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 15:39:35 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/28 14:53:21 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/08/11 16:03:04 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Section.hpp"
+#include "Utils.hpp"
 
 ft::Section::Section(const std::string& cwd, const std::string& name)
 {
@@ -51,8 +52,12 @@ std::map<std::string, std::string> ft::Section::exportFields(void) const
 
 void ft::Section::importFields(std::map<std::string, std::string> fields)
 {
-	for (const auto &vals: fields)
+	for (const std::pair<std::string, std::string> &vals: fields)
+	{
+		std::cout << BLACK << "Importing " << vals.first << ": " << vals.second << RESET << std::endl;
+		std::cout << BLACK << "Currently " << vals.first << ": " << this->fields[vals.first] << RESET << std::endl;
 		this->fields[vals.first] = vals.second;
+	}
 }
 
 bool ft::Section::keyExists(const std::string& key) const
@@ -140,13 +145,15 @@ uint32_t ft::Section::getAmountOfFields() const
 
 void ft::Section::print(std::string prefix) const
 {
-	std::cout << "[DEBUG] " << prefix << ">>>> SECTION NAME " << this->name << " <<<<" << std::endl;
+	std::cout << BLACK << "" << prefix << ">>>> SECTION NAME " << this->name << " <<<<" << std::endl;
 
 	if (!this->appliesToPath.empty())
-		std::cout << "[DEBUG] " << prefix << ">>>> APPLIES TO PATH " << this->appliesToPath << " <<<<" << std::endl;
+		std::cout << "" << prefix << ">>>> APPLIES TO PATH " << this->appliesToPath << " <<<<" << std::endl;
 
 	for (auto& i : this->fields)
-		std::cout << "[DEBUG] " << prefix <<  i.first << " = " << i.second << std::endl;
+		std::cout << "" << prefix <<  i.first << " = " << i.second << std::endl;
+
+	std::cout << RESET << std::endl;;
 }
 
 const std::string& ft::Section::getcwd() const
@@ -205,13 +212,20 @@ void ft::Section::verifyKeyValue(uint32_t lineNum, std::string& key, std::string
 				throw ft::InvalidFieldValueException(lineNum);
 			break;
 
+		// expecting a path that starts with /
+		case 8: //path
+			if (value.size() == 0)
+				throw ft::InvalidFieldValueException(lineNum);
+			if (value.front() != '/')
+				throw ft::InvalidFieldValueException(lineNum);
+			break;
+
 		// expecting a non-empty string
 		case 2: // server_name
 		case 3: // index
 		case 6: // error_404
 		case 7: // methods
 		case 10: //error_403
-		case 8: // path
 			if (value.size() == 0)
 				throw ft::InvalidFieldValueException(lineNum);
 			break;

@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:07:35 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/09 20:50:36 by W2Wizard      ########   odam.nl         */
+/*   Updated: 2022/08/11 16:04:24 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,21 +35,33 @@ ft::Response::~Response()
 
 //////////////////////////////////////////
 
-static std::string basedir(const std::string& path)
-{
-	std::string base = path;
-	base.erase(path.find_last_of('/'));
-	return (base);
-}
-
-void ft::Response::importFieldsForPath()
+void ft::Response::importFieldsForPath(std::string& rootPath)
 {
 	this->pathConfig = ft::Section(this->config.getcwd(), "response", this->config);
-	std::string basePath = basedir(this->conn.request->path);
+	std::string* overridePath = nullptr;
 
-	for (const auto &val: this->config.locations)
-		if (val.appliesForPath(basePath))
-			this->pathConfig.importFields(val.exportFields());	
+	std::cout << BLACK << "rootPath: " << rootPath << RESET << std::endl;
+	for (const auto &location: this->config.locations)
+	{
+		if (location.appliesForPath(rootPath))
+		{
+			std::cout << BLACK << "Location " << location.getAppliedPath() << " applies for path " << rootPath << "!" << RESET << std::endl;
+			this->pathConfig.importFields(location.exportFields());
+			overridePath = const_cast<std::string*>(this->pathConfig.getValue("path"));
+			if (overridePath)
+			{
+				std::cout << BLACK << "rootPath before override: " << rootPath << RESET << std::endl;
+				rootPath.erase(0, location.getAppliedPath().length());
+				std::cout << BLACK << "rootPath after erasure: " << rootPath << RESET << std::endl;
+				if (location.getAppliedPath().back() != '/' && rootPath.front() != '/')
+					rootPath.erase(0, rootPath.find_first_of('/') + 1);
+				std::cout << BLACK << "rootPath after erasure of starting /: " << rootPath << RESET << std::endl;
+				rootPath = *overridePath + rootPath;
+				std::cout << BLACK << "rootPath after override: " << rootPath << RESET << std::endl;
+			}
+		}
+	}
+	std::cout << BLACK << "rootPath after import: " << rootPath << RESET << std::endl;
 }
 
 //////////////////////////////////////////
