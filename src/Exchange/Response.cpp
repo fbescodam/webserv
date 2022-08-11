@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:07:35 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/11 17:02:40 by fbes          ########   odam.nl         */
+/*   Updated: 2022/08/11 19:18:49 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,6 +88,8 @@ void ft::Response::generateResponse(ft::Connection& conn, int32_t status)
 	conn.response = new ft::Response(conn);
 	if (status == 100)
 		conn.response->headers["connection"] = "keep-alive";
+	else
+		conn.response->headers["connection"] = "close";
 	conn.response->generateStatus(status);
 }
 
@@ -242,7 +244,7 @@ ft::Response::Status ft::Response::sendDynamic(ft::fd_t socket)
 {
 	std::cout << BLACK << "Sending everything in one go (dynamically generated page)..." << RESET << std::endl;
 	size_t bsent = ft::send(socket, this->data.data(), this->data.length(), NONE); // Send as much as possible
-	std::cout <<RED<<"argh: "<<bsent<<RESET<<std::endl;
+	std::cout << BLACK << "Bytes sent: " << bsent << RESET << std::endl;
 	this->data.erase(0, bsent); // Delete data that has been sent
 	if (bsent < this->data.length()) // Not everything was sent, send more in the next poll
 		return (ft::Response::Status::NOT_DONE);

@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 15:39:35 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/11 16:06:12 by fbes          ########   odam.nl         */
+/*   Updated: 2022/08/11 19:30:48 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,7 +79,7 @@ bool ft::Section::getValueAsInt(const std::string& key, int& output) const
 	return (true);
 }
 
-int ft::Section::returnValueAsInt(const std::string& key) const
+int32_t ft::Section::returnValueAsInt(const std::string& key) const
 {
 	auto it = this->fields.find(key);
 
@@ -187,7 +187,7 @@ void ft::Section::verifyKeyValue(uint32_t lineNum, std::string& key, std::string
 		}
 	}
 	size_t space;
-	int statusCode;
+	int32_t statusCode;
 
 	if (index == -1)
 		throw ft::UnknownFieldKeyException(lineNum);
