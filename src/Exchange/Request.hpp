@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:07:36 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/10 14:20:01 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/08/11 19:30:58 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ public: // Ctor ~ Dtor
 	Request(const std::vector<ft::Server>& servers) noexcept;
 
 public: // Functions
-	void appendBuffer(char *buffer, int bread);
+	void appendBuffer(char *buffer, int32_t bread);
 	void parseHeader(ft::Connection& conn);
 	bool isHeaderDone(void) const;
 	bool isHeaderParsed(void) const;
@@ -58,8 +58,9 @@ public: // Attributes
 	bool headerParsed;
 
 private:
-	const std::vector<ft::Server>& servers;
-	bool headerDone;
+	const	std::vector<ft::Server>& servers;
+	bool	headerDone;
+	int32_t	contentLength; // only used for POST requests
 };
 
 }

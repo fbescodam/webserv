@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 13:54:52 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/27 10:37:45 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/08/11 19:30:27 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,7 +68,7 @@ public: // Functions
 	 * @param key the key of a configuration field to get the value of
 	 * @return the direct value of the configuration
 	 */
-	int returnValueAsInt(const std::string& key) const;
+	int32_t returnValueAsInt(const std::string& key) const;
 
 	/**
 	 * @brief directly return the value of a configuration field, as a boolean

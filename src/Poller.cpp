@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/28 15:48:13 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/11 16:09:49 by fbes          ########   odam.nl         */
+/*   Updated: 2022/08/11 19:19:12 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -217,7 +217,7 @@ void ft::Poller::pollInEvent(ft::Connection& conn)
 	if (conn.request->isHeaderDone() && !conn.request->headerParsed)
 	{
 		conn.request->parseHeader(conn);
-		std::cout << BLACK << "[DEBUG] Header Parsed" << RESET << std::endl;
+		std::cout << BLACK << "Header parsed" << RESET << std::endl;
 	}
 	if (conn.request->isBodyDone())
 	{
@@ -250,7 +250,7 @@ void ft::Poller::pollInEvent(ft::Connection& conn)
 		}
 	}
 pollout:
-	std::cout << "Pollout now" << std::endl;
+	std::cout << BLACK << "Pollout now" << RESET << std::endl;
 	conn.poll->events = POLLOUT;
 	conn.lastActivity = std::time(nullptr);
 }

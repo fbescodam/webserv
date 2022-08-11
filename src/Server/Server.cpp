@@ -64,7 +64,9 @@ void ft::Server::handleRequest(ft::Connection& conn)
 	try
 	{
 		conn.response = new ft::Response(conn);
-		rootPath = conn.request->path;
+		std::cout << BLACK << "Requested path: " << conn.request->path << RESET << std::endl;
+		rootPath = conn.request->path.substr(0, conn.request->path.find_first_of('?'));
+		// Note: no need to split on #, the anchor/fragment identifier is not sent as part of the request
 		conn.response->importFieldsForPath(rootPath);
 	}
 	catch (const std::exception& e)
@@ -74,21 +76,31 @@ void ft::Server::handleRequest(ft::Connection& conn)
 		try { this->respondWithStatus(conn, 500); }
 		catch (const std::exception& e) { exit(EXIT_FAILURE); }
 	}
-	filePath = this->config.getcwd() + *(this->config.getValue("path")) + rootPath;
-	std::cout << BLACK << "filePath: " << filePath << RESET << std::endl;
-
 	conn.response->pathConfig.print("pathConfig\t");
 
-	// TODO: Verify
 	if (!conn.response->pathConfig.returnValueAsBoolean("access"))
 		return (this->respondWithStatus(conn, 403));
 
-	// dir listing
-	struct stat stats;
-	stat(filePath.c_str(), &stats);
-	if (S_ISDIR(stats.st_mode) && filePath.back() != '/')
+	// Get actual path used for IO
+	filePath = this->config.getcwd() + *(this->config.getValue("path")) + rootPath;
+	std::cout << BLACK << "Relative filePath: " << filePath << RESET << std::endl;
+
+	// Get the absolute path to perform security checks
+	if (!ft::filesystem::getAbsolutePath(filePath.c_str(), filePath))
+		return (this->respondWithStatus(conn, 404)); // Likely a 404 error
+	std::cout << BLACK << "Absolute filePath: " << filePath << RESET << std::endl;
+
+	if (filePath.find(this->config.getcwd() + *this->config.getValue("path")) != 0)
+	{
+		std::cout << RED << "[WARNING] Requested path is outside of the root defined in the server config!" << RESET << std::endl;
+		return (this->respondWithStatus(conn, 403));
+	}
+
+	// Modify path for directory reading if path is a directory
+	if (ft::filesystem::isDir(filePath) && filePath.back() != '/')
 		filePath += "/";
 
+	// Run directory checks
 	if (filePath.back() == '/')
 	{
 		std::string indexFile = "index.html"; // default
@@ -103,10 +115,15 @@ void ft::Server::handleRequest(ft::Connection& conn)
 			std::cout << BLACK << "Index file does not exist and dir_listing is not enabled, responding with 404" << RESET << std::endl;
 			return (this->respondWithStatus(conn, 404));
 		}
+		else if (!ft::filesystem::isDir(filePath))
+		{
+			std::cout << BLACK << "Index file does not exist, dir_listing is enabled, but directory does not exist, responding with 404" << RESET << std::endl;
+			return (this->respondWithStatus(conn, 404));
+		}
+		else
+			conn.response->isDirListing = true;
 		std::cout << BLACK << "Index file exists or dir_listing is enabled, new filePath is " << filePath << RESET << std::endl;
 	}
-
-	std::cout << BLACK << "Final filePath: " << filePath << RESET << std::endl;
 
 	// Gets the allowed methods for path
 	std::list<std::string> methodList;

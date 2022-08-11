@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:07:33 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/11 15:34:56 by fbes          ########   odam.nl         */
+/*   Updated: 2022/08/11 20:23:14 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,7 +98,8 @@ private:
 	void writeHeaders(void);
 
 public: // Attributes
-	ft::Section pathConfig;
+	ft::Section	pathConfig;
+	bool		isDirListing;
 private:
 	// The current connection this response is targeting.
 	const ft::Connection& conn;

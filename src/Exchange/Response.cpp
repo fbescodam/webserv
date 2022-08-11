@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:07:35 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/11 17:02:40 by fbes          ########   odam.nl         */
+/*   Updated: 2022/08/11 20:28:07 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@ ft::Response::Response(const ft::Connection& conn) : conn(conn), config(this->co
 	this->file = nullptr;
 	this->offset = 0;
 	this->headers["server"] = "Breadserv";
+	this->isDirListing = false;
 	if (conn.request->headers["connection"] == "keep-alive")
 	{
 		this->headers["connection"] = "keep-alive";
@@ -88,6 +89,8 @@ void ft::Response::generateResponse(ft::Connection& conn, int32_t status)
 	conn.response = new ft::Response(conn);
 	if (status == 100)
 		conn.response->headers["connection"] = "keep-alive";
+	else
+		conn.response->headers["connection"] = "close";
 	conn.response->generateStatus(status);
 }
 
@@ -185,33 +188,28 @@ void ft::Response::getMethod(const std::string& filePath)
 {
 	std::cout << BLACK << "Receiving GET method. Responding now." << RESET << std::endl;
 
-	// Check if filepath ends with /, if so, dir listing.
-	if (filePath.back() == '/')
+	if (this->isDirListing) try
 	{
-		try
-		{
-			std::string dirListing;
-			ft::DirectoryFactory::buildContentFromDir(filePath, this->conn.request->path, dirListing);
+		std::string dirListing;
+		ft::DirectoryFactory::buildContentFromDir(filePath, this->conn.request->path, dirListing);
 
-			this->writeStatusLine(200);
-			this->headers["content-length"] = std::to_string(dirListing.size());
-			this->headers["content-type"] = "text/html";
-			this->writeHeaders();
-			this->data += dirListing;
-			std::cout << BLACK << "Set sendRes to sendDynamic" << RESET << std::endl;
-			this->sendRes = &ft::Response::sendDynamic;
-			return;
-		}
-		catch(const std::exception& e)
-		{
-			std::cerr << RED << "Webserv: " << e.what() << RESET << std::endl;
-
-			try { return (this->generateStatus(500)); }
-			catch (const std::exception& e) { exit (EXIT_FAILURE); }
-		}
+		this->writeStatusLine(200);
+		this->headers["content-length"] = std::to_string(dirListing.size());
+		this->headers["content-type"] = "text/html";
+		this->writeHeaders();
+		this->data += dirListing;
+		std::cout << BLACK << "Set sendRes to sendDynamic" << RESET << std::endl;
+		this->sendRes = &ft::Response::sendDynamic;
+		return;
 	}
+	catch(const std::exception& e)
+	{
+		std::cerr << RED << "Webserv: " << e.what() << RESET << std::endl;
 
-	try // No, its just a file
+		try { return (this->generateStatus(500)); }
+		catch (const std::exception& e) { exit(EXIT_FAILURE); }
+	}
+	else try
 	{
 		if (!ft::filesystem::fileExists(filePath))
 			return (this->generateStatus(404));
@@ -243,7 +241,7 @@ ft::Response::Status ft::Response::sendDynamic(ft::fd_t socket)
 {
 	std::cout << BLACK << "Sending everything in one go (dynamically generated page)..." << RESET << std::endl;
 	size_t bsent = ft::send(socket, this->data.data(), this->data.length(), NONE); // Send as much as possible
-	std::cout <<RED<<"argh: "<<bsent<<RESET<<std::endl;
+	std::cout << BLACK << "Bytes sent: " << bsent << RESET << std::endl;
 	this->data.erase(0, bsent); // Delete data that has been sent
 	if (bsent < this->data.length()) // Not everything was sent, send more in the next poll
 		return (ft::Response::Status::NOT_DONE);
