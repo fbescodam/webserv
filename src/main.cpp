@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 17:39:03 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/09 16:33:37 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/08/10 11:34:34 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,8 +69,8 @@ int32_t main(int32_t argc, const char* argv[])
 		return (EXIT_FAILURE);
 	}
 
-	// Termcap, allowed ? Maybe ?
-	struct termios	raw;
+	// Remove termcaps
+	termios raw;
 	tcgetattr(STDIN_FILENO, &raw);
 	raw.c_lflag &= ~(ECHOCTL);
 	tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
