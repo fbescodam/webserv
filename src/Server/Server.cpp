@@ -76,21 +76,20 @@ void ft::Server::handleRequest(ft::Connection& conn)
 		try { this->respondWithStatus(conn, 500); }
 		catch (const std::exception& e) { exit(EXIT_FAILURE); }
 	}
-	filePath = this->config.getcwd() + *(this->config.getValue("path")) + rootPath;
-	std::cout << BLACK << "filePath: " << filePath << RESET << std::endl;
-
 	conn.response->pathConfig.print("pathConfig\t");
 
-	// TODO: Verify
 	if (!conn.response->pathConfig.returnValueAsBoolean("access"))
 		return (this->respondWithStatus(conn, 403));
 
-	// dir listing
-	struct stat stats;
-	stat(filePath.c_str(), &stats);
-	if (S_ISDIR(stats.st_mode) && filePath.back() != '/')
+	// Get actual path used for IO
+	filePath = this->config.getcwd() + *(this->config.getValue("path")) + rootPath;
+	std::cout << BLACK << "filePath: " << filePath << RESET << std::endl;
+
+	// Modify path for directory reading if path is a directory
+	if (ft::filesystem::isDir(filePath) && filePath.back() != '/')
 		filePath += "/";
 
+	// Run directory checks
 	if (filePath.back() == '/')
 	{
 		std::string indexFile = "index.html"; // default
@@ -103,6 +102,11 @@ void ft::Server::handleRequest(ft::Connection& conn)
 		else if (!conn.response->pathConfig.returnValueAsBoolean("dir_listing"))
 		{
 			std::cout << BLACK << "Index file does not exist and dir_listing is not enabled, responding with 404" << RESET << std::endl;
+			return (this->respondWithStatus(conn, 404));
+		}
+		else if (!ft::filesystem::isDir(filePath))
+		{
+			std::cout << BLACK << "Index file does not exist, dir_listing is enabled, but directory does not exist, responding with 404" << RESET << std::endl;
 			return (this->respondWithStatus(conn, 404));
 		}
 		std::cout << BLACK << "Index file exists or dir_listing is enabled, new filePath is " << filePath << RESET << std::endl;

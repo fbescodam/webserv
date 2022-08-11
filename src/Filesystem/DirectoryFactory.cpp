@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/12 16:02:40 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/11 19:28:27 by fbes          ########   odam.nl         */
+/*   Updated: 2022/08/11 19:54:35 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,14 +15,14 @@
 // Fuck macos 14
 void ft::DirectoryFactory::buildContentFromDir(const std::string& actualPath, const std::string& requestedPath, std::string& outContent)
 {
-	std::string requestedPathCopy = requestedPath;
+	std::string requestedPathCopy = requestedPath.substr(0, requestedPath.find_first_of('?'));
 	if (requestedPathCopy.back() != '/')
 		requestedPathCopy += "/";
 	outContent.clear();
 
 	// Title and header
-	outContent += "<html><head><title>Index of " + requestedPath + "</title></head>";
-	outContent += "<body><h1>Index of " + requestedPath + "</h1><hr><pre>";
+	outContent += "<html><head><title>Index of " + requestedPathCopy + "</title></head>";
+	outContent += "<body><h1>Index of " + requestedPathCopy + "</h1><hr><pre>";
 
 	DIR* dir;
 
