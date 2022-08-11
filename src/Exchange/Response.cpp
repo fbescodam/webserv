@@ -155,11 +155,11 @@ void ft::Response::deleteMethod(const std::string& filePath)
 
 //////////////////////////////////////////
 
-void ft::Response::fileUpload(std::string data)
-{
-	std::cout << RED<<data<<std::endl;
-	exit(0);
-}
+// void ft::Response::fileUpload(std::string data)
+// {
+// 	std::cout << RED<<data<<std::endl;
+// 	exit(0);
+// }
 
 void ft::Response::postMethod(const std::string& filePath)
 {
