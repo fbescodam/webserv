@@ -54,6 +54,7 @@ public: // Attributes
 	ft::Exchange::Method method;
 	std::string path;
 	std::string version;
+	std::string header_data;
 	bool headerParsed;
 
 private:
