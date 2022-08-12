@@ -6,7 +6,7 @@
 /*   By: fbes <fbes@student.codam.nl>                 +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/31 16:27:42 by fbes          #+#    #+#                 */
-/*   Updated: 2022/08/04 19:06:57 by fbes          ########   odam.nl         */
+/*   Updated: 2022/08/12 15:58:33 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,7 +82,7 @@ bool ft::CGI::runCGI(const ft::Connection& conn, const std::string& path, std::s
 	else // Parent
 	{
 		std::string fullData = conn.request->header_data + "\r\n\r\n" + conn.request->data;
-		std::cout <<fullData;
+		// std::cout <<fullData;
 
 		if (!conn.request->data.empty())
 			size_t bread = write(body_pipe[WRITE],fullData.data(),fullData.size());
@@ -103,6 +103,7 @@ bool ft::CGI::runCGI(const ft::Connection& conn, const std::string& path, std::s
 
 	std::cout << RED << "Exiting cgi"<<RESET<<std::endl;
 	std::cout << out<<std::endl;
+	std::cout << out.size()<<std::endl;
 
 	return (true);
 }

@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 10:41:28 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/04 19:31:54 by fbes          ########   odam.nl         */
+/*   Updated: 2022/08/12 17:35:41 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -250,6 +250,13 @@ std::string& ft::getContentType(std::string path)
 		{"htm",		"text/html"},
 		{"shtml",	"text/html"},
 		{"css",		"text/css"},
+		{"c",		"text/x-c"},
+		{"cpp",		"text/x-cpp"},
+		{"py",		"text/x-py"},
+		{"bat",		"text/x-bat"},
+		{"sh",		"text/x-sh"},
+		{"mk",		"text/x-mk"},
+		{"md",		"text/markdown"},
 		{"xml",		"text/xml"},
 		{"mml",		"text/mathml"},
 		{"txt",		"text/plain"},
@@ -278,14 +285,6 @@ std::string& ft::getContentType(std::string path)
 		{"bmp",		"image/bmp"},
 
 		{"json",	"application/json"},
-
-		{"mid",		"audio/midi"},
-		{"midi",	"audio/midi"},
-		{"kar",		"audio/midi"},
-		{"mp3",		"audio/mpeg"},
-		{"ogg",		"audio/ogg"},
-		{"m4a",		"audio/x-m4a"},
-		{"ra",		"audio/x-realaudio"},
 
 		{"mid",		"audio/midi"},
 		{"midi",	"audio/midi"},

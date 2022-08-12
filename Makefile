@@ -6,7 +6,7 @@
 #    By: lde-la-h <lde-la-h@student.codam.nl>         +#+                      #
 #                                                    +#+                       #
 #    Created: 2022/05/13 11:36:28 by lde-la-h      #+#    #+#                  #
-#    Updated: 2022/08/11 19:55:43 by fbes          ########   odam.nl          #
+#    Updated: 2022/08/12 14:32:19 by pvan-dij      ########   odam.nl          #
 #                                                                              #
 # **************************************************************************** #
 
@@ -39,7 +39,7 @@ SRCS	:=	$(shell find ./src -iname "*.cpp")
 OBJS	:=	${SRCS:.cpp=.o}
 
 #//= Recipes =//#
-all: # Multi threading badness because C++ is slow
+all: fileupload # Multi threading badness because C++ is slow
 	@$(MAKE) $(NAME) -j4
 
 %.o: %.cpp
@@ -52,9 +52,14 @@ $(NAME): $(OBJS)
 clean:
 	@echo "$(RED)Cleaning$(RESET)"
 	@rm -f $(OBJS)
+	@rm -f ./examples/www/post/filecgi.out
 
 fclean: clean
 	@rm -f $(NAME)
+
+fileupload:
+	@g++ -std=c++17 -o filecgi.out ./examples/www/post/fileupload.cpp
+	@mv filecgi.out ./examples/www/post/
 
 re:	fclean all
 
