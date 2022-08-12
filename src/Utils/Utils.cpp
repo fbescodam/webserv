@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 10:41:28 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/12 17:35:41 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/08/12 17:56:22 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -251,7 +251,7 @@ std::string& ft::getContentType(std::string path)
 		{"shtml",	"text/html"},
 		{"css",		"text/css"},
 		{"c",		"text/x-c"},
-		{"cpp",		"text/x-cpp"},
+		{"cpp",		"text/x-c"},
 		{"py",		"text/x-py"},
 		{"bat",		"text/x-bat"},
 		{"sh",		"text/x-sh"},
