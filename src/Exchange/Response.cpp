@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:07:35 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/11 20:28:07 by fbes          ########   odam.nl         */
+/*   Updated: 2022/08/15 11:28:18 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,10 +87,7 @@ void ft::Response::writeHeaders(void)
 void ft::Response::generateResponse(ft::Connection& conn, int32_t status)
 {
 	conn.response = new ft::Response(conn);
-	if (status == 100)
-		conn.response->headers["connection"] = "keep-alive";
-	else
-		conn.response->headers["connection"] = "close";
+	conn.response->headers["connection"] = status == 100 ? "keep-alive" : "close";
 	conn.response->generateStatus(status);
 }
 
@@ -108,7 +105,7 @@ void ft::Response::generateStatus(int32_t status)
 		const std::string* page = this->config.getValue(errorPage);
 		if (!path || !page)
 			goto generic;
-		std::string filePath(*path + *page);
+		std::string filePath(this->config.getcwd() + *path + *page);
 		if ((this->file = fopen(filePath.c_str(), "r")) == nullptr)
 			goto generic;
 
