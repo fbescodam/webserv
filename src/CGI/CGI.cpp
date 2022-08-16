@@ -6,7 +6,7 @@
 /*   By: fbes <fbes@student.codam.nl>                 +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/31 16:27:42 by fbes          #+#    #+#                 */
-/*   Updated: 2022/08/12 15:58:33 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/08/16 15:05:03 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ bool ft::CGI::runCGI(const ft::Connection& conn, const std::string& path, std::s
 	envp.push_back("SCRIPT_NAME=" + path);
 	envp.push_back("SERVER_NAME=localhost");
 	envp.push_back("SERVER_PROTOCOL=HTTP/1.1");
-	envp.push_back("PATH_INFO=~/work/webserv/examples/www/post/fileupload.sh"); // TODO: Remove abs path
+	envp.push_back("PATH_INFO=" + path);
 	envp.push_back("CONTENT_LENGTH=" + conn.request->headers["content-length"]);
 
 	std::cout << RED << "Entering cgi"<<RESET<<std::endl;

@@ -6,7 +6,7 @@
 #    By: lde-la-h <lde-la-h@student.codam.nl>         +#+                      #
 #                                                    +#+                       #
 #    Created: 2022/05/13 11:36:28 by lde-la-h      #+#    #+#                  #
-#    Updated: 2022/08/12 14:32:19 by pvan-dij      ########   odam.nl          #
+#    Updated: 2022/08/16 15:11:13 by lde-la-h      ########   odam.nl          #
 #                                                                              #
 # **************************************************************************** #
 
@@ -35,11 +35,24 @@ else ifdef FSAN
 else
 	CFLAGS	+= -D NDEBUG -Ofast
 endif
-SRCS	:=	$(shell find ./src -iname "*.cpp")
+SRCS	:=	./src/CGI/CGI.cpp \
+			./src/Config/GlobalConfig.cpp \
+			./src/Config/KeyValueVerifier.cpp \
+			./src/Config/Sections/Section.cpp \
+			./src/Config/Sections/ServerSection.cpp \
+			./src/Exchange/Exchange.cpp \
+			./src/Exchange/Request.cpp \
+			./src/Exchange/Response.cpp \
+			./src/Filesystem/DirectoryFactory.cpp \
+			./src/Filesystem/Filesystem.cpp \
+			./src/main.cpp \
+			./src/Poller.cpp \
+			./src/Server/Server.cpp \
+			./src/Utils/Utils.cpp \
 OBJS	:=	${SRCS:.cpp=.o}
 
 #//= Recipes =//#
-all: fileupload # Multi threading badness because C++ is slow
+all: filecgi # Multi threading badness because C++ is slow
 	@$(MAKE) $(NAME) -j4
 
 %.o: %.cpp
@@ -57,9 +70,9 @@ clean:
 fclean: clean
 	@rm -f $(NAME)
 
-fileupload:
-	@g++ -std=c++17 -o filecgi.out ./examples/www/post/fileupload.cpp
-	@mv filecgi.out ./examples/www/post/
+filecgi:
+	@$(CC) $(CFLAGS) -o filecgi.cgi ./examples/www/post/fileupload.cpp
+	@mv filecgi.cgi ./examples/www/post/
 
 re:	fclean all
 

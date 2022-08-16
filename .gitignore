@@ -33,3 +33,4 @@
 webserv
 .vscode/*.log
 .DS_Store
+examples/www/delete/*

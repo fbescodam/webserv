@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:07:35 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/15 11:28:18 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/08/16 13:28:21 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -121,7 +121,7 @@ void ft::Response::generateStatus(int32_t status)
 
 generic: // Send generic built-in page.
 	std::cout << BLACK << "Generating status page for " << status << RESET << std::endl;
-	std::string statusText(ft::getStatusCodes().at(status)); // TODO: Retrieve pig image.
+	std::string statusText(ft::getStatusCodes().at(status));
 	this->generateStatus(status, "<!DOCTYPE html><html><head><title>" + statusText + "</title></head><body><h1>" + std::to_string(status) + " " + statusText + "</h1></body></html>");
 }
 
@@ -149,8 +149,8 @@ void ft::Response::deleteMethod(const std::string& filePath)
 		return (this->generateStatus(404));
 
 	if (std::remove(filePath.c_str()) != 0)
-		return (this->generateStatus(500, "File deletion failed!"));
-	this->generateStatus(200, "File deleted");
+		return (this->generateStatus(500, "<h1>File failed to deleted</h1>"));
+	this->generateStatus(200, "<h1>File deleted</h1>");
 }
 
 //////////////////////////////////////////
