@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/28 15:48:13 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/16 15:04:54 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/08/16 16:42:02 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -132,6 +132,14 @@ ft::Server* ft::Poller::getFirstServerOfPort(uint16_t port)
 
 //////////////////////////////////////////
 
+static uint16_t getPortBySocket(int32_t socket)
+{
+    struct sockaddr_in sin;
+    socklen_t len = sizeof(sin);
+    getsockname(socket, (struct sockaddr *)&sin, &len);
+    return (ntohs(sin.sin_port));
+}
+
 bool ft::Poller::acceptIncoming(const ft::Server& server)
 {
 	if (this->activeClients >= MAX_CLIENTS)
@@ -179,7 +187,7 @@ bool ft::Poller::acceptIncoming(const ft::Server& server)
 				// Populate the connection struct
 				this->connections[i].poll = fd;
 				this->connections[i].lastActivity = std::time(nullptr);
-                this->connections[i].server = this->getFirstServerOfPort(8080); //TODO: get port
+                this->connections[i].server = this->getFirstServerOfPort(getPortBySocket(serverSocket->fd)); //TODO: get port
 				this->connections[i].ipv4 = ft::inet_ntop(*const_cast<ft::SocketAddress*>(&server.getSocket()->addr));
 
 				// Increment the active connection count
