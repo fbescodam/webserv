@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/28 15:48:13 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/11 19:19:12 by fbes          ########   odam.nl         */
+/*   Updated: 2022/08/16 12:27:09 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -119,6 +119,19 @@ void ft::Poller::pollAll(void)
 
 //////////////////////////////////////////
 
+ft::Server* ft::Poller::getFirstServerOfPort(uint16_t port)
+{
+    for (auto& server : this->servers)
+    {
+        auto servPort = server.config.returnValueAsInt("listen");
+        if (port == servPort)
+            return (&server);
+    }
+    return (nullptr);
+}
+
+//////////////////////////////////////////
+
 bool ft::Poller::acceptIncoming(const ft::Server& server)
 {
 	if (this->activeClients >= MAX_CLIENTS)
@@ -131,6 +144,7 @@ bool ft::Poller::acceptIncoming(const ft::Server& server)
 		// Accept this connection.
 		std::cout << GREEN << "Accepting incoming connection" << RESET << std::endl;
 		const Socket *serverSocket = server.getSocket();
+        
 		// Assign new connection a clientSocket, which is connected to a server's socket
 		ft::fd_t clientSocket = ft::accept(serverSocket->fd, const_cast<ft::SocketAddress*>(&serverSocket->addr));
 		ft::setSocketOption(clientSocket, SOL_SOCKET, SO_REUSEADDR, true, sizeof(int32_t)); // Make kernel release socket after exit
@@ -165,7 +179,7 @@ bool ft::Poller::acceptIncoming(const ft::Server& server)
 				// Populate the connection struct
 				this->connections[i].poll = fd;
 				this->connections[i].lastActivity = std::time(nullptr);
-				this->connections[i].server = nullptr; // Don't know yet
+                this->connections[i].server = nullptr;
 				this->connections[i].ipv4 = ft::inet_ntop(*const_cast<ft::SocketAddress*>(&server.getSocket()->addr));
 
 				// Increment the active connection count
@@ -180,7 +194,7 @@ bool ft::Poller::acceptIncoming(const ft::Server& server)
 		return (false);
 	}
 
-	// This should never happen
+    // TODO: Somehow send a 503 back ??
 	std::cout << RED << "Refusing incoming connection; no available pollfd or connection struct found" << RESET << std::endl;
 	return (false);
 }
@@ -189,8 +203,6 @@ bool ft::Poller::acceptIncoming(const ft::Server& server)
 
 void ft::Poller::pollInEvent(ft::Connection& conn)
 {
-	ssize_t		brecv;		// Bytes received
-
 	// Clear the current response, as a request is now being made.
 	delete conn.response;
 	conn.response = nullptr;
@@ -198,7 +210,7 @@ void ft::Poller::pollInEvent(ft::Connection& conn)
 		conn.request = new Request(this->servers);
 
 	bzero(this->buffer, BUFF_SIZE); // Clear the buffer
-	brecv = recv(conn.poll->fd, this->buffer, BUFF_SIZE, NONE);
+	ssize_t brecv = recv(conn.poll->fd, this->buffer, BUFF_SIZE, NONE);
 	if (brecv <= 0)
 	{
 		if (brecv < 0)
@@ -208,7 +220,15 @@ void ft::Poller::pollInEvent(ft::Connection& conn)
 		this->closeConnection(conn);
 		return;
 	}
-	try { conn.request->appendBuffer(buffer, brecv); }
+    // Connection needs a server at this point ....
+	try 
+    { 
+        conn.request->appendBuffer(buffer, brecv);
+
+        // Check if first byte is bad, https should trigger this.
+        if (!isprint(conn.request->data[0]))
+            throw ft::BadRequest();
+    }
 	catch (const ft::BadRequest& e)
 	{ ft::Response::generateResponse(conn, 400); goto pollout;}
 	catch (const ft::PayloadTooLarge& e)

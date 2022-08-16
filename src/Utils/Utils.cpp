@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 10:41:28 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/12 17:56:22 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/08/16 10:03:05 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -243,7 +243,7 @@ const std::map<uint16_t, std::string>& ft::getStatusCodes()
 	return (list);
 }
 
-std::string& ft::getContentType(std::string path)
+std::string ft::getContentType(std::string path)
 {
 	static std::map<std::string, std::string> list = {
 		{"html",	"text/html"},
@@ -307,6 +307,6 @@ std::string& ft::getContentType(std::string path)
 	auto reslt = list.find(path.substr(path.find_last_of(".") + 1));
 
 	if (reslt == list.end())
-		return (list["html"]); // Default
+		return ("application/octet-stream"); // Default, we don't know so treat as binary.
 	return ((*reslt).second);
 }

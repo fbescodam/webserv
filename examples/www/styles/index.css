@@ -103,3 +103,24 @@ audio {
     background-color: var(--foreground);
     border-radius: 4px;
 }
+
+.stack {
+	display: flex;
+	flex-wrap: wrap;
+}
+
+.quick-links {
+    justify-content: center;
+    margin: 8px;
+    padding: 8px;
+}
+
+a {
+    text-decoration: solid;
+    margin: 8px;
+    padding: 8px;
+    color: var(--foreground);
+    background-color: var(--header-background);
+    border-radius: 8px;
+    box-shadow: 4px 4px 1px 2px var(--header-background-shadow);
+}

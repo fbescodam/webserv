@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/28 15:48:18 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/07/31 17:40:40 by fbes          ########   odam.nl         */
+/*   Updated: 2022/08/16 11:36:22 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,7 @@ public: // Ctor ~ Dtor
 public: // Functions
 	void setServers(const size_t amount);
 	void pollAll(void);
+    ft::Server* getFirstServerOfPort(uint16_t port);
 
 private: // Functions
 	bool acceptIncoming(const ft::Server& server);
