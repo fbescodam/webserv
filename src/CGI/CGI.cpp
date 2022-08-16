@@ -6,7 +6,7 @@
 /*   By: fbes <fbes@student.codam.nl>                 +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/31 16:27:42 by fbes          #+#    #+#                 */
-/*   Updated: 2022/08/16 15:05:03 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/08/16 15:39:00 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,18 +24,24 @@ static std::vector<const char*> c_arr(const std::vector<std::string> &v)
 
 bool ft::CGI::runCGI(const ft::Connection& conn, const std::string& path, std::string& out, const std::string& cgiBin)
 {
+    std::map<ft::Exchange::Method, std::string> methods = {
+        {ft::Exchange::Method::GET, "GET"},
+        {ft::Exchange::Method::POST, "POST"},
+        {ft::Exchange::Method::DELETE, "DELETE"},
+    };
+
 	std::vector<std::string> argv = {cgiBin, path};
 	std::vector<std::string> envp;
 	envp.push_back("GATEWAY_INTERFACE=CGI/1.1");
-	envp.push_back("REMOTE_ADDR=" + conn.ipv4);
-	envp.push_back("REQUEST_METHOD=POST");
-	envp.push_back("SCRIPT_NAME=" + path);
-	envp.push_back("SERVER_NAME=localhost");
 	envp.push_back("SERVER_PROTOCOL=HTTP/1.1");
-	envp.push_back("PATH_INFO=" + path);
+	envp.push_back("REMOTE_ADDR=" + conn.ipv4);
+	envp.push_back("REQUEST_METHOD=" + methods[conn.request->method]);
+	envp.push_back("SCRIPT_NAME=" + path);
+	envp.push_back("SERVER_NAME=" + *conn.server->config.getValue("server_name"));
+	envp.push_back("PATH_INFO=bitch");
 	envp.push_back("CONTENT_LENGTH=" + conn.request->headers["content-length"]);
 
-	std::cout << RED << "Entering cgi"<<RESET<<std::endl;
+	std::cout << RED << path << RESET << std::endl;
 
 	int32_t fds[2];
 	int32_t body_pipe[2];
