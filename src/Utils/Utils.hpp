@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 10:40:21 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/04 19:05:48 by fbes          ########   odam.nl         */
+/*   Updated: 2022/08/16 12:28:30 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -167,7 +167,7 @@ const std::map<uint16_t, std::string>& getStatusCodes();
  * @param ext The file extension, include the '.' in it.
  * @return std::string& The content type.
  */
-std::string& getContentType(std::string ext);
+std::string getContentType(std::string ext);
 
 }
 #endif
