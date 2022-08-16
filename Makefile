@@ -6,7 +6,7 @@
 #    By: lde-la-h <lde-la-h@student.codam.nl>         +#+                      #
 #                                                    +#+                       #
 #    Created: 2022/05/13 11:36:28 by lde-la-h      #+#    #+#                  #
-#    Updated: 2022/08/16 15:11:13 by lde-la-h      ########   odam.nl          #
+#    Updated: 2022/08/16 15:24:25 by lde-la-h      ########   odam.nl          #
 #                                                                              #
 # **************************************************************************** #
 
@@ -49,6 +49,7 @@ SRCS	:=	./src/CGI/CGI.cpp \
 			./src/Poller.cpp \
 			./src/Server/Server.cpp \
 			./src/Utils/Utils.cpp \
+
 OBJS	:=	${SRCS:.cpp=.o}
 
 #//= Recipes =//#
