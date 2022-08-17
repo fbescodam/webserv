@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:07:39 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/17 12:18:13 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/08/17 12:20:47 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,6 +108,8 @@ void ft::Request::checkHostHeader(ft::Connection& conn)
     // If not found then we simply leave at the default server set by poll.
     // Since there we default to the first server found on the requested port.
 }
+
+//////////////////////////////////////////
 
 static bool isValid(const std::string& str)
 {
