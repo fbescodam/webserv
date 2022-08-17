@@ -6,7 +6,7 @@
 /*   By: lde-la-h <main@w2wizard.dev>                 +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/08/17 10:35:10 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/17 14:41:27 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/08/17 15:10:00 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,7 +78,7 @@ void writeDataToFile(const std::string &fname, const std::string &val, const std
 {
 	std::fstream file;
 
-	file.open("examples/www/delete/" + fname, std::fstream::out);
+	file.open(uploadDir + "/" + fname, std::fstream::out);
 	if (!file.good())
 	{
 		std::cerr << "HTTP/1.1 500 Internal Server Error\nContent-type: text/html\nContent-length: 21\r\n\r\nInternal Server Error";
@@ -163,5 +163,6 @@ int main(int ac, char **av, char **envp)
 	else
 		parseMultipart(data, cType, uploadDir);
 
+	//TODO: fix this
 	std::cout << "HTTP/1.1 302 Found\nLocation: /delete\n\n";
 }
