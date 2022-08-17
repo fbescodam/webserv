@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/28 15:48:13 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/16 16:42:02 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/08/17 10:54:01 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -244,7 +244,9 @@ void ft::Poller::pollInEvent(ft::Connection& conn)
 
 	if (conn.request->isHeaderDone() && !conn.request->headerParsed)
 	{
-		conn.request->parseHeader(conn);
+        try { conn.request->parseHeader(conn); }
+        catch(const std::exception& e)
+        { ft::Response::generateResponse(conn, 400); goto pollout;}
 		std::cout << BLACK << "Header parsed" << RESET << std::endl;
 	}
 	if (conn.request->isBodyDone())

@@ -6,7 +6,7 @@
 /*   By: fbes <fbes@student.codam.nl>                 +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/31 16:27:42 by fbes          #+#    #+#                 */
-/*   Updated: 2022/08/16 15:39:00 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/08/17 10:40:36 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,9 +36,9 @@ bool ft::CGI::runCGI(const ft::Connection& conn, const std::string& path, std::s
 	envp.push_back("SERVER_PROTOCOL=HTTP/1.1");
 	envp.push_back("REMOTE_ADDR=" + conn.ipv4);
 	envp.push_back("REQUEST_METHOD=" + methods[conn.request->method]);
-	envp.push_back("SCRIPT_NAME=" + path);
+	envp.push_back("SCRIPT_NAME=" + path); // TODO: Proper naming pls
 	envp.push_back("SERVER_NAME=" + *conn.server->config.getValue("server_name"));
-	envp.push_back("PATH_INFO=bitch");
+	envp.push_back("PATH_INFO=" + path);
 	envp.push_back("CONTENT_LENGTH=" + conn.request->headers["content-length"]);
 
 	std::cout << RED << path << RESET << std::endl;

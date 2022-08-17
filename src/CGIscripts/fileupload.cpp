@@ -1,9 +1,22 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        ::::::::            */
+/*   fileupload.cpp                                     :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: lde-la-h <main@w2wizard.dev>                 +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2022/08/17 10:35:10 by lde-la-h      #+#    #+#                 */
+/*   Updated: 2022/08/17 10:38:52 by lde-la-h      ########   odam.nl         */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include <string>
 #include <iostream>
 #include <fstream>
 #include <sstream>
 #include <ctime>
 #include <random>
+#include <sys/stat.h>
 
 void trimQoutes(std::string& body)
 {
