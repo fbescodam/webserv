@@ -6,7 +6,7 @@
 /*   By: fbes <fbes@student.codam.nl>                 +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/31 16:27:42 by fbes          #+#    #+#                 */
-/*   Updated: 2022/08/17 10:40:36 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/08/17 14:31:03 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,7 @@ bool ft::CGI::runCGI(const ft::Connection& conn, const std::string& path, std::s
 	envp.push_back("SERVER_NAME=" + *conn.server->config.getValue("server_name"));
 	envp.push_back("PATH_INFO=" + path);
 	envp.push_back("CONTENT_LENGTH=" + conn.request->headers["content-length"]);
+	envp.push_back("UPLOAD_DIR=./examples/www/delete"); //TODO: this should be in config
 
 	std::cout << RED << path << RESET << std::endl;
 

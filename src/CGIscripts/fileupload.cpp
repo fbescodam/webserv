@@ -6,7 +6,7 @@
 /*   By: lde-la-h <main@w2wizard.dev>                 +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/08/17 10:35:10 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/17 10:38:52 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/08/17 14:41:27 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,13 @@
 #include <ctime>
 #include <random>
 #include <sys/stat.h>
+
+
+bool doesPathExist(const std::string &s)
+{
+	struct stat buffer;
+	return (stat (s. c_str(), &buffer) == 0);
+}
 
 void trimQoutes(std::string& body)
 {
@@ -67,7 +74,7 @@ std::string getFileName(size_t name, const std::string& data)
 }
 
 // Create a file based on fname and write val to it
-void writeDataToFile(const std::string &fname, const std::string &val)
+void writeDataToFile(const std::string &fname, const std::string &val, const std::string &uploadDir)
 {
 	std::fstream file;
 
@@ -82,7 +89,7 @@ void writeDataToFile(const std::string &fname, const std::string &val)
 }
 
 // Parse multipart file data, handles multipe files
-void parseMultipart(std::string data, std::string cType)
+void parseMultipart(std::string data, const std::string &cType, const std::string &uploadDir)
 {
 	// Set variables, substring magic to get all the data we need
 	time_t randomFileName = std::time(0);
@@ -110,41 +117,51 @@ void parseMultipart(std::string data, std::string cType)
 		// Erase all content info and write the data to file
 		val.erase(0, val.find("\r\n\r\n"));
 		val.erase(0, val.find_first_not_of(" \t\r\n\t\f\v"));
-		writeDataToFile(fname, val);
+		writeDataToFile(fname, val, uploadDir);
 	}
 
 }
 
 // If content type is not multipart just create file and write data to it
-void makeFile(std::string data)
+void makeFile(std::string data, const std::string &uploadDir)
 {
 	std::fstream file;
 
-	file.open("examples/www/delete/" + std::to_string(std::time(0)), std::fstream::out);
-	if (!file.good())
-	{
-		std::cerr << "HTTP/1.1 500 Internal Server Error\nContent-type: text/html\nContent-length: 21\r\n\r\nInternal Server Error";
-		exit(1);
-	}
 	std::string body = data.substr(data.find("\r\n\r\n"));
 	body.erase(0, body.find_first_not_of("\r\n"));
-	file.write(body.data(), body.size());
-	file.close();
+
+	writeDataToFile(std::to_string(std::time(0)), body, uploadDir);
 }
 
-int main(int ac, char **av)
+int main(int ac, char **av, char **envp)
 {
 	// Get data from cin
 	std::istreambuf_iterator<char> begin(std::cin), end;
 	std::string data(begin, end);
 
+	// Get upload_dir from envp
+	std::string uploadDir;
+	while (envp)
+	{
+		std::string var(*envp);
+		if (var.find("UPLOAD_DIR") != std::string::npos)
+		{
+			uploadDir = var.substr(var.find_first_of("=") + 1);
+			break;
+		}
+		envp++;
+	}
+	if (!doesPathExist(uploadDir))
+		mkdir(uploadDir.c_str(), 0700);
+
+
 	// Get the content type from data
 	auto cTypeIt = data.find("Content-Type");
 	std::string cType = data.substr(cTypeIt, data.find("\r\n", cTypeIt) - cTypeIt);
 	if (cType.find("multipart/form-data") == std::string::npos)
-		makeFile(data);
+		makeFile(data, uploadDir);
 	else
-		parseMultipart(data, cType);
+		parseMultipart(data, cType, uploadDir);
 
 	std::cout << "HTTP/1.1 302 Found\nLocation: /delete\n\n";
 }
