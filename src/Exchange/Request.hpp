@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:07:36 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/11 19:30:58 by fbes          ########   odam.nl         */
+/*   Updated: 2022/08/17 11:58:07 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,8 +47,8 @@ public: // Functions
 	bool isBodyDone(void) const;
 
 private:
-	void parseBody();
-	void parseStatusLine(const std::string& buffer);
+	void parseStatusLine(std::istringstream& ss);
+    void checkHostHeader(ft::Connection& conn);
 
 public: // Attributes
 	ft::Exchange::Method method;

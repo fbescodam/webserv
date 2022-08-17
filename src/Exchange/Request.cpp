@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:07:39 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/11 19:30:54 by fbes          ########   odam.nl         */
+/*   Updated: 2022/08/17 12:18:13 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,90 +73,96 @@ bool ft::Request::isBodyDone(void) const
 
 //////////////////////////////////////////
 
-void ft::Request::parseBody()
+// @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Host
+void ft::Request::checkHostHeader(ft::Connection& conn)
 {
-	// TODO: why is this commented?
-	//if (this->method != ft::Exchange::Method::POST)
-	//	return;
-	return;
+	const std::string* host;
+	if (!(host = this->getHeaderValue("host")))
+    {
+        std::cout << RED << "Host header not set" << RESET << std::endl;
+        throw ft::BadRequest();
+    }
+    
+    // <host>:<port>
+	std::pair<std::string, std::string> output;
+	ft::slice(*host, ":", output);
+
+    // Check which server this host matches to
+	for (auto& server : this->servers)
+    {
+        const std::string* servHost = server.config.getValue("server_name");
+		const std::string* servPort = server.config.getValue("listen");
+
+        // Check if we messed up
+        if (!servHost || !servPort)
+            throw std::exception();
+
+        // Check that name matches, if it does then check if port is set, if it is, chck that it matches.
+        if (*servHost != output.first || (!output.second.empty() && *servPort != output.second))
+            continue;
+        
+        conn.server = const_cast<ft::Server*>(&server);
+        break;
+    }
+
+    // If not found then we simply leave at the default server set by poll.
+    // Since there we default to the first server found on the requested port.
 }
+
+static bool isValid(const std::string& str)
+{
+    return std::any_of(str.begin(), str.end(), [](char c) { 
+        return (isprint(static_cast<unsigned char>(c))); 
+    });
+};
 
 //////////////////////////////////////////
 
 // Extracts the header and parses it into the request object
-void ft::Request:: parseHeader(ft::Connection& conn)
+void ft::Request::parseHeader(ft::Connection& conn)
 {
+    // Check if we have found the separator, we haven't its probably a bad request.
 	size_t pos;
 	if ((pos = this->data.find("\r\n\r\n")) == std::string::npos)
 	{
-		std::cout << RED << "Error: request header end not found" << RESET << std::endl;
-		throw std::exception(); // there is no body! run!!
+		std::cout << RED << "Error: Request separator missing!" << RESET << std::endl;
+		throw ft::BadRequest();
 	}
 
 	// We have gotten the data up until the body, we can now parse the header
-	// BuffA = Header | BuffB = Body
 	std::pair<std::string, std::string> splitBuff(this->data.substr(0, pos), this->data.substr(pos));
-	std::istringstream iss(splitBuff.first);
+	std::istringstream ss(splitBuff.first);
 	this->header_data = splitBuff.first;
 
-	// Parse the status line
+    // Check the status line
+    this->parseStatusLine(ss);
+
 	std::string line;
-	std::getline(iss, line);
-	this->parseStatusLine(line);
-
-	// Parse the headers
-	std::pair<std::string, std::string> header;
-	while (std::getline(iss, line))
-	{
-		// std::cout << BLACK << "Parsing line " << line << RESET << std::endl;
-		if (line.find(':') == std::string::npos)
+    std::pair<std::string, std::string> header;
+	while (std::getline(ss, line))
+    {
+        // Find separator of the header entry.
+        if (line.find(':') == std::string::npos)
 			throw ft::BadRequest();
 
-		ft::slice(line, ":", header);
-
-		if (header.first.empty() || header.second.empty())
-			throw ft::BadRequest();
-		ft::tolower(header.first);
-		ft::trim(header.first);
+        // Slice and trim for spaces.
+        ft::slice(line, ":", header);
+        ft::trim(header.first);
 		ft::trim(header.second);
+
+        // If either field is empty, or contains printable (like bytes or null) data
+		if (header.first.empty() || header.second.empty() || !isValid(header.first) || !isValid(header.second))
+			throw ft::BadRequest();
+
+		ft::tolower(header.first);
 		this->headers[header.first] = header.second;
-	}
+    }
 
-	// Check which server this request belongs to
-	const std::string* host;
-	if ((host = this->getHeaderValue("host")))
-	{
-		// Fist: Name | Second: Port
-		std::pair<std::string, std::string> output;
-		ft::slice(*host, ":", output);
+    // Check if the host header is set correctly.
+    // HTTP/1.1 ALWAYS has this set!
+    this->checkHostHeader(conn);
 
-		// Check if name matches that of any of our servers.
-		// Ignore port and just pick first match, and if no match is found pick first server.
-		for (auto& server : this->servers)
-		{
-			auto host = server.config.getValue("server_name");
-			auto port = server.config.getValue("listen");
-			if (port && host)
-			{
-				// TODO: Check port, can be optional
-				if (*host == output.first)
-				{
-					conn.server = const_cast<ft::Server*>(&server);
-					break;
-				}
-				// Not the right server, keep going...
-			}
-			else throw std::exception(); // Not set ?
-		}
-		if (!conn.server) // TODO: take into account the port
-			conn.server = const_cast<ft::Server*>(&this->servers.front());
-	}
-	else
-	{
-		std::cout << RED << "Host not set in header" << RESET << std::endl;
-		throw ft::BadRequest(); // for HTTP/1.1 Host NEEDS to be present!!!
-	}
-
+    // Erase header data and leave behind only the body.
 	if (this->headers.count("content-length"))
 		this->contentLength = std::stoi(this->headers["content-length"]);
 
@@ -167,16 +173,20 @@ void ft::Request:: parseHeader(ft::Connection& conn)
 	// Now split the body from the data and parse that next
 	if (splitBuff.second.size() > 0)
 	{
-		splitBuff.second.erase(0, splitBuff.second.find_first_not_of(WHITESPACE)); // trim whitespace from left
+        // Front trim from left to remove separator.
+		splitBuff.second.erase(0, splitBuff.second.find_first_not_of(WHITESPACE));
 		this->data = splitBuff.second;
-		this->parseBody();
 	}
 }
 
 //////////////////////////////////////////
 
-void ft::Request::parseStatusLine(const std::string& line)
+void ft::Request::parseStatusLine(std::istringstream& ss)
 {
+	std::string line;
+	std::getline(ss, line);
+
+    // Split on spaces for METHOD, VERSION and PATH
 	std::vector<std::string> values;
 	ft::split(line, ' ', values);
 
