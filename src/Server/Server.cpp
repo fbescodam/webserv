@@ -85,6 +85,20 @@ void ft::Server::handleRequest(ft::Connection& conn)
 	filePath = this->config.getcwd() + *(this->config.getValue("path")) + rootPath;
 	std::cout << BLACK << "Relative filePath: " << filePath << RESET << std::endl;
 
+
+	// Check for redirect
+	std::list<std::string> redirInfo;
+	std::cout << BLACK << "Check redir" << RESET << std::endl;
+	if (conn.response->pathConfig.getValueAsList("redir", redirInfo))
+	{
+		std::cout << GREEN << "Redir found, redirecting" << RESET << std::endl;
+		conn.response->headers["Location"] = redirInfo.back();
+		conn.response->generateStatus(std::stoi(redirInfo.front()));
+		return ;
+	}
+	std::cout << BLACK << "No redir found" << RESET << std::endl;
+
+	//TODO: doing this before redir caused issues because redir directory did not exist, moved it up for now
 	// Get the absolute path to perform security checks
 	if (!ft::filesystem::getAbsolutePath(filePath.c_str(), filePath))
 		return (this->respondWithStatus(conn, 404)); // Likely a 404 error
@@ -133,15 +147,6 @@ void ft::Server::handleRequest(ft::Connection& conn)
 	// Checks if request method is in allowed methods
 	if (!checkMethods(methodRules ? methodList : methodGet, conn.request->method))
 		return (this->respondWithStatus(conn, 405));
-
-	// Check for redirect
-	std::list<std::string> redirInfo;
-	if (conn.response->pathConfig.getValueAsList("redir", redirInfo))
-	{
-		conn.response->headers["Location"] = redirInfo.back();
-		conn.response->generateStatus(std::stoi(redirInfo.front()));
-		return ;
-	}
 
 	// If something fails within the GET, POST or DELETE methods
 	// they set the appropriate content, worst case they kill the app.
