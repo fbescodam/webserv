@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 10:41:28 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/16 10:03:05 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/08/18 10:59:37 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -268,6 +268,8 @@ std::string ft::getContentType(std::string path)
 		{"atom",	"application/atom+xml"},
 		{"rss",		"application/rss+xml"},
 		{"7z",		"application/x-7z-compressed"},
+		{"json",	"application/json"},
+        {"pdf",     "application/pdf"},
 
 		{"gif",		"image/gif"},
 		{"jpeg",	"image/jpeg"},
@@ -283,8 +285,6 @@ std::string ft::getContentType(std::string path)
 		{"ico",		"image/ico"},
 		{"jng",		"image/jng"},
 		{"bmp",		"image/bmp"},
-
-		{"json",	"application/json"},
 
 		{"mid",		"audio/midi"},
 		{"midi",	"audio/midi"},
