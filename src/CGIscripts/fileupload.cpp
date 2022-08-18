@@ -6,7 +6,7 @@
 /*   By: lde-la-h <main@w2wizard.dev>                 +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/08/17 10:35:10 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/18 15:28:40 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/08/18 16:04:53 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -115,6 +115,10 @@ void parseMultipart(const std::string &data, const std::string &cType, const std
 		else
 			fname = getFileName(namePos + 9, val);
 		
+		if (fname.empty())
+			continue;
+		fileNames.push_back(fname);
+	
 		// Erase all content info and write the data to file
 		val.erase(0, val.find("\r\n\r\n"));
 		val.erase(0, val.find_first_not_of(" \t\r\n\t\f\v"));
@@ -136,6 +140,25 @@ void makeFile(const std::string &data, const std::string &uploadDir, std::vector
 	fileNames.push_back(fName);
 }
 
+void GenerateResponse(const std::string &uploadPath, const std::vector<std::string> &fileNames)
+{
+	std::string out;
+
+	out += "<html><head><title>Uploaded files</title></head>";
+	out += "<body><h1>Uploaded Files</h1><hr><pre>";
+
+	for (const std::string &val : fileNames)
+	{
+		out += "<a href=\"" + uploadPath + "/" + val + "\">";
+		out += val;
+		out += "</a>\n";
+	}
+
+	out += "</pre><hr></body></html>";
+
+	std::cout << "HTTP/1.1 200 OK\nContent-Length: " + std::to_string(out.size()) + "\n\n" + out;
+}
+
 int main(int ac, char **av, char **envp)
 {
 	// Get data from cin
@@ -144,19 +167,21 @@ int main(int ac, char **av, char **envp)
 
 	// Get upload_dir from envp
 	std::string uploadDir;
+	std::string uploadPath;
 	while (envp)
 	{
+		if (!*envp)
+			break;
 		std::string var(*envp);
 		if (var.find("UPLOAD_DIR") != std::string::npos)
-		{
 			uploadDir = var.substr(var.find_first_of("=") + 1);
-			break;
-		}
+		if (var.find("UPLOAD_PATH") != std::string::npos)
+			uploadPath = var.substr(var.find_first_of("=") + 1);
 		envp++;
 	}
 	if (!doesPathExist(uploadDir))
 		mkdir(uploadDir.c_str(), 0700);
-
+	
 	// vector for storinga all the uploaded filenames
 	std::vector<std::string> fileNames;
 
@@ -168,6 +193,5 @@ int main(int ac, char **av, char **envp)
 	else
 		parseMultipart(data, cType, uploadDir, fileNames);
 
-	//TODO: fix this
-	std::cout << "HTTP/1.1 302 Found\nLocation: /delete\n\n";
+	GenerateResponse(uploadPath, fileNames);
 }
