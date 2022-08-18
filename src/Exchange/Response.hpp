@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:07:33 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/11 20:23:14 by fbes          ########   odam.nl         */
+/*   Updated: 2022/08/18 19:53:38 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,12 +63,12 @@ public: // Functions
 	static void generateResponse(ft::Connection& conn, int32_t status);
 
 	void deleteMethod(const std::string& filePath);
-	void postMethod(const std::string& filePath);
-	void getMethod(const std::string& filePath);
+	void respond(const std::string& filePath);
 
 	void importFieldsForPath(std::string& rootPath);
 
 private:
+	void notCGI(const std::string& filePath);
 
 	/**
 	 * @brief Use sendDynamic if a header and a body need to be sent in one go. This only occurs if there is no fd.
