@@ -6,7 +6,7 @@
 /*   By: fbes <fbes@student.codam.nl>                 +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/31 16:27:42 by fbes          #+#    #+#                 */
-/*   Updated: 2022/08/18 15:06:48 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/08/18 15:11:34 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ bool ft::CGI::runCGI(const ft::Connection& conn, const std::string& path, std::s
 		envp.push_back("SERVER_NAME=" + *servName);
 		envp.push_back("PATH_INFO=" + path);
 		envp.push_back("CONTENT_LENGTH=" + conn.request->headers["content-length"]);
-		envp.push_back("UPLOAD_DIR=" + *servPath + *uploadPath);
+		envp.push_back("UPLOAD_DIR=" + std::string(getcwd(NULL, 0)) + *servPath + *uploadPath);
 	}
 	catch(...) { return (false); } // Allocation failure or something.
 
