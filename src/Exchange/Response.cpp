@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:07:35 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/18 14:28:34 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/08/18 19:53:25 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -156,7 +156,7 @@ void ft::Response::deleteMethod(const std::string& filePath)
 //////////////////////////////////////////
 
 
-void ft::Response::postMethod(const std::string& filePath)
+void ft::Response::respond(const std::string& filePath)
 {
 	std::list<std::string> cgiBin;
 
@@ -179,14 +179,13 @@ void ft::Response::postMethod(const std::string& filePath)
 		return;
 	}
 
-	// Nothing to post so we treat it as a get method.
-	this->getMethod(filePath);
+	this->notCGI(filePath);
 }
 
 //////////////////////////////////////////
 
 // Simply open the file and send it over.
-void ft::Response::getMethod(const std::string& filePath)
+void ft::Response::notCGI(const std::string& filePath)
 {
 	std::cout << BLACK << "Receiving GET method. Responding now." << RESET << std::endl;
 

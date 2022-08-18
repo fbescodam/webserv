@@ -152,9 +152,8 @@ void ft::Server::handleRequest(ft::Connection& conn)
 	switch (conn.request->method)
 	{
 		case ft::Exchange::Method::GET:
-			return (conn.response->getMethod(filePath));
 		case ft::Exchange::Method::POST:
-			return (conn.response->postMethod(filePath));
+			return (conn.response->respond(filePath));
 		case ft::Exchange::Method::DELETE:
 			return (conn.response->deleteMethod(filePath));
 		default: break; // Do nothing
