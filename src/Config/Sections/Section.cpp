@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 15:39:35 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/18 15:53:16 by fbes          ########   odam.nl         */
+/*   Updated: 2022/08/18 20:22:15 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -213,7 +213,7 @@ void ft::Section::verifyKeyValue(uint32_t lineNum, std::string& key, std::string
 			break;
 
 		// expecting a path that starts with /
-		case 8: //path
+		case 8: // path
 		case 12: // upload_dir
 			if (value.length() == 0)
 				throw ft::InvalidFieldValueException(lineNum);
