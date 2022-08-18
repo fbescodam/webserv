@@ -22,10 +22,8 @@ void ft::Server::respondWithStatus(ft::Connection& conn, int32_t statusCode)
 	// Yeet out whatever response we had before.
 	delete conn.response;
 
-	conn.response = new ft::Response(conn); // TODO try catch this maybe, if it fails, close the connection
+	conn.response = new ft::Response(conn);
 	conn.response->generateStatus(statusCode);
-
-	// TODO: Do something will poll ?
 }
 
 void ft::Server::setSocket(const ft::Socket* socket)
@@ -102,7 +100,6 @@ void ft::Server::handleRequest(ft::Connection& conn)
 	}
 	std::cout << BLACK << "No redir found" << RESET << std::endl;
 
-	//TODO: doing this before redir caused issues because redir directory did not exist, moved it up for now
 	// Get the absolute path to perform security checks
 	if (!ft::filesystem::getAbsolutePath(filePath.c_str(), filePath))
 		return (this->respondWithStatus(conn, 404)); // Likely a 404 error

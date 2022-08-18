@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:07:39 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/18 15:32:18 by fbes          ########   odam.nl         */
+/*   Updated: 2022/08/18 16:34:34 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,10 +27,6 @@ void ft::Request::appendBuffer(char *buffer, int32_t bread)
 	static int32_t maxBodySize = this->servers[0].config.returnValueAsInt("limit_body_size");
 	if (maxBodySize == -1)
 		maxBodySize = DEFAULT_LIMIT_BODY_SIZE;
-
-	// Check if request is malformed.
-	//else if (!isalpha(buffer.at(0)))
-	//	throw ft::BadRequest(); // TODO: move to header parser, this is for invalid requests (HTTPS, for example)
 
 	if (this->contentLength > maxBodySize || bread > maxBodySize)
 		throw ft::PayloadTooLarge();
@@ -214,5 +210,5 @@ void ft::Request::parseStatusLine(std::istringstream& ss)
 	if (this->path[0] != '/')
 		throw ft::BadRequest(); // Path should always start with a /
 	if (this->version != "HTTP/1.1")
-		throw ft::BadRequest(); // TODO: change to 505 HTTP version not supported
+		throw ft::HTTPInvalid(); 
 }

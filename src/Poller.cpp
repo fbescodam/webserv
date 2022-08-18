@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/28 15:48:13 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/18 14:42:13 by fbes          ########   odam.nl         */
+/*   Updated: 2022/08/18 17:01:17 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -187,7 +187,7 @@ bool ft::Poller::acceptIncoming(const ft::Server& server)
 				// Populate the connection struct
 				this->connections[i].poll = fd;
 				this->connections[i].lastActivity = std::time(nullptr);
-				this->connections[i].server = this->getFirstServerOfPort(getPortBySocket(serverSocket->fd)); //TODO: get port
+				this->connections[i].server = this->getFirstServerOfPort(getPortBySocket(serverSocket->fd)); 
 				this->connections[i].ipv4 = ft::inet_ntop(*const_cast<ft::SocketAddress*>(&server.getSocket()->addr));
 
 				// Increment the active connection count
@@ -195,6 +195,8 @@ bool ft::Poller::acceptIncoming(const ft::Server& server)
 				return (true);
 			}
 		}
+		// If we get here we have no room for new connections;
+		close(clientSocket);
 	}
 	catch(const std::exception& e)
 	{
@@ -202,7 +204,6 @@ bool ft::Poller::acceptIncoming(const ft::Server& server)
 		return (false);
 	}
 
-	// TODO: Somehow send a 503 back ??
 	std::cout << RED << "Refusing incoming connection; no available pollfd or connection struct found" << RESET << std::endl;
 	return (false);
 }
@@ -245,6 +246,8 @@ void ft::Poller::pollInEvent(ft::Connection& conn)
 	if (conn.request->isHeaderDone() && !conn.request->headerParsed)
 	{
 		try { conn.request->parseHeader(conn); }
+		catch(const ft::HTTPInvalid &e)
+		{ ft::Response::generateResponse(conn, 505); goto pollout;}
 		catch(const std::exception& e)
 		{ ft::Response::generateResponse(conn, 400); goto pollout;}
 		std::cout << BLACK << "Header parsed" << RESET << std::endl;
