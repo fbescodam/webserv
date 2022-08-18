@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 14:59:11 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/18 20:23:12 by fbes          ########   odam.nl         */
+/*   Updated: 2022/08/18 20:38:25 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -245,7 +245,7 @@ void ft::GlobalConfig::verifyConfig(const uint32_t& lineNum) const
 	if (this->serverSections.size() == 0)
 		throw ft::NoServersException();
 	for (const ft::ServerSection& serverSection : this->serverSections)
-		verifyServerSection(lineNum, serverSection); // TODO: can possibly be changed to just checking the last server section
+		verifyServerSection(lineNum, serverSection);
 }
 
 //////////////////////////////////////////
