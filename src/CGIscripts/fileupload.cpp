@@ -6,7 +6,7 @@
 /*   By: lde-la-h <main@w2wizard.dev>                 +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/08/17 10:35:10 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/17 14:41:27 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/08/18 15:28:40 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,6 +70,7 @@ std::string getFileName(size_t name, const std::string& data)
 	if (fileName.back()== '\"')
 		fileName.pop_back();
 	
+	std::replace(fileName.begin(), fileName.end(), ' ', '+');
 	return fileName;
 }
 
@@ -78,7 +79,7 @@ void writeDataToFile(const std::string &fname, const std::string &val, const std
 {
 	std::fstream file;
 
-	file.open("examples/www/delete/" + fname, std::fstream::out);
+	file.open(uploadDir + "/" + fname, std::fstream::out);
 	if (!file.good())
 	{
 		std::cerr << "HTTP/1.1 500 Internal Server Error\nContent-type: text/html\nContent-length: 21\r\n\r\nInternal Server Error";
@@ -89,7 +90,7 @@ void writeDataToFile(const std::string &fname, const std::string &val, const std
 }
 
 // Parse multipart file data, handles multipe files
-void parseMultipart(std::string data, const std::string &cType, const std::string &uploadDir)
+void parseMultipart(const std::string &data, const std::string &cType, const std::string &uploadDir, std::vector<std::string> &fileNames)
 {
 	// Set variables, substring magic to get all the data we need
 	time_t randomFileName = std::time(0);
@@ -123,14 +124,16 @@ void parseMultipart(std::string data, const std::string &cType, const std::strin
 }
 
 // If content type is not multipart just create file and write data to it
-void makeFile(std::string data, const std::string &uploadDir)
+void makeFile(const std::string &data, const std::string &uploadDir, std::vector<std::string> &fileNames)
 {
 	std::fstream file;
 
 	std::string body = data.substr(data.find("\r\n\r\n"));
 	body.erase(0, body.find_first_not_of("\r\n"));
 
-	writeDataToFile(std::to_string(std::time(0)), body, uploadDir);
+	std::string fName = std::to_string(std::time(0));
+	writeDataToFile(fName, body, uploadDir);
+	fileNames.push_back(fName);
 }
 
 int main(int ac, char **av, char **envp)
@@ -154,14 +157,17 @@ int main(int ac, char **av, char **envp)
 	if (!doesPathExist(uploadDir))
 		mkdir(uploadDir.c_str(), 0700);
 
+	// vector for storinga all the uploaded filenames
+	std::vector<std::string> fileNames;
 
 	// Get the content type from data
 	auto cTypeIt = data.find("Content-Type");
 	std::string cType = data.substr(cTypeIt, data.find("\r\n", cTypeIt) - cTypeIt);
 	if (cType.find("multipart/form-data") == std::string::npos)
-		makeFile(data, uploadDir);
+		makeFile(data, uploadDir, fileNames);
 	else
-		parseMultipart(data, cType, uploadDir);
+		parseMultipart(data, cType, uploadDir, fileNames);
 
+	//TODO: fix this
 	std::cout << "HTTP/1.1 302 Found\nLocation: /delete\n\n";
 }

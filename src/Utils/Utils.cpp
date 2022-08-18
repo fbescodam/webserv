@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 10:41:28 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/18 14:28:39 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/08/18 15:35:11 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -240,6 +240,7 @@ std::string ft::getContentType(std::string path)
 		{"html",	"text/html"},
 		{"htm",		"text/html"},
 		{"shtml",	"text/html"},
+		{"md",		"text/markdown"},
 		{"css",		"text/css"},
 		{"c",		"text/x-c"},
 		{"cpp",		"text/x-c"},
@@ -247,7 +248,6 @@ std::string ft::getContentType(std::string path)
 		{"bat",		"text/x-bat"},
 		{"sh",		"text/x-sh"},
 		{"mk",		"text/x-mk"},
-		{"md",		"text/markdown"},
 		{"xml",		"text/xml"},
 		{"mml",		"text/mathml"},
 		{"txt",		"text/plain"},
