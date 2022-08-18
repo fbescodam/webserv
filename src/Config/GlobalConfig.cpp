@@ -6,11 +6,12 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 14:59:11 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/09 20:51:10 by W2Wizard      ########   odam.nl         */
+/*   Updated: 2022/08/18 15:33:21 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "GlobalConfig.hpp"
+#include <array>
 
 //////////////////////////////////////////
 
@@ -107,6 +108,62 @@ static void getSubSectionName(const uint32_t lineNum, const std::string& line, s
 
 //////////////////////////////////////////
 
+static void checkNoServerKeysInSection(const uint32_t& lineNum, const ft::Section& section, std::string sectionName)
+{
+	// check for fields that may only be used in server sections
+	std::array<std::string, 3> forbiddenFields = { "server_name", "listen", "limit_body_size" };
+	for (std::string& forbiddenField : forbiddenFields)
+	{
+		if (section.keyExists(forbiddenField))
+			throw ft::ForbiddenFieldException(lineNum, forbiddenField, sectionName);
+	}
+}
+
+static void verifyGlobalSection(const uint32_t& lineNum, const ft::Section& globalSection)
+{
+	// check for fields that are required in the global section
+	// DISABLED, NOTHING IS REQUIRED!
+	/*
+	std::array<std::string, 1> requiredFields = { "limit_body_size" };
+	for (std::string& requiredField : requiredFields)
+	{
+		if (!globalSection.keyExists(requiredField))
+			throw ft::MissingFieldException(lineNum, requiredField, "global");
+	}
+	*/
+
+	// check for fields that are only allowed in server sections
+	checkNoServerKeysInSection(lineNum, globalSection, "global");
+}
+
+static void verifyLocationSection(const uint32_t& lineNum, const ft::Section& location)
+{
+	if (location.getAmountOfFields() == 0)
+		throw ft::EmptySectionException(lineNum);
+
+	// check for fields that are only allowed in server sections
+	checkNoServerKeysInSection(lineNum, location, "location");
+}
+
+static void verifyServerSection(const uint32_t& lineNum, const ft::ServerSection& serverSection)
+{
+	if (serverSection.getAmountOfFields() == 0)
+		throw ft::EmptySectionException(lineNum);
+
+	// check for fields that are required in a server section
+	std::array<std::string, 3> requiredFields = { "path", "server_name", "listen" };
+	for (std::string& requiredField : requiredFields)
+	{
+		if (!serverSection.keyExists(requiredField))
+			throw ft::MissingFieldException(lineNum, requiredField, "server");
+	}
+
+	for (const ft::Section& location : serverSection.locations)
+		verifyLocationSection(lineNum, location);
+}
+
+//////////////////////////////////////////
+
 void ft::GlobalConfig::readFile(const std::string& filePath)
 {
 	struct stat s;
@@ -142,8 +199,7 @@ void ft::GlobalConfig::readFile(const std::string& filePath)
 				if (currentSection->getAmountOfFields() == 0)
 					throw ft::EmptySectionException(lineNum);
 				if (currentSection->getName() == "server")
-					if (!currentSection->keyExists("path") || !currentSection->keyExists("server_name") || !currentSection->keyExists("listen"))
-						throw ft::MissingFieldException(lineNum);
+					verifyServerSection(lineNum, this->serverSections.back());
 			}
 
 			if (isSubSectionDef(line)) // is subsection (.location)
@@ -185,16 +241,8 @@ void ft::GlobalConfig::verifyConfig(const uint32_t& lineNum) const
 {
 	if (this->serverSections.size() == 0)
 		throw ft::NoServersException();
-	for (const ft::ServerSection& server : this->serverSections)
-	{
-		if (server.getAmountOfFields() == 0)
-			throw ft::EmptySectionException(lineNum);
-		if (!server.keyExists("path") || !server.keyExists("server_name") || !server.keyExists("listen"))
-			throw ft::MissingFieldException(lineNum);
-		for (const ft::Section& location : server.locations)
-			if (location.getAmountOfFields() == 0)
-				throw ft::EmptySectionException(lineNum);
-	}
+	for (const ft::ServerSection& serverSection : this->serverSections)
+		verifyServerSection(lineNum, serverSection); // TODO: can possibly be changed to just checking the last server section
 }
 
 //////////////////////////////////////////

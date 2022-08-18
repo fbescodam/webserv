@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:07:39 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/18 11:17:35 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/08/18 15:32:18 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,9 +25,9 @@ ft::Request::Request(const std::vector<ft::Server>& servers) noexcept : servers(
 void ft::Request::appendBuffer(char *buffer, int32_t bread)
 {
 	static int32_t maxBodySize = this->servers[0].config.returnValueAsInt("limit_body_size");
-    if (maxBodySize == -1)
-        throw std::exception();
-    
+	if (maxBodySize == -1)
+		maxBodySize = DEFAULT_LIMIT_BODY_SIZE;
+
 	// Check if request is malformed.
 	//else if (!isalpha(buffer.at(0)))
 	//	throw ft::BadRequest(); // TODO: move to header parser, this is for invalid requests (HTTPS, for example)
@@ -81,44 +81,44 @@ void ft::Request::checkHostHeader(ft::Connection& conn)
 {
 	const std::string* host;
 	if (!(host = this->getHeaderValue("host")))
-    {
-        std::cout << RED << "Host header not set" << RESET << std::endl;
-        throw ft::BadRequest();
-    }
-    
-    // <host>:<port>
+	{
+		std::cout << RED << "Host header not set" << RESET << std::endl;
+		throw ft::BadRequest();
+	}
+
+	// <host>:<port>
 	std::pair<std::string, std::string> output;
 	ft::slice(*host, ":", output);
 
-    // Check which server this host matches to
+	// Check which server this host matches to
 	for (auto& server : this->servers)
-    {
-        const std::string* servHost = server.config.getValue("server_name");
+	{
+		const std::string* servHost = server.config.getValue("server_name");
 		const std::string* servPort = server.config.getValue("listen");
 
-        // Check if we messed up
-        if (!servHost || !servPort)
-            throw std::exception();
+		// Check if we messed up
+		if (!servHost || !servPort)
+			throw std::exception();
 
-        // Check that name matches, if it does then check if port is set, if it is, chck that it matches.
-        if (*servHost != output.first || (!output.second.empty() && *servPort != output.second))
-            continue;
-        
-        conn.server = const_cast<ft::Server*>(&server);
-        break;
-    }
+		// Check that name matches, if it does then check if port is set, if it is, chck that it matches.
+		if (*servHost != output.first || (!output.second.empty() && *servPort != output.second))
+			continue;
 
-    // If not found then we simply leave at the default server set by poll.
-    // Since there we default to the first server found on the requested port.
+		conn.server = const_cast<ft::Server*>(&server);
+		break;
+	}
+
+	// If not found then we simply leave at the default server set by poll.
+	// Since there we default to the first server found on the requested port.
 }
 
 //////////////////////////////////////////
 
 static bool isValid(const std::string& str)
 {
-    return std::any_of(str.begin(), str.end(), [](char c) { 
-        return (isprint(static_cast<unsigned char>(c))); 
-    });
+	return std::any_of(str.begin(), str.end(), [](char c) {
+		return (isprint(static_cast<unsigned char>(c)));
+	});
 };
 
 //////////////////////////////////////////
@@ -126,7 +126,7 @@ static bool isValid(const std::string& str)
 // Extracts the header and parses it into the request object
 void ft::Request::parseHeader(ft::Connection& conn)
 {
-    // Check if we have found the separator, we haven't its probably a bad request.
+	// Check if we have found the separator, we haven't its probably a bad request.
 	size_t pos;
 	if ((pos = this->data.find("\r\n\r\n")) == std::string::npos)
 	{
@@ -139,35 +139,35 @@ void ft::Request::parseHeader(ft::Connection& conn)
 	std::istringstream ss(splitBuff.first);
 	this->header_data = splitBuff.first;
 
-    // Check the status line
-    this->parseStatusLine(ss);
+	// Check the status line
+	this->parseStatusLine(ss);
 
 	std::string line;
-    std::pair<std::string, std::string> header;
+	std::pair<std::string, std::string> header;
 	while (std::getline(ss, line))
-    {
-        // Find separator of the header entry.
-        if (line.find(':') == std::string::npos)
+	{
+		// Find separator of the header entry.
+		if (line.find(':') == std::string::npos)
 			throw ft::BadRequest();
 
-        // Slice and trim for spaces.
-        ft::slice(line, ":", header);
-        ft::trim(header.first);
+		// Slice and trim for spaces.
+		ft::slice(line, ":", header);
+		ft::trim(header.first);
 		ft::trim(header.second);
 
-        // If either field is empty, or contains printable (like bytes or null) data
+		// If either field is empty, or contains printable (like bytes or null) data
 		if (header.first.empty() || header.second.empty() || !isValid(header.first) || !isValid(header.second))
 			throw ft::BadRequest();
 
 		ft::tolower(header.first);
 		this->headers[header.first] = header.second;
-    }
+	}
 
-    // Check if the host header is set correctly.
-    // HTTP/1.1 ALWAYS has this set!
-    this->checkHostHeader(conn);
+	// Check if the host header is set correctly.
+	// HTTP/1.1 ALWAYS has this set!
+	this->checkHostHeader(conn);
 
-    // Erase header data and leave behind only the body.
+	// Erase header data and leave behind only the body.
 	if (this->headers.count("content-length"))
 		this->contentLength = std::stoi(this->headers["content-length"]);
 
@@ -178,7 +178,7 @@ void ft::Request::parseHeader(ft::Connection& conn)
 	// Now split the body from the data and parse that next
 	if (splitBuff.second.size() > 0)
 	{
-        // Front trim from left to remove separator.
+		// Front trim from left to remove separator.
 		splitBuff.second.erase(0, splitBuff.second.find_first_not_of(WHITESPACE));
 		this->data = splitBuff.second;
 	}
@@ -191,7 +191,7 @@ void ft::Request::parseStatusLine(std::istringstream& ss)
 	std::string line;
 	std::getline(ss, line);
 
-    // Split on spaces for METHOD, VERSION and PATH
+	// Split on spaces for METHOD, VERSION and PATH
 	std::vector<std::string> values;
 	ft::split(line, ' ', values);
 

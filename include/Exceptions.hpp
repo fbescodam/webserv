@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 18:05:00 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/17 14:43:52 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/08/18 15:03:20 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -122,8 +122,16 @@ public:
 struct MissingFieldException : public ft::ConfigException
 {
 public:
-	MissingFieldException(int32_t on) {
-		this->err = std::string("Missing field found in config before line ") + std::to_string(on) + std::string(" of your configuration file (every server needs a path, server_name and listen field)");
+	MissingFieldException(int32_t on, std::string fieldKey, std::string sectionName) {
+		this->err = std::string("Missing field ") + fieldKey + std::string(" in section ") + sectionName + std::string(" before line ") + std::to_string(on) + std::string(" of your configuration file");
+	}
+};
+
+struct ForbiddenFieldException : public ft::ConfigException
+{
+public:
+	ForbiddenFieldException(int32_t on, std::string fieldKey, std::string sectionName) {
+		this->err = std::string("Field ") + fieldKey + std::string(" cannot be used in section ") + sectionName + std::string(" before line ") + std::to_string(on) + std::string(" of your configuration file");
 	}
 };
 
