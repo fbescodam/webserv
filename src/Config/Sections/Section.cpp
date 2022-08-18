@@ -6,12 +6,13 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 15:39:35 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/17 16:40:43 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/08/18 15:53:16 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Section.hpp"
 #include "Utils.hpp"
+#include <algorithm>
 
 ft::Section::Section(const std::string& cwd, const std::string& name)
 {
@@ -173,9 +174,9 @@ void ft::Section::verifyKeyValue(uint32_t lineNum, std::string& key, std::string
 		"methods",
 		"path",
 		"redir",
-        "error_403",
-        "cgi_bin",
-        "upload_dir"
+		"error_403",
+		"cgi_bin",
+		"upload_dir"
 	};
 
 	int8_t index = -1;
@@ -189,6 +190,7 @@ void ft::Section::verifyKeyValue(uint32_t lineNum, std::string& key, std::string
 	}
 	size_t space;
 	int32_t statusCode;
+	std::string::difference_type n;
 
 	if (index == -1)
 		throw ft::UnknownFieldKeyException(lineNum);
@@ -212,7 +214,7 @@ void ft::Section::verifyKeyValue(uint32_t lineNum, std::string& key, std::string
 
 		// expecting a path that starts with /
 		case 8: //path
-        case 12: // upload_dir
+		case 12: // upload_dir
 			if (value.length() == 0)
 				throw ft::InvalidFieldValueException(lineNum);
 			if (value.front() != '/')
@@ -244,13 +246,17 @@ void ft::Section::verifyKeyValue(uint32_t lineNum, std::string& key, std::string
 			statusCode = std::stoi(value.substr(0, space));
 			if (statusCode != 301 && statusCode != 302 && statusCode != 307 && statusCode != 308)
 				throw ft::InvalidFieldValueException(lineNum);
-			// TODO check max 2 fields
+			n = std::count(value.begin(), value.end(), ' '); // count amount of spaces
+			if (n > 1)
+				throw ft::InvalidFieldValueException(lineNum);
 			break;
 		case 11: // cgi_bin
 			space = value.find(' ');
 			if (space == std::string::npos)
 				throw ft::InvalidFieldValueException(lineNum);
-			// TODO check max 2 fields
+			n = std::count(value.begin(), value.end(), ' '); // count amount of spaces
+			if (n > 1)
+				throw ft::InvalidFieldValueException(lineNum);
 			break;
 	}
 }
