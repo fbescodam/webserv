@@ -6,7 +6,7 @@
 /*   By: lde-la-h <main@w2wizard.dev>                 +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/08/17 10:35:10 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/18 16:04:53 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/08/18 22:08:33 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,9 +89,68 @@ void writeDataToFile(const std::string &fname, const std::string &val, const std
 	file.close();
 }
 
-// Parse multipart file data, handles multipe files
-void parseMultipart(const std::string &data, const std::string &cType, const std::string &uploadDir, std::vector<std::string> &fileNames)
+void GenerateResponse(const std::string &uploadPath, const std::vector<std::string> &fileNames)
 {
+	std::string out;
+
+	out += "<html><head><title>Uploaded files</title></head>";
+	out += "<body><h1>Uploaded Files</h1><hr><pre>";
+
+	for (const std::string &val : fileNames)
+	{
+		out += "<a href=\"" + uploadPath + "/" + val + "\">";
+		out += val;
+		out += "</a>\n";
+	}
+
+	out += "</pre><hr></body></html>";
+
+	std::cout << "HTTP/1.1 200 OK\nContent-Length: " + std::to_string(out.size()) + "\n\n" + out;
+}
+
+
+void GenerateResponse(const std::string &uploadPath, const std::vector<std::string> &fileNames, const std::vector<std::string> &formData)
+{
+	std::string out;
+
+	out += "<html><head><title>Uploaded files</title></head>";
+	out += "<body><h1>Uploaded Files</h1><hr><pre>";
+
+	// Filenames + links
+	for (const std::string &val : fileNames)
+	{
+		out += "<a href=\"" + uploadPath + "/" + val + "\">";
+		out += val;
+		out += "</a>\n";
+	}
+	out += "</pre><hr>";
+
+	if (!formData.empty())
+	{
+		out += "<pre>";
+		// Formdata in a table
+		out += "<table><tr><th>field</th><th>value</th></tr>";
+		for (const std::string &val : formData)
+		{
+			out += "<tr>";
+			size_t delimPos = val.find('=');
+			out += "<td>" + val.substr(0, delimPos) + "</td>";
+			out += "<td>" + val .substr(delimPos + 1) + "</td>";
+			out += "</tr>"; //TODO: actually parse val
+		}
+		out += "</table></pre><hr>";
+	}
+	
+	out += "</body></html>";
+	std::cout << "HTTP/1.1 200 OK\nContent-Length: " + std::to_string(out.size()) + "\n\n" + out;
+}
+
+// Parse multipart file data, handles multipe files
+void parseMultipart(const std::string &data, const std::string &cType, const std::string &uploadDir, const std::string &uploadPath)
+{
+	std::vector<std::string> fileNames;
+	std::vector<std::string> formData;
+
 	// Set variables, substring magic to get all the data we need
 	time_t randomFileName = std::time(0);
 	size_t boundaryIt = cType.find_first_of("=");
@@ -111,7 +170,10 @@ void parseMultipart(const std::string &data, const std::string &cType, const std
 
 		size_t namePos = val.find("filename=");
 		if (namePos == std::string::npos)
-			fname = std::to_string(randomFileName++);
+		{
+			formData.push_back(val);
+			continue;
+		}
 		else
 			fname = getFileName(namePos + 9, val);
 		
@@ -125,12 +187,15 @@ void parseMultipart(const std::string &data, const std::string &cType, const std
 		writeDataToFile(fname, val, uploadDir);
 	}
 
+	GenerateResponse(uploadPath, fileNames, formData);
+
 }
 
 // If content type is not multipart just create file and write data to it
-void makeFile(const std::string &data, const std::string &uploadDir, std::vector<std::string> &fileNames)
+void makeFile(const std::string &data, const std::string &uploadDir, const std::string &uploadPath)
 {
 	std::fstream file;
+	std::vector<std::string> fileNames;
 
 	std::string body = data.substr(data.find("\r\n\r\n"));
 	body.erase(0, body.find_first_not_of("\r\n"));
@@ -138,25 +203,34 @@ void makeFile(const std::string &data, const std::string &uploadDir, std::vector
 	std::string fName = std::to_string(std::time(0));
 	writeDataToFile(fName, body, uploadDir);
 	fileNames.push_back(fName);
+
+	GenerateResponse(uploadPath, fileNames);
+
 }
 
-void GenerateResponse(const std::string &uploadPath, const std::vector<std::string> &fileNames)
+
+// application/x-www-form-urlencoded
+void parseFormData(const std::string &data)
 {
-	std::string out;
+    std::string body = data.substr(data.find("\r\n\r\n"));
+    body.erase(0, body.find("\r\n\r\n"));
+    body.erase(0, body.find_first_not_of(" \t\r\n\t\f\v"));
 
-	out += "<html><head><title>Uploaded files</title></head>";
-	out += "<body><h1>Uploaded Files</h1><hr><pre>";
+    std::vector<std::string> formData;
+    cppSplit(body, formData, "&");
 
-	for (const std::string &val : fileNames)
-	{
-		out += "<a href=\"" + uploadPath + "/" + val + "\">";
-		out += val;
-		out += "</a>\n";
-	}
+    std::string out = "<table><tr><th>field</th><th>value</th></tr>";
+    for (const std::string &val : formData)
+    {
+        out += "<tr>";
+        size_t delimPos = val.find('=');
+        out += "<td>" + val.substr(0, delimPos) + "</td>";
+        out += "<td>" + val .substr(delimPos + 1) + "</td>";
+        out += "</tr>";
+    }
+    out += "</table>";
 
-	out += "</pre><hr></body></html>";
-
-	std::cout << "HTTP/1.1 200 OK\nContent-Length: " + std::to_string(out.size()) + "\n\n" + out;
+    std::cout << "HTTP/1.1 200 OK\nContent-Length: " + std::to_string(out.size()) + "\n\n" + out;
 }
 
 int main(int ac, char **av, char **envp)
@@ -188,10 +262,10 @@ int main(int ac, char **av, char **envp)
 	// Get the content type from data
 	auto cTypeIt = data.find("Content-Type");
 	std::string cType = data.substr(cTypeIt, data.find("\r\n", cTypeIt) - cTypeIt);
-	if (cType.find("multipart/form-data") == std::string::npos)
-		makeFile(data, uploadDir, fileNames);
-	else
-		parseMultipart(data, cType, uploadDir, fileNames);
-
-	GenerateResponse(uploadPath, fileNames);
+    if (cType.find("multipart/form-data") != std::string::npos)
+        parseMultipart(data, cType, uploadDir, uploadPath);
+    else if (cType.find("application/x-www-form-urlencoded") != std::string::npos)
+        parseFormData(data);
+    else
+        makeFile(data, uploadDir, uploadPath);
 }

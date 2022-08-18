@@ -6,7 +6,7 @@
 #    By: lde-la-h <lde-la-h@student.codam.nl>         +#+                      #
 #                                                    +#+                       #
 #    Created: 2022/05/13 11:36:28 by lde-la-h      #+#    #+#                  #
-#    Updated: 2022/08/16 17:28:57 by pvan-dij      ########   odam.nl          #
+#    Updated: 2022/08/18 20:47:25 by pvan-dij      ########   odam.nl          #
 #                                                                              #
 # **************************************************************************** #
 
@@ -72,7 +72,7 @@ fclean: clean
 	@rm -f $(NAME)
 
 filecgi:
-	@$(CC) $(CFLAGS) -o filecgi.cgi ./src/CGIscripts/fileupload.cpp
+	@$(CC) $(CFLAGS) -o filecgi.cgi -Wno-unreachable-code ./src/CGIscripts/fileupload.cpp
 	@mv filecgi.cgi ./examples/www/post/
 
 re:	fclean all
