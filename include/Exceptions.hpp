@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 18:05:00 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/18 16:34:14 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/08/18 20:24:41 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,6 +108,14 @@ struct InvalidFieldValueException : public ft::ConfigException
 public:
 	InvalidFieldValueException(int32_t on) {
 		this->err = std::string("Invalid field value on line ") + std::to_string(on) + std::string(" of your configuration file");
+	}
+};
+
+struct InvalidPathException : public ft::ConfigException
+{
+public:
+	InvalidPathException(int32_t on) {
+		this->err = std::string("Invalid path for server before line ") + std::to_string(on) + std::string(" of your configuration file. Does the path exist and is it a directory?");
 	}
 };
 

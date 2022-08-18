@@ -6,11 +6,12 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 14:59:11 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/18 19:17:00 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/08/18 20:23:12 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "GlobalConfig.hpp"
+#include "Filesystem.hpp"
 #include <array>
 
 //////////////////////////////////////////
@@ -121,19 +122,16 @@ static void checkNoServerKeysInSection(const uint32_t& lineNum, const ft::Sectio
 
 static void verifyGlobalSection(const uint32_t& lineNum, const ft::Section& globalSection)
 {
-	// check for fields that are required in the global section
-	// DISABLED, NOTHING IS REQUIRED!
-	/*
-	std::array<std::string, 1> requiredFields = { "limit_body_size" };
-	for (std::string& requiredField : requiredFields)
-	{
-		if (!globalSection.keyExists(requiredField))
-			throw ft::MissingFieldException(lineNum, requiredField, "global");
-	}
-	*/
-
 	// check for fields that are only allowed in server sections
 	checkNoServerKeysInSection(lineNum, globalSection, "global");
+
+	// check for more forbidden fields
+	std::array<std::string, 3> forbiddenFields = { "path", "redir" };
+	for (std::string& forbiddenField : forbiddenFields)
+	{
+		if (globalSection.keyExists(forbiddenField))
+			throw ft::ForbiddenFieldException(lineNum, forbiddenField, "global");
+	}
 }
 
 static void verifyLocationSection(const uint32_t& lineNum, const ft::Section& location)
@@ -157,6 +155,9 @@ static void verifyServerSection(const uint32_t& lineNum, const ft::ServerSection
 		if (!serverSection.keyExists(requiredField))
 			throw ft::MissingFieldException(lineNum, requiredField, "server");
 	}
+
+	if (!ft::filesystem::isDir(serverSection.getcwd() + *serverSection.getValue("path")))
+		throw ft::InvalidPathException(lineNum);
 
 	for (const ft::Section& location : serverSection.locations)
 		verifyLocationSection(lineNum, location);
