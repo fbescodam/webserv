@@ -54,6 +54,7 @@ bool checkMethods(const std::list<std::string> &methods, ft::Exchange::Method re
 	return (false);
 }
 
+// My god this shit is unreadable ...
 void ft::Server::handleRequest(ft::Connection& conn)
 {
 	std::string rootPath; // where the request is rooted
@@ -82,7 +83,11 @@ void ft::Server::handleRequest(ft::Connection& conn)
 		return (this->respondWithStatus(conn, 403));
 
 	// Get actual path used for IO
-	filePath = this->config.getcwd() + *(this->config.getValue("path")) + rootPath;
+    const std::string* path = this->config.getValue("path");
+    if (!path)
+        return (this->respondWithStatus(conn, 500));
+    
+	filePath = this->config.getcwd() + *path + rootPath;
 	std::cout << BLACK << "Relative filePath: " << filePath << RESET << std::endl;
 
 
@@ -94,7 +99,7 @@ void ft::Server::handleRequest(ft::Connection& conn)
 		std::cout << GREEN << "Redir found, redirecting" << RESET << std::endl;
 		conn.response->headers["Location"] = redirInfo.back();
 		conn.response->generateStatus(std::stoi(redirInfo.front()));
-		return ;
+		return;
 	}
 	std::cout << BLACK << "No redir found" << RESET << std::endl;
 
@@ -104,7 +109,7 @@ void ft::Server::handleRequest(ft::Connection& conn)
 		return (this->respondWithStatus(conn, 404)); // Likely a 404 error
 	std::cout << BLACK << "Absolute filePath: " << filePath << RESET << std::endl;
 
-	if (filePath.find(this->config.getcwd() + *this->config.getValue("path")) != 0)
+	if (filePath.find(this->config.getcwd() + *path) != 0)
 	{
 		std::cout << RED << "[WARNING] Requested path is outside of the root defined in the server config!" << RESET << std::endl;
 		return (this->respondWithStatus(conn, 403));
@@ -143,6 +148,12 @@ void ft::Server::handleRequest(ft::Connection& conn)
 	std::list<std::string> methodList;
 	static std::list<std::string> methodGet = {{"GET"}};
 	bool methodRules = conn.response->pathConfig.getValueAsList("methods", methodList);
+    if (!methodRules)
+    {
+        // TODO: Is this an error?
+		std::cout << RED << "[WARNING] Requested path is outside of the root defined in the server config!" << RESET << std::endl;
+        return (this->respondWithStatus(conn, 500));
+    }
 
 	// Checks if request method is in allowed methods
 	if (!checkMethods(methodRules ? methodList : methodGet, conn.request->method))

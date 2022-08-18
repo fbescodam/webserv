@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:07:39 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/17 12:20:47 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/08/18 11:17:35 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,9 @@ ft::Request::Request(const std::vector<ft::Server>& servers) noexcept : servers(
 void ft::Request::appendBuffer(char *buffer, int32_t bread)
 {
 	static int32_t maxBodySize = this->servers[0].config.returnValueAsInt("limit_body_size");
+    if (maxBodySize == -1)
+        throw std::exception();
+    
 	// Check if request is malformed.
 	//else if (!isalpha(buffer.at(0)))
 	//	throw ft::BadRequest(); // TODO: move to header parser, this is for invalid requests (HTTPS, for example)

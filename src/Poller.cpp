@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/28 15:48:13 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/17 10:54:01 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/08/18 11:23:30 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,12 +38,10 @@ const ft::Socket* ft::Poller::createSocket(const uint16_t port)
 
 ft::Poller::Poller(std::vector<ft::Server>& servers, const ft::GlobalConfig& globalConfig) : servers(servers), globalConfig(globalConfig)
 {
-	uint16_t				port;
 	std::list<uint16_t>		ports;
 
-	this->activeClients = 0;
-
 	// Init pollfds
+	this->activeClients = 0;
 	for (pollfd& fd : this->pollfds)
 	{
 		fd.fd = -1;
@@ -56,7 +54,7 @@ ft::Poller::Poller(std::vector<ft::Server>& servers, const ft::GlobalConfig& glo
 	this->reservedSocketAmount = 0;
 	for (size_t i = 0; i < this->servers.size(); i++)
 	{
-		port = (uint16_t) this->servers[i].config.returnValueAsInt("listen");
+		uint16_t port = this->servers[i].config.returnValueAsInt("listen");
 		if (std::find(ports.begin(), ports.end(), port) == ports.end()) // port has no socket yet
 		{
 			const Socket* socket = this->createSocket(port);
@@ -124,7 +122,9 @@ ft::Server* ft::Poller::getFirstServerOfPort(uint16_t port)
     for (auto& server : this->servers)
     {
         auto servPort = server.config.returnValueAsInt("listen");
-        if (port == servPort)
+        if (servPort == -1)
+            break;        
+        else if (port == servPort)
             return (&server);
     }
     return (nullptr);
@@ -293,7 +293,7 @@ void ft::Poller::pollOutEvent(ft::Connection& conn)
 
 	// WTFFFFFF
 	if (!conn.response)
-		std::cout << RED << "Warning: response points to nothing in a PollOutEvent" << RESET << std::endl;
+		std::cout << RED << "[WARNING] response points to nothing in a PollOutEvent" << RESET << std::endl;
 	if (!conn.response->sendRes || (conn.response->*(conn.response->sendRes))(conn.poll->fd) == ft::Response::Status::DONE)
 		return (this->resolveConnection(conn));
 	std::cout << GREEN << "Partially sent a response" << RED << std::endl;
