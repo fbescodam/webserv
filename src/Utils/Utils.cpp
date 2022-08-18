@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 10:41:28 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/18 14:28:39 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/08/18 15:26:30 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -237,9 +237,10 @@ const std::map<uint16_t, std::string>& ft::getStatusCodes()
 std::string ft::getContentType(std::string path)
 {
 	static std::map<std::string, std::string> list = {
-		{"html",	"text/html"},
-		{"htm",		"text/html"},
-		{"shtml",	"text/html"},
+		{"html",	"text/html; charset=UTF8"},
+		{"htm",		"text/html; charset=UTF8"},
+		{"shtml",	"text/html; charset=UTF8"},
+		{"md",		"text/markdown; charset=UTF8"},
 		{"css",		"text/css"},
 		{"c",		"text/x-c"},
 		{"cpp",		"text/x-c"},
@@ -247,10 +248,9 @@ std::string ft::getContentType(std::string path)
 		{"bat",		"text/x-bat"},
 		{"sh",		"text/x-sh"},
 		{"mk",		"text/x-mk"},
-		{"md",		"text/markdown"},
 		{"xml",		"text/xml"},
 		{"mml",		"text/mathml"},
-		{"txt",		"text/plain"},
+		{"txt",		"text/plain;"},
 		{"jad",		"text/vnd.sun.j2me.app-descriptor"},
 		{"wml",		"text/vnd.wap.wml"},
 		{"htc",  	"text/x-component"},
