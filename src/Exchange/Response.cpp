@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:07:35 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/18 11:19:42 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/08/18 14:28:34 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -242,7 +242,7 @@ void ft::Response::getMethod(const std::string& filePath)
 ft::Response::Status ft::Response::sendDynamic(ft::fd_t socket)
 {
 	std::cout << BLACK << "Sending everything in one go (dynamically generated page)..." << RESET << std::endl;
-	size_t bsent = ft::send(socket, this->data.data(), this->data.length(), NONE); // Send as much as possible
+	size_t bsent = send(socket, this->data.data(), this->data.length(), NONE); // Send as much as possible
 	std::cout << BLACK << "Bytes sent: " << bsent << RESET << std::endl;
 	this->data.erase(0, bsent); // Delete data that has been sent
 	if (bsent < this->data.length()) // Not everything was sent, send more in the next poll
@@ -257,7 +257,7 @@ ft::Response::Status ft::Response::sendDynamic(ft::fd_t socket)
 ft::Response::Status ft::Response::sendHeaders(ft::fd_t socket)
 {
 	std::cout << BLACK << "Sending headers..." << RESET << std::endl;
-	size_t bsent = ft::send(socket, this->data.data(), this->data.length(), NONE);
+	size_t bsent = send(socket, this->data.data(), this->data.length(), NONE);
 	this->data.erase(0, bsent); // Delete data that has been sent
 	if (bsent < this->data.length()) // Not everything was sent, send more in the next poll
 		return (ft::Response::Status::NOT_DONE);

@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 10:40:21 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/16 12:28:30 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/08/18 14:28:51 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,9 +112,6 @@ ft::fd_t accept(int32_t socketFD, SocketAddress* address);
 
 // Examines a set of file descriptors to see if some of them are ready for I/O or if certain events have occurred on them.
 int32_t poll(struct pollfd fds[], size_t size, int32_t timeout);
-
-// Send a message from a socket.
-ssize_t send(ft::fd_t socket, const void* buffer, size_t length, int32_t flags);
 
 // Receive a message from a socket.
 ssize_t receive(ft::fd_t socket, void* buffer, size_t length, int32_t flags);

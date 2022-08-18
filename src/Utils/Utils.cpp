@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 10:41:28 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/18 10:59:37 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/08/18 14:28:39 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,15 +89,6 @@ int32_t ft::poll(pollfd* fds, size_t size, int32_t timeout)
 	if (ret < 0)
 		throw ft::GenericErrnoException();
 	return (ret);
-}
-
-// Send a message to a socket.
-ssize_t ft::send(ft::fd_t socket, const void* buffer, size_t length, int32_t flags)
-{
-	ssize_t Value = ::send(socket, buffer, length, flags);
-	if (Value == -1)
-		throw ft::GenericErrnoException(); // TODO WE CAN ABSOLUTELY NOT DO THIS
-	return (Value);
 }
 
 int32_t ft::setSocketOption(ft::fd_t socket, int32_t level, int32_t optionName, bool optionValue, size_t optionLen)
