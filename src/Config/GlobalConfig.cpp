@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 14:59:11 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/18 19:11:04 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/08/18 19:17:00 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,7 +111,7 @@ static void getSubSectionName(const uint32_t lineNum, const std::string& line, s
 static void checkNoServerKeysInSection(const uint32_t& lineNum, const ft::Section& section, std::string sectionName)
 {
 	// check for fields that may only be used in server sections
-	std::array<std::string, 3> forbiddenFields = { "server_name", "listen", "limit_body_size" };
+	std::array<std::string, 3> forbiddenFields = { "server_name", "listen" };
 	for (std::string& forbiddenField : forbiddenFields)
 	{
 		if (section.keyExists(forbiddenField))
@@ -202,7 +202,7 @@ void ft::GlobalConfig::readFile(const std::string& filePath)
 					verifyServerSection(lineNum, this->serverSections.back());
 			}
 			else
-				verifyGlobalSection(lineNum, globalSection);
+				verifyGlobalSection(lineNum, this->globalSection);
 
 			if (isSubSectionDef(line)) // is subsection (.location)
 			{
