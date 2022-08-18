@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/28 15:48:13 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/17 10:54:01 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/08/18 14:42:13 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,12 +38,10 @@ const ft::Socket* ft::Poller::createSocket(const uint16_t port)
 
 ft::Poller::Poller(std::vector<ft::Server>& servers, const ft::GlobalConfig& globalConfig) : servers(servers), globalConfig(globalConfig)
 {
-	uint16_t				port;
 	std::list<uint16_t>		ports;
 
-	this->activeClients = 0;
-
 	// Init pollfds
+	this->activeClients = 0;
 	for (pollfd& fd : this->pollfds)
 	{
 		fd.fd = -1;
@@ -56,7 +54,7 @@ ft::Poller::Poller(std::vector<ft::Server>& servers, const ft::GlobalConfig& glo
 	this->reservedSocketAmount = 0;
 	for (size_t i = 0; i < this->servers.size(); i++)
 	{
-		port = (uint16_t) this->servers[i].config.returnValueAsInt("listen");
+		uint16_t port = this->servers[i].config.returnValueAsInt("listen");
 		if (std::find(ports.begin(), ports.end(), port) == ports.end()) // port has no socket yet
 		{
 			const Socket* socket = this->createSocket(port);
@@ -121,23 +119,25 @@ void ft::Poller::pollAll(void)
 
 ft::Server* ft::Poller::getFirstServerOfPort(uint16_t port)
 {
-    for (auto& server : this->servers)
-    {
-        auto servPort = server.config.returnValueAsInt("listen");
-        if (port == servPort)
-            return (&server);
-    }
-    return (nullptr);
+	for (auto& server : this->servers)
+	{
+		auto servPort = server.config.returnValueAsInt("listen");
+		if (servPort == -1)
+			break;
+		else if (port == servPort)
+			return (&server);
+	}
+	return (nullptr);
 }
 
 //////////////////////////////////////////
 
 static uint16_t getPortBySocket(int32_t socket)
 {
-    struct sockaddr_in sin;
-    socklen_t len = sizeof(sin);
-    getsockname(socket, (struct sockaddr *)&sin, &len);
-    return (ntohs(sin.sin_port));
+	struct sockaddr_in sin;
+	socklen_t len = sizeof(sin);
+	getsockname(socket, (struct sockaddr *)&sin, &len);
+	return (ntohs(sin.sin_port));
 }
 
 bool ft::Poller::acceptIncoming(const ft::Server& server)
@@ -152,7 +152,7 @@ bool ft::Poller::acceptIncoming(const ft::Server& server)
 		// Accept this connection.
 		std::cout << GREEN << "Accepting incoming connection" << RESET << std::endl;
 		const Socket *serverSocket = server.getSocket();
-        
+
 		// Assign new connection a clientSocket, which is connected to a server's socket
 		ft::fd_t clientSocket = ft::accept(serverSocket->fd, const_cast<ft::SocketAddress*>(&serverSocket->addr));
 		ft::setSocketOption(clientSocket, SOL_SOCKET, SO_REUSEADDR, true, sizeof(int32_t)); // Make kernel release socket after exit
@@ -187,7 +187,7 @@ bool ft::Poller::acceptIncoming(const ft::Server& server)
 				// Populate the connection struct
 				this->connections[i].poll = fd;
 				this->connections[i].lastActivity = std::time(nullptr);
-                this->connections[i].server = this->getFirstServerOfPort(getPortBySocket(serverSocket->fd)); //TODO: get port
+				this->connections[i].server = this->getFirstServerOfPort(getPortBySocket(serverSocket->fd)); //TODO: get port
 				this->connections[i].ipv4 = ft::inet_ntop(*const_cast<ft::SocketAddress*>(&server.getSocket()->addr));
 
 				// Increment the active connection count
@@ -202,7 +202,7 @@ bool ft::Poller::acceptIncoming(const ft::Server& server)
 		return (false);
 	}
 
-    // TODO: Somehow send a 503 back ??
+	// TODO: Somehow send a 503 back ??
 	std::cout << RED << "Refusing incoming connection; no available pollfd or connection struct found" << RESET << std::endl;
 	return (false);
 }
@@ -228,15 +228,15 @@ void ft::Poller::pollInEvent(ft::Connection& conn)
 		this->closeConnection(conn);
 		return;
 	}
-    // Connection needs a server at this point ....
-	try 
-    { 
-        conn.request->appendBuffer(buffer, brecv);
+	// Connection needs a server at this point ....
+	try
+	{
+		conn.request->appendBuffer(buffer, brecv);
 
-        // Check if first byte is bad, https should trigger this.
-        if (!isprint(conn.request->data[0]))
-            throw ft::BadRequest();
-    }
+		// Check if first byte is bad, https should trigger this.
+		if (!isprint(conn.request->data[0]))
+			throw ft::BadRequest();
+	}
 	catch (const ft::BadRequest& e)
 	{ ft::Response::generateResponse(conn, 400); goto pollout;}
 	catch (const ft::PayloadTooLarge& e)
@@ -244,9 +244,9 @@ void ft::Poller::pollInEvent(ft::Connection& conn)
 
 	if (conn.request->isHeaderDone() && !conn.request->headerParsed)
 	{
-        try { conn.request->parseHeader(conn); }
-        catch(const std::exception& e)
-        { ft::Response::generateResponse(conn, 400); goto pollout;}
+		try { conn.request->parseHeader(conn); }
+		catch(const std::exception& e)
+		{ ft::Response::generateResponse(conn, 400); goto pollout;}
 		std::cout << BLACK << "Header parsed" << RESET << std::endl;
 	}
 	if (conn.request->isBodyDone())
@@ -293,7 +293,7 @@ void ft::Poller::pollOutEvent(ft::Connection& conn)
 
 	// WTFFFFFF
 	if (!conn.response)
-		std::cout << RED << "Warning: response points to nothing in a PollOutEvent" << RESET << std::endl;
+		std::cout << RED << "[WARNING] response points to nothing in a PollOutEvent" << RESET << std::endl;
 	if (!conn.response->sendRes || (conn.response->*(conn.response->sendRes))(conn.poll->fd) == ft::Response::Status::DONE)
 		return (this->resolveConnection(conn));
 	std::cout << GREEN << "Partially sent a response" << RED << std::endl;

@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 18:05:00 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/04 15:33:53 by fbes          ########   odam.nl         */
+/*   Updated: 2022/08/17 14:43:52 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,7 +99,7 @@ struct UnknownFieldKeyException : public ft::ConfigException
 {
 public:
 	UnknownFieldKeyException(int32_t on) {
-		this->err = std::string("Unknown field key on line") + std::to_string(on) + std::string("Unknown field key on line");
+		this->err = std::string("Unknown field key on line ") + std::to_string(on);
 	}
 };
 

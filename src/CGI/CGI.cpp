@@ -6,7 +6,7 @@
 /*   By: fbes <fbes@student.codam.nl>                 +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/31 16:27:42 by fbes          #+#    #+#                 */
-/*   Updated: 2022/08/17 14:31:03 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/08/18 15:06:48 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,11 @@ static std::vector<const char*> c_arr(const std::vector<std::string> &v)
 
 bool ft::CGI::runCGI(const ft::Connection& conn, const std::string& path, std::string& out, const std::string& cgiBin)
 {
+	auto servPath = conn.server->config.getValue("path");
+	auto uploadPath = conn.server->config.getValue("upload_dir");
+	auto servName = conn.server->config.getValue("server_name");
+	if (!servName || !servPath || !uploadPath) return (false);
+	
     std::map<ft::Exchange::Method, std::string> methods = {
         {ft::Exchange::Method::GET, "GET"},
         {ft::Exchange::Method::POST, "POST"},
@@ -32,17 +37,21 @@ bool ft::CGI::runCGI(const ft::Connection& conn, const std::string& path, std::s
 
 	std::vector<std::string> argv = {cgiBin, path};
 	std::vector<std::string> envp;
-	envp.push_back("GATEWAY_INTERFACE=CGI/1.1");
-	envp.push_back("SERVER_PROTOCOL=HTTP/1.1");
-	envp.push_back("REMOTE_ADDR=" + conn.ipv4);
-	envp.push_back("REQUEST_METHOD=" + methods[conn.request->method]);
-	envp.push_back("SCRIPT_NAME=" + path); // TODO: Proper naming pls
-	envp.push_back("SERVER_NAME=" + *conn.server->config.getValue("server_name"));
-	envp.push_back("PATH_INFO=" + path);
-	envp.push_back("CONTENT_LENGTH=" + conn.request->headers["content-length"]);
-	envp.push_back("UPLOAD_DIR=./examples/www/delete"); //TODO: this should be in config
-
-	std::cout << RED << path << RESET << std::endl;
+	try
+	{
+		size_t queryPos = conn.request->path.find_first_of('?');
+		envp.push_back("QUERY_STRING=" + (queryPos != std::string::npos ? conn.request->path.substr(queryPos) : ""));
+		envp.push_back("GATEWAY_INTERFACE=CGI/1.1");
+		envp.push_back("SERVER_PROTOCOL=HTTP/1.1");
+		envp.push_back("REMOTE_ADDR=" + conn.ipv4);
+		envp.push_back("REQUEST_METHOD=" + methods[conn.request->method]);
+		envp.push_back("SCRIPT_NAME=" + path); // TODO: Proper naming pls
+		envp.push_back("SERVER_NAME=" + *servName);
+		envp.push_back("PATH_INFO=" + path);
+		envp.push_back("CONTENT_LENGTH=" + conn.request->headers["content-length"]);
+		envp.push_back("UPLOAD_DIR=" + *servPath + *uploadPath);
+	}
+	catch(...) { return (false); } // Allocation failure or something.
 
 	int32_t fds[2];
 	int32_t body_pipe[2];

@@ -40,13 +40,13 @@ const ft::Socket* ft::Server::getSocket(void) const
 
 bool checkMethods(const std::list<std::string> &methods, ft::Exchange::Method reqMethod)
 {
-	const std::string shit[4] = {
+	const std::string stringedMethods[4] = {
 		"GET",
 		"POST",
 		"DELETE",
 		"MAX"
 	};
-	std::string reqMethodString = shit[static_cast<int32_t>(reqMethod)];
+	std::string reqMethodString = stringedMethods[static_cast<int32_t>(reqMethod)];
 
 	for (const std::string& val: methods)
 		if (val == reqMethodString)
@@ -54,6 +54,7 @@ bool checkMethods(const std::list<std::string> &methods, ft::Exchange::Method re
 	return (false);
 }
 
+// My god this shit is unreadable ...
 void ft::Server::handleRequest(ft::Connection& conn)
 {
 	std::string rootPath; // where the request is rooted
@@ -82,7 +83,11 @@ void ft::Server::handleRequest(ft::Connection& conn)
 		return (this->respondWithStatus(conn, 403));
 
 	// Get actual path used for IO
-	filePath = this->config.getcwd() + *(this->config.getValue("path")) + rootPath;
+    const std::string* path = this->config.getValue("path");
+    if (!path)
+        return (this->respondWithStatus(conn, 500));
+    
+	filePath = this->config.getcwd() + *path + rootPath;
 	std::cout << BLACK << "Relative filePath: " << filePath << RESET << std::endl;
 
 
@@ -94,7 +99,7 @@ void ft::Server::handleRequest(ft::Connection& conn)
 		std::cout << GREEN << "Redir found, redirecting" << RESET << std::endl;
 		conn.response->headers["Location"] = redirInfo.back();
 		conn.response->generateStatus(std::stoi(redirInfo.front()));
-		return ;
+		return;
 	}
 	std::cout << BLACK << "No redir found" << RESET << std::endl;
 
@@ -104,7 +109,7 @@ void ft::Server::handleRequest(ft::Connection& conn)
 		return (this->respondWithStatus(conn, 404)); // Likely a 404 error
 	std::cout << BLACK << "Absolute filePath: " << filePath << RESET << std::endl;
 
-	if (filePath.find(this->config.getcwd() + *this->config.getValue("path")) != 0)
+	if (filePath.find(this->config.getcwd() + *path) != 0)
 	{
 		std::cout << RED << "[WARNING] Requested path is outside of the root defined in the server config!" << RESET << std::endl;
 		return (this->respondWithStatus(conn, 403));
@@ -140,13 +145,11 @@ void ft::Server::handleRequest(ft::Connection& conn)
 	}
 
 	// Gets the allowed methods for path
-	std::list<std::string> methodList;
-	static std::list<std::string> methodGet = {{"GET"}};
-	bool methodRules = conn.response->pathConfig.getValueAsList("methods", methodList);
-
-	// Checks if request method is in allowed methods
-	if (!checkMethods(methodRules ? methodList : methodGet, conn.request->method))
-		return (this->respondWithStatus(conn, 405));
+    std::list<std::string> methodList;
+    static std::list<std::string> methodGet = {{"GET"}}; // Default allowed methods, if methods is not set in config
+    bool methodRules = conn.response->pathConfig.getValueAsList("methods", methodList);
+    if (!checkMethods(methodRules ? methodList : methodGet, conn.request->method))
+        return (this->respondWithStatus(conn, 405));
 
 	// If something fails within the GET, POST or DELETE methods
 	// they set the appropriate content, worst case they kill the app.
@@ -163,88 +166,3 @@ void ft::Server::handleRequest(ft::Connection& conn)
 }
 
 //////////////////////////////////////////
-
-/*
-void ft::Server::pollInEvent(pollfd* poll)
-{
-	std::cout << BLACK << "Incoming Request" << RESET << std::endl;
-
-	ssize_t brecv;							// Bytes received
-	const size_t BUFF_SIZE = 4096;			// Buffer size
-	static char buffer[BUFF_SIZE] = {0};	// The buffer
-
-	// Receive the incoming message
-	if ((brecv = recv(poll->fd, buffer, BUFF_SIZE, NONE)) <= 0)
-	{
-		if (brecv == NONE)
-			std::cerr << BLACK << "Connection closed by client" << RESET << std::endl;
-		else
-			std::cerr << RED << "Receive function has failed!" << RESET << std::endl;
-
-		close(poll->fd);
-		poll->fd = -1;
-		return;
-	}
-
-	// Parse the incoming request
-	try
-	{
-		// TODO: Parse HTTP request
-	}
-	catch (const ft::PayloadTooLarge& e)
-	{
-		this->respondWithStatus(poll, 413);
-		return;
-	}
-	catch (const ft::BadRequest& e)
-	{
-		this->respondWithStatus(poll, 400);
-		return;
-	}
-	catch (const std::bad_alloc& e)
-	{
-		std::cerr << RED << "Failed to allocate memory" << RESET << std::endl;
-		this->respondWithStatus(poll, 507);
-		return;
-	}
-	catch (const std::exception& e)
-	{
-		std::cerr << RED << "Something went wrong while parsing request" << RESET << std::endl;
-		this->respondWithStatus(poll, 500);
-		return;
-	}
-
-	poll->events = POLLOUT;
-}
-
-void ft::Server::pollOutEvent(pollfd* poll)
-{
-	// TODO: Prevent timeout!
-	// TODO: Use response class to send response.
-
-	std::cout << "\033[30;1m" << "Sent Response" << "\033[0m" << std::endl;
-}
-*/
-
-/*
-void ft::Server::run(pollfd* fds, size_t size)
-{
-	// Check our open fds for events.
-	ft::poll(fds, size, 0);
-
-	for (int i = 0; i < size; i++)
-	{
-		pollfd* poll = &fds[i];
-
-		// Create new connection
-		if (!i && (fds[0].revents & POLLIN))
-			this->pollListen();
-		// Pollfd is ready for reading.
-		else if (poll->revents & POLLIN)
-			this->pollInEvent(poll);
-		// Pollfd is ready for writing.
-		else if (poll->revents & POLLOUT)
-			this->pollOutEvent(poll);
-	}
-}
-*/
