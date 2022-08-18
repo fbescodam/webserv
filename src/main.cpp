@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 17:39:03 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/18 20:49:06 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/08/18 21:19:56 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,11 +68,11 @@ int32_t main(int32_t argc, const char* argv[])
 		return (EXIT_FAILURE);
 	}
 
-	LOG("Webserv: Starting");
+	std::cout << "Webserv: Starting" << std::endl;
 	setupServers(argv[1], config, servers);
 	ft::Poller poller(servers, config);
 
-	LOG("Webserv: Running");
+	std::cout << "Webserv: Running" << std::endl;
 	while (true)
 	{
 		poller.pollAll();
