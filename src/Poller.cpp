@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/28 15:48:13 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/18 19:15:15 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/08/18 19:20:46 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,6 +59,7 @@ ft::Poller::Poller(std::vector<ft::Server>& servers, const ft::GlobalConfig& glo
 		{
 			this->createSocket(port);
 			servers[i].setSocket(this->sockets.back()); // Link socket to server
+			ports.push_back(port);
 		}
 		else
 			servers[i].setSocket(this->getSocketByPort(port)); // Socket already exists, link it to the server
