@@ -40,13 +40,13 @@ const ft::Socket* ft::Server::getSocket(void) const
 
 bool checkMethods(const std::list<std::string> &methods, ft::Exchange::Method reqMethod)
 {
-	const std::string shit[4] = {
+	const std::string stringedMethods[4] = {
 		"GET",
 		"POST",
 		"DELETE",
 		"MAX"
 	};
-	std::string reqMethodString = shit[static_cast<int32_t>(reqMethod)];
+	std::string reqMethodString = stringedMethods[static_cast<int32_t>(reqMethod)];
 
 	for (const std::string& val: methods)
 		if (val == reqMethodString)
@@ -145,19 +145,11 @@ void ft::Server::handleRequest(ft::Connection& conn)
 	}
 
 	// Gets the allowed methods for path
-	std::list<std::string> methodList;
-	static std::list<std::string> methodGet = {{"GET"}};
-	bool methodRules = conn.response->pathConfig.getValueAsList("methods", methodList);
-    if (!methodRules)
-    {
-        // TODO: Is this an error?
-		std::cout << RED << "[WARNING] Requested path is outside of the root defined in the server config!" << RESET << std::endl;
-        return (this->respondWithStatus(conn, 500));
-    }
-
-	// Checks if request method is in allowed methods
-	if (!checkMethods(methodRules ? methodList : methodGet, conn.request->method))
-		return (this->respondWithStatus(conn, 405));
+    std::list<std::string> methodList;
+    static std::list<std::string> methodGet = {{"GET"}}; // Default allowed methods, if methods is not set in config
+    bool methodRules = conn.response->pathConfig.getValueAsList("methods", methodList);
+    if (!checkMethods(methodRules ? methodList : methodGet, conn.request->method))
+        return (this->respondWithStatus(conn, 405));
 
 	// If something fails within the GET, POST or DELETE methods
 	// they set the appropriate content, worst case they kill the app.
