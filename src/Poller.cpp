@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/28 15:48:13 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/18 19:20:46 by fbes          ########   odam.nl         */
+/*   Updated: 2022/08/18 20:51:42 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -223,10 +223,9 @@ void ft::Poller::pollInEvent(ft::Connection& conn)
 	ssize_t brecv = recv(conn.poll->fd, this->buffer, BUFF_SIZE, NONE);
 	if (brecv <= 0)
 	{
-		if (brecv < 0)
-			std::cerr << RED << "Receive function has failed!" << RESET << std::endl;
-		else
-			std::cout << BLACK << "Connection closed by peer" << RESET << std::endl;
+		if (brecv < 0) { ERR("Receive function has failed!"); }
+		else LOG("Connection closed by peer");
+		
 		this->closeConnection(conn);
 		return;
 	}
@@ -251,11 +250,11 @@ void ft::Poller::pollInEvent(ft::Connection& conn)
 		{ ft::Response::generateResponse(conn, 505); goto pollout;}
 		catch(const std::exception& e)
 		{ ft::Response::generateResponse(conn, 400); goto pollout;}
-		std::cout << BLACK << "Header parsed" << RESET << std::endl;
+		LOG("Header parsed");
 	}
 	if (conn.request->isBodyDone())
 	{
-		std::cout << BLACK << "Buffer is complete!" << RESET << std::endl;
+		LOG("Buffer is complete!");
 
 		// Once we have the full request, parse the header and check which server.
 		// Pass connection to server for it to parse the request and generate an appropriate response.
@@ -274,7 +273,7 @@ void ft::Poller::pollInEvent(ft::Connection& conn)
 	}
 	else
 	{
-		std::cout << BLACK << "[DEBUG] Buffer is incomplete." << RESET << std::endl;
+		LOG("[DEBUG] Buffer is incomplete.");
 		if (conn.request->headers["Expect"] == "100-continue")
 			ft::Response::generateResponse(conn, 100);
 		else
@@ -284,7 +283,7 @@ void ft::Poller::pollInEvent(ft::Connection& conn)
 		}
 	}
 pollout:
-	std::cout << BLACK << "Pollout now" << RESET << std::endl;
+	LOG("Pollout now");
 	conn.poll->events = POLLOUT;
 	conn.lastActivity = std::time(nullptr);
 }
@@ -297,7 +296,7 @@ void ft::Poller::pollOutEvent(ft::Connection& conn)
 
 	// WTFFFFFF
 	if (!conn.response)
-		std::cout << RED << "[WARNING] response points to nothing in a PollOutEvent" << RESET << std::endl;
+		ERR("[WARNING] response points to nothing in a PollOutEvent");
 	if (!conn.response->sendRes || (conn.response->*(conn.response->sendRes))(conn.poll->fd) == ft::Response::Status::DONE)
 		return (this->resolveConnection(conn));
 	std::cout << GREEN << "Partially sent a response" << RED << std::endl;
@@ -315,10 +314,10 @@ void ft::Poller::resolveConnection(ft::Connection& conn)
 			this->deleteReqRes(conn);
 		conn.poll->events = POLLIN;
 		conn.poll->revents = NONE;
-		std::cout << BLACK << "Connection kept alive" << RESET << std::endl;
+		LOG("Connection kept alive");
 		return;
 	}
-	std::cout << BLACK << "Connection closed" << RESET << std::endl;
+	LOG("Connection closed");
 	this->closeConnection(conn);
 }
 

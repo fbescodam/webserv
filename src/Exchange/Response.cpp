@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:07:35 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/18 19:53:25 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/08/18 21:11:57 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 ft::Response::Response(const ft::Connection& conn) : conn(conn), config(this->conn.server->config)
 {
-	std::cout << BLACK << "Set sendRes to nullptr (in constructor)" << RESET << std::endl;
+	LOG("Set sendRes to nullptr (in constructor)");
 	this->sendRes = nullptr;
 	this->file = nullptr;
 	this->offset = 0;
@@ -40,29 +40,29 @@ void ft::Response::importFieldsForPath(std::string& rootPath)
 {
 	this->pathConfig = ft::Section(this->config.getcwd(), "response", this->config);
 	std::string* overridePath = nullptr;
-
-	std::cout << BLACK << "rootPath: " << rootPath << RESET << std::endl;
+	LOG("rootPath: " << rootPath);
 	for (const auto &location: this->config.locations)
 	{
 		if (location.appliesForPath(rootPath))
 		{
-			std::cout << BLACK << "Location " << location.getAppliedPath() << " applies for path " << rootPath << "!" << RESET << std::endl;
+			LOG("Location " << location.getAppliedPath() << " applies for path " << rootPath << "!");
 			this->pathConfig.importFields(location.exportFields());
 			overridePath = const_cast<std::string*>(location.getValue("path"));
 			if (overridePath)
 			{
-				std::cout << BLACK << "rootPath before override: " << rootPath << RESET << std::endl;
+				LOG("rootPath before override: " << rootPath);
 				rootPath.erase(0, location.getAppliedPath().length());
-				std::cout << BLACK << "rootPath after erasure: " << rootPath << RESET << std::endl;
+				LOG("rootPath after erasure: " << rootPath);
 				if (location.getAppliedPath().back() != '/' && rootPath.front() != '/')
 					rootPath.erase(0, rootPath.find_first_of('/') + 1);
-				std::cout << BLACK << "rootPath after erasure of starting /: " << rootPath << RESET << std::endl;
+				LOG("rootPath after erasure of starting /: " << rootPath);
+			
 				rootPath = *overridePath + rootPath;
-				std::cout << BLACK << "rootPath after override: " << rootPath << RESET << std::endl;
+				LOG("rootPath after override: " << rootPath);
 			}
 		}
 	}
-	std::cout << BLACK << "rootPath after import: " << rootPath << RESET << std::endl;
+	LOG("rootPath after import: " << rootPath);
 }
 
 //////////////////////////////////////////
@@ -99,7 +99,8 @@ void ft::Response::generateStatus(int32_t status)
 	std::string errorPage = "error_" + std::to_string(status);
 	if (this->config.keyExists(errorPage))
 	{
-		std::cout << BLACK << "A custom error page exists for status " << status << RESET << std::endl;
+
+		LOG("A custom error page exists for status " << status);
 
 		const std::string* path = this->config.getValue("path");
 		const std::string* page = this->config.getValue(errorPage);
@@ -114,13 +115,13 @@ void ft::Response::generateStatus(int32_t status)
 		this->headers["content-type"] = ft::getContentType(filePath);
 		this->writeHeaders();
 		this->fileSize = ft::filesystem::getFileSize(this->file);
-		std::cout << BLACK << "Set sendRes to sendHeaders" << RESET << std::endl;
+		LOG("Set sendRes to sendHeaders");
 		this->sendRes = &ft::Response::sendHeaders;
 		return;
 	}
 
 generic: // Send generic built-in page.
-	std::cout << BLACK << "Generating status page for " << status << RESET << std::endl;
+	LOG("Generating status page for " << status);
 	std::string statusText(ft::getStatusCodes().at(status));
 	this->generateStatus(status, "<!DOCTYPE html><html><head><title>" + statusText + "</title></head><body><h1>" + std::to_string(status) + " " + statusText + "</h1></body></html>");
 }
@@ -137,7 +138,7 @@ void ft::Response::generateStatus(int32_t status, const std::string& content)
 
 	// Build content
 	this->data += content;
-	std::cout << BLACK << "Set sendRes to sendDynamic" << RESET << std::endl;
+	LOG("Set sendRes to sendDynamic");
 	this->sendRes = &ft::Response::sendDynamic;
 }
 
@@ -164,7 +165,7 @@ void ft::Response::respond(const std::string& filePath)
 		this->generateStatus(404);
     if (!this->config.getValueAsList("cgi_bin", cgiBin))
     {
-		std::cout << RED << "ERROR: cgi_bin not set!" << RESET << std::endl;
+		ERR("ERROR: cgi_bin not set!");
 		this->generateStatus(500);
     }
 	else if (endsWith(filePath, cgiBin.front()))
@@ -174,7 +175,7 @@ void ft::Response::respond(const std::string& filePath)
 			return (this->generateStatus(500));
 
 		this->data = out;
-		std::cout << BLACK << "Set sendRes to sendDynamic" << RESET << std::endl;
+		LOG("Set sendRes to sendDynamic");
 		this->sendRes = &ft::Response::sendDynamic;
 		return;
 	}
@@ -187,7 +188,7 @@ void ft::Response::respond(const std::string& filePath)
 // Simply open the file and send it over.
 void ft::Response::notCGI(const std::string& filePath)
 {
-	std::cout << BLACK << "Receiving GET method. Responding now." << RESET << std::endl;
+	LOG("Receiving GET method. Responding now.");
 
 	if (this->isDirListing) try
 	{
@@ -199,14 +200,15 @@ void ft::Response::notCGI(const std::string& filePath)
 		this->headers["content-type"] = "text/html";
 		this->writeHeaders();
 		this->data += dirListing;
-		std::cout << BLACK << "Set sendRes to sendDynamic" << RESET << std::endl;
+		LOG("Set sendRes to sendDynamic");
 		this->sendRes = &ft::Response::sendDynamic;
 		return;
 	}
 	catch(const std::exception& e)
 	{
+#ifdef DEBUG
 		std::cerr << RED << "Webserv: " << e.what() << RESET << std::endl;
-
+#endif
 		try { return (this->generateStatus(500)); }
 		catch (const std::exception& e) { exit(EXIT_FAILURE); }
 	}
@@ -223,13 +225,12 @@ void ft::Response::notCGI(const std::string& filePath)
 		this->headers["content-length"] = std::to_string(this->fileSize);
 		this->headers["content-type"] = ft::getContentType(filePath);
 		this->writeHeaders();
-		std::cout << BLACK << "Set sendRes to sendHeaders" << RESET << std::endl;
+		LOG("Set sendRes to sendHeaders");
 		this->sendRes = &ft::Response::sendHeaders;
 	}
 	catch(const std::exception& e)
 	{
-		std::cerr << RED << "Webserv: " << e.what() << RESET << std::endl;
-
+		ERR("Webserv: " << e.what());
 		// We should NEVER have to reach this point ...
 		try { return (this->generateStatus(500)); }
 		catch (const std::exception& e) { exit (EXIT_FAILURE); }
@@ -240,13 +241,13 @@ void ft::Response::notCGI(const std::string& filePath)
 
 ft::Response::Status ft::Response::sendDynamic(ft::fd_t socket)
 {
-	std::cout << BLACK << "Sending everything in one go (dynamically generated page)..." << RESET << std::endl;
+	LOG("Sending everything in one go (dynamically generated page)...");
 	size_t bsent = send(socket, this->data.data(), this->data.length(), NONE); // Send as much as possible
-	std::cout << BLACK << "Bytes sent: " << bsent << RESET << std::endl;
+	LOG("Bytes sent: " << bsent);
 	this->data.erase(0, bsent); // Delete data that has been sent
 	if (bsent < this->data.length()) // Not everything was sent, send more in the next poll
 		return (ft::Response::Status::NOT_DONE);
-	std::cout << BLACK << "Set sendRes to nullptr" << RESET << std::endl;
+	LOG("Set sendRes to nullptr");
 	this->sendRes = nullptr; // Everything was sent, nothing more to do
 	return (ft::Response::Status::DONE);
 }
@@ -255,12 +256,12 @@ ft::Response::Status ft::Response::sendDynamic(ft::fd_t socket)
 
 ft::Response::Status ft::Response::sendHeaders(ft::fd_t socket)
 {
-	std::cout << BLACK << "Sending headers..." << RESET << std::endl;
+	LOG("Sending headers...");
 	size_t bsent = send(socket, this->data.data(), this->data.length(), NONE);
 	this->data.erase(0, bsent); // Delete data that has been sent
 	if (bsent < this->data.length()) // Not everything was sent, send more in the next poll
 		return (ft::Response::Status::NOT_DONE);
-	std::cout << BLACK << "Set sendRes to sendFile" << RESET << std::endl;
+	LOG("Set sendRes to sendFile");
 	this->sendRes = &ft::Response::sendFile; // Everything was sent, now continue with sending the file
 	return (ft::Response::Status::NOT_DONE); // Actually not done yet! We now need to send the file
 }
@@ -274,7 +275,7 @@ ft::Response::Status ft::Response::sendFile(ft::fd_t socket)
 	if (this->file == nullptr)
 		throw std::exception();
 
-	std::cout << BLACK << "Sending file..." << RESET << std::endl;
+	LOG("Sending file...");
 	sendfile(fileno(this->file), socket, offset, &bsent, NULL, NONE);
 	this->offset += bsent;
 
@@ -282,7 +283,7 @@ ft::Response::Status ft::Response::sendFile(ft::fd_t socket)
 		return (ft::Response::Status::NOT_DONE);
 
 	// Everything was sent, nothing more to do
-	std::cout << BLACK << "Set sendRes to nullptr" << RESET << std::endl;
+	LOG("Set sendRes to nullptr");
 	this->sendRes = nullptr;
 	return (ft::Response::Status::DONE);
 }

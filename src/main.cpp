@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 17:39:03 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/11 16:09:16 by fbes          ########   odam.nl         */
+/*   Updated: 2022/08/18 20:49:06 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,16 +36,15 @@ static void setupServers(const std::string& configPath, ft::GlobalConfig& config
 		std::cout << "\n\nWebserv: Signal catched, shutting down..." << std::endl;
 		exit(EXIT_SUCCESS);
 	});
-
-	std::cout << BLACK << "Webserv: Reading config file" << RESET << std::endl;
+	
+	LOG("Webserv: Reading config file");
 	try { config.readFile(configPath); }
 	catch (const std::exception& e)
 	{
 		std::cerr << RED << e.what() << RESET << std::endl;
 		exit(EXIT_FAILURE);
 	}
-
-	std::cout << BLACK << "Webserv: Creating servers" << RESET << std::endl;
+	LOG("Webserv: Creating servers");
 	for (ft::ServerSection& serverSection : config.serverSections)
 		servers.push_back(ft::Server(serverSection));
 }
@@ -69,17 +68,11 @@ int32_t main(int32_t argc, const char* argv[])
 		return (EXIT_FAILURE);
 	}
 
-	// Remove termcaps
-	termios raw;
-	tcgetattr(STDIN_FILENO, &raw);
-	raw.c_lflag &= ~(ECHOCTL);
-	tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
-
-	std::cout << "Webserv: Starting" << std::endl;
+	LOG("Webserv: Starting");
 	setupServers(argv[1], config, servers);
 	ft::Poller poller(servers, config);
 
-	std::cout << "Webserv: Running" << std::endl;
+	LOG("Webserv: Running");
 	while (true)
 	{
 		poller.pollAll();

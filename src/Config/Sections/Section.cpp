@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 15:39:35 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/18 20:22:15 by fbes          ########   odam.nl         */
+/*   Updated: 2022/08/18 21:04:38 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,8 +52,8 @@ void ft::Section::importFields(std::map<std::string, std::string> fields)
 {
 	for (const std::pair<std::string, std::string> &vals: fields)
 	{
-		std::cout << BLACK << "Importing " << vals.first << ": " << vals.second << RESET << std::endl;
-		std::cout << BLACK << "Currently " << vals.first << ": " << this->fields[vals.first] << RESET << std::endl;
+		LOG("Importing " << vals.first << ": " << vals.second);
+		LOG("Currently " << vals.first << ": " << this->fields[vals.first]);
 		this->fields[vals.first] = vals.second;
 	}
 }
@@ -143,6 +143,7 @@ uint32_t ft::Section::getAmountOfFields() const
 
 void ft::Section::print(std::string prefix) const
 {
+#ifdef DEBUG
 	std::cout << BLACK << prefix << ">>>> SECTION NAME " << this->name << " <<<<" << std::endl;
 
 	if (!this->appliesToPath.empty())
@@ -152,6 +153,7 @@ void ft::Section::print(std::string prefix) const
 		std::cout << prefix << i.first << " = " << i.second << std::endl;
 
 	std::cout << RESET << std::endl;;
+#endif
 }
 
 const std::string& ft::Section::getcwd() const

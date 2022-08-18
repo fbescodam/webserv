@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:07:39 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/18 16:34:34 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/08/18 21:07:16 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,19 +31,12 @@ void ft::Request::appendBuffer(char *buffer, int32_t bread)
 	if (this->contentLength > maxBodySize || bread > maxBodySize)
 		throw ft::PayloadTooLarge();
 
-	std::cout << BLACK << "Appending to buffer (original size " << this->data.size() << ", appending " << bread << " bytes" << RESET << std::endl;
+	LOG("Appending to buffer (original size " << this->data.size() << ", appending " << bread << " bytes");
 	this->data.append(buffer, bread);
-	std::cout<< BLACK << "New buffer size: " << this->data.size() << RESET << std::endl;
-
-	// std::cout << BLACK << "Data: " << this->data << RESET << std::endl;
+	LOG("New buffer size: " << this->data.size());
 
 	if (this->data.size() > maxBodySize)
 		throw ft::PayloadTooLarge();
-
-	// IF its a get request, we check for the \r\n\r\n
-	// IF its a post request we compare against the content-length instead.
-
-	// Check if we've received the full header
 	if (!this->headerDone)
 		this->headerDone = this->data.find("\r\n\r\n") != std::string::npos;
 }
@@ -64,7 +57,7 @@ bool ft::Request::isBodyDone(void) const
 	else if (this->method == ft::Exchange::Method::POST) // If we have the header we can check if the content length matches the data length.
 	{
 		int32_t bodySize = (int32_t) this->data.length();
-		std::cout << BLACK << "content-length expected " << this->contentLength << ", current size " << bodySize <<RESET<<std::endl;
+		LOG("content-length expected " << this->contentLength << ", current size " << bodySize);
 		return (this->contentLength <= bodySize);
 	}
 	return (true);
@@ -78,7 +71,7 @@ void ft::Request::checkHostHeader(ft::Connection& conn)
 	const std::string* host;
 	if (!(host = this->getHeaderValue("host")))
 	{
-		std::cout << RED << "Host header not set" << RESET << std::endl;
+		ERR("Host header not set")
 		throw ft::BadRequest();
 	}
 
@@ -126,7 +119,7 @@ void ft::Request::parseHeader(ft::Connection& conn)
 	size_t pos;
 	if ((pos = this->data.find("\r\n\r\n")) == std::string::npos)
 	{
-		std::cout << RED << "Error: Request separator missing!" << RESET << std::endl;
+		ERR("Error: Request separator missing!");
 		throw ft::BadRequest();
 	}
 
