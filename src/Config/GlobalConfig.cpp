@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 14:59:11 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/18 15:33:21 by fbes          ########   odam.nl         */
+/*   Updated: 2022/08/18 19:11:04 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -201,6 +201,8 @@ void ft::GlobalConfig::readFile(const std::string& filePath)
 				if (currentSection->getName() == "server")
 					verifyServerSection(lineNum, this->serverSections.back());
 			}
+			else
+				verifyGlobalSection(lineNum, globalSection);
 
 			if (isSubSectionDef(line)) // is subsection (.location)
 			{

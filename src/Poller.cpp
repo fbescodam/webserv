@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/28 15:48:13 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/18 14:42:13 by fbes          ########   odam.nl         */
+/*   Updated: 2022/08/18 16:16:38 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,7 @@ ft::Poller::Poller(std::vector<ft::Server>& servers, const ft::GlobalConfig& glo
 		uint16_t port = this->servers[i].config.returnValueAsInt("listen");
 		if (std::find(ports.begin(), ports.end(), port) == ports.end()) // port has no socket yet
 		{
-			const Socket* socket = this->createSocket(port);
+			this->createSocket(port);
 			servers[i].setSocket(this->sockets.back()); // Link socket to server
 		}
 		else
