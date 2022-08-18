@@ -58,19 +58,19 @@ void ft::Server::handleRequest(ft::Connection& conn)
 	std::string rootPath; // where the request is rooted
 	std::string filePath; // full path to the file requested (including server path)
 
-	std::cout << BLACK << "Now handling the request" << RESET << std::endl;
+	LOG("Now handling the request");
 
 	try
 	{
 		conn.response = new ft::Response(conn);
-		std::cout << BLACK << "Requested path: " << conn.request->path << RESET << std::endl;
+		LOG("Requested path: " << conn.request->path);
 		rootPath = conn.request->path.substr(0, conn.request->path.find_first_of('?'));
 		// Note: no need to split on #, the anchor/fragment identifier is not sent as part of the request
 		conn.response->importFieldsForPath(rootPath);
 	}
 	catch (const std::exception& e)
 	{
-		std::cerr << RED << e.what() << RESET << std::endl;
+		ERR(e.what());
 
 		try { this->respondWithStatus(conn, 500); }
 		catch (const std::exception& e) { exit(EXIT_FAILURE); }
@@ -86,11 +86,11 @@ void ft::Server::handleRequest(ft::Connection& conn)
 		return (this->respondWithStatus(conn, 500));
 
 	filePath = this->config.getcwd() + *path + rootPath; // Get the FULL PATH to the file, starting at the root /
-	std::cout << BLACK << "Relative filePath: " << filePath << RESET << std::endl;
+	LOG("Relative filePath: " << filePath);
 
 	// Check for redirect
 	std::list<std::string> redirInfo;
-	std::cout << BLACK << "Check redir" << RESET << std::endl;
+	LOG("Check redir");
 	if (conn.response->pathConfig.getValueAsList("redir", redirInfo))
 	{
 		std::cout << GREEN << "Redir found, redirecting" << RESET << std::endl;
@@ -98,16 +98,16 @@ void ft::Server::handleRequest(ft::Connection& conn)
 		conn.response->generateStatus(std::stoi(redirInfo.front()));
 		return;
 	}
-	std::cout << BLACK << "No redir found" << RESET << std::endl;
+	LOG("No redir found");
 
 	// Get the absolute path to perform security checks
 	if (!ft::filesystem::getAbsolutePath(filePath.c_str(), filePath))
 		return (this->respondWithStatus(conn, 404)); // Likely a 404 error
-	std::cout << BLACK << "Absolute filePath: " << filePath << RESET << std::endl;
+	LOG("Absolute filePath: " << filePath);
 
 	if (filePath.find(this->config.getcwd() + *path) != 0)
 	{
-		std::cout << RED << "[WARNING] Requested path is outside of the root defined in the server config!" << RESET << std::endl;
+		ERR("[WARNING] Requested path is outside of the root defined in the server config!");
 		return (this->respondWithStatus(conn, 403));
 	}
 
@@ -122,22 +122,22 @@ void ft::Server::handleRequest(ft::Connection& conn)
 		if (conn.response->pathConfig.keyExists("index"))
 			indexFile = *conn.response->pathConfig.getValue("index");
 
-		std::cout << BLACK << "Requested path is a directory, checking if index file exists at " << filePath << indexFile << RESET << std::endl;
+		LOG("Requested path is a directory, checking if index file exists at " << filePath << indexFile);
 		if (ft::filesystem::fileExists(filePath + indexFile))
 			filePath = filePath + indexFile;
 		else if (!conn.response->pathConfig.returnValueAsBoolean("dir_listing"))
 		{
-			std::cout << BLACK << "Index file does not exist and dir_listing is not enabled, responding with 404" << RESET << std::endl;
+			LOG("Index file does not exist and dir_listing is not enabled, responding with 404");
 			return (this->respondWithStatus(conn, 404));
 		}
 		else if (!ft::filesystem::isDir(filePath))
 		{
-			std::cout << BLACK << "Index file does not exist, dir_listing is enabled, but directory does not exist, responding with 404" << RESET << std::endl;
+			LOG("Index file does not exist, dir_listing is enabled, but directory does not exist, responding with 404");
 			return (this->respondWithStatus(conn, 404));
 		}
 		else
 			conn.response->isDirListing = true;
-		std::cout << BLACK << "Index file exists or dir_listing is enabled, new filePath is " << filePath << RESET << std::endl;
+		LOG("Index file exists or dir_listing is enabled, new filePath is " << filePath);
 	}
 
 	// Gets the allowed methods for path
@@ -152,9 +152,8 @@ void ft::Server::handleRequest(ft::Connection& conn)
 	switch (conn.request->method)
 	{
 		case ft::Exchange::Method::GET:
-			return (conn.response->getMethod(filePath));
 		case ft::Exchange::Method::POST:
-			return (conn.response->postMethod(filePath));
+			return (conn.response->respond(filePath));
 		case ft::Exchange::Method::DELETE:
 			return (conn.response->deleteMethod(filePath));
 		default: break; // Do nothing

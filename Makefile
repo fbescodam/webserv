@@ -6,7 +6,7 @@
 #    By: lde-la-h <lde-la-h@student.codam.nl>         +#+                      #
 #                                                    +#+                       #
 #    Created: 2022/05/13 11:36:28 by lde-la-h      #+#    #+#                  #
-#    Updated: 2022/08/18 20:47:25 by pvan-dij      ########   odam.nl          #
+#    Updated: 2022/08/18 22:09:21 by pvan-dij      ########   odam.nl          #
 #                                                                              #
 # **************************************************************************** #
 
@@ -27,7 +27,7 @@ CC		:=	clang++
 NAME	:=	webserv
 HEADERS :=	$(addprefix -I , $(shell find ./src -iname '*.hpp' | sed -E "s|/[^/]+$$||" | uniq)) -I include
 # Project requires you do it in 98, frankly we don't care (We asked)
-CFLAGS	:= -std=c++17 -Wextra -Wall -Werror -Wunreachable-code -Wno-char-subscripts -Wno-unused-variable -Wno-unused-parameter -Wno-unused-function -Wno-sign-compare
+CFLAGS	:= -std=c++17 -Wextra -Wall -Werror -Wunreachable-code -Wno-char-subscripts -Wno-unused-parameter -Wno-sign-compare
 ifdef DEBUG
 	CFLAGS	+=	-g3
 else ifdef FSAN
@@ -53,7 +53,7 @@ SRCS	:=	./src/CGI/CGI.cpp \
 OBJS	:=	${SRCS:.cpp=.o}
 
 #//= Recipes =//#
-all: filecgi # Multi threading badness because C++ is slow
+all: cgi-bin # Multi threading badness because C++ is slow
 	@$(MAKE) $(NAME) -j4
 
 %.o: %.cpp
@@ -71,9 +71,8 @@ clean:
 fclean: clean
 	@rm -f $(NAME)
 
-filecgi:
-	@$(CC) $(CFLAGS) -o filecgi.cgi -Wno-unreachable-code ./src/CGIscripts/fileupload.cpp
-	@mv filecgi.cgi ./examples/www/post/
+cgi-bin:
+	@$(CC) $(CFLAGS) -o cgi-bin ./src/CGIscripts/fileupload.cpp
 
 re:	fclean all
 

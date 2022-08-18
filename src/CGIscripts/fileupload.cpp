@@ -6,7 +6,7 @@
 /*   By: lde-la-h <main@w2wizard.dev>                 +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/08/17 10:35:10 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/18 22:08:33 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/08/18 22:09:59 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -235,6 +235,9 @@ void parseFormData(const std::string &data)
 
 int main(int ac, char **av, char **envp)
 {
+	(void)ac;
+	(void)av;
+
 	// Get data from cin
 	std::istreambuf_iterator<char> begin(std::cin), end;
 	std::string data(begin, end);

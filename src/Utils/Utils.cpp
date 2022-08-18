@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 10:41:28 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/18 15:35:11 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/08/18 16:16:24 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ void ft::trim(std::string& string)
 
 void ft::slice(const std::string& string, std::string delim, std::pair<std::string, std::string>& output)
 {
-	size_t start, end = 0;
+	size_t start = 0;
 	start = string.find_first_of(delim);
 	if (start == std::string::npos)
 		throw ft::DelimiterNotFoundException();

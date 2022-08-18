@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 17:39:03 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/11 16:09:16 by fbes          ########   odam.nl         */
+/*   Updated: 2022/08/18 21:19:56 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,16 +36,15 @@ static void setupServers(const std::string& configPath, ft::GlobalConfig& config
 		std::cout << "\n\nWebserv: Signal catched, shutting down..." << std::endl;
 		exit(EXIT_SUCCESS);
 	});
-
-	std::cout << BLACK << "Webserv: Reading config file" << RESET << std::endl;
+	
+	LOG("Webserv: Reading config file");
 	try { config.readFile(configPath); }
 	catch (const std::exception& e)
 	{
 		std::cerr << RED << e.what() << RESET << std::endl;
 		exit(EXIT_FAILURE);
 	}
-
-	std::cout << BLACK << "Webserv: Creating servers" << RESET << std::endl;
+	LOG("Webserv: Creating servers");
 	for (ft::ServerSection& serverSection : config.serverSections)
 		servers.push_back(ft::Server(serverSection));
 }
@@ -68,12 +67,6 @@ int32_t main(int32_t argc, const char* argv[])
 		std::cerr << "Usage: ./webserv <Configuration Filepath>\n" << std::endl;
 		return (EXIT_FAILURE);
 	}
-
-	// Remove termcaps
-	termios raw;
-	tcgetattr(STDIN_FILENO, &raw);
-	raw.c_lflag &= ~(ECHOCTL);
-	tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
 
 	std::cout << "Webserv: Starting" << std::endl;
 	setupServers(argv[1], config, servers);

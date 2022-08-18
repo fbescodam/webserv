@@ -6,11 +6,12 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 14:59:11 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/18 15:33:21 by fbes          ########   odam.nl         */
+/*   Updated: 2022/08/18 20:38:25 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "GlobalConfig.hpp"
+#include "Filesystem.hpp"
 #include <array>
 
 //////////////////////////////////////////
@@ -111,7 +112,7 @@ static void getSubSectionName(const uint32_t lineNum, const std::string& line, s
 static void checkNoServerKeysInSection(const uint32_t& lineNum, const ft::Section& section, std::string sectionName)
 {
 	// check for fields that may only be used in server sections
-	std::array<std::string, 3> forbiddenFields = { "server_name", "listen", "limit_body_size" };
+	std::array<std::string, 3> forbiddenFields = { "server_name", "listen" };
 	for (std::string& forbiddenField : forbiddenFields)
 	{
 		if (section.keyExists(forbiddenField))
@@ -121,19 +122,16 @@ static void checkNoServerKeysInSection(const uint32_t& lineNum, const ft::Sectio
 
 static void verifyGlobalSection(const uint32_t& lineNum, const ft::Section& globalSection)
 {
-	// check for fields that are required in the global section
-	// DISABLED, NOTHING IS REQUIRED!
-	/*
-	std::array<std::string, 1> requiredFields = { "limit_body_size" };
-	for (std::string& requiredField : requiredFields)
-	{
-		if (!globalSection.keyExists(requiredField))
-			throw ft::MissingFieldException(lineNum, requiredField, "global");
-	}
-	*/
-
 	// check for fields that are only allowed in server sections
 	checkNoServerKeysInSection(lineNum, globalSection, "global");
+
+	// check for more forbidden fields
+	std::array<std::string, 3> forbiddenFields = { "path", "redir" };
+	for (std::string& forbiddenField : forbiddenFields)
+	{
+		if (globalSection.keyExists(forbiddenField))
+			throw ft::ForbiddenFieldException(lineNum, forbiddenField, "global");
+	}
 }
 
 static void verifyLocationSection(const uint32_t& lineNum, const ft::Section& location)
@@ -157,6 +155,9 @@ static void verifyServerSection(const uint32_t& lineNum, const ft::ServerSection
 		if (!serverSection.keyExists(requiredField))
 			throw ft::MissingFieldException(lineNum, requiredField, "server");
 	}
+
+	if (!ft::filesystem::isDir(serverSection.getcwd() + *serverSection.getValue("path")))
+		throw ft::InvalidPathException(lineNum);
 
 	for (const ft::Section& location : serverSection.locations)
 		verifyLocationSection(lineNum, location);
@@ -201,6 +202,8 @@ void ft::GlobalConfig::readFile(const std::string& filePath)
 				if (currentSection->getName() == "server")
 					verifyServerSection(lineNum, this->serverSections.back());
 			}
+			else
+				verifyGlobalSection(lineNum, this->globalSection);
 
 			if (isSubSectionDef(line)) // is subsection (.location)
 			{
@@ -242,7 +245,7 @@ void ft::GlobalConfig::verifyConfig(const uint32_t& lineNum) const
 	if (this->serverSections.size() == 0)
 		throw ft::NoServersException();
 	for (const ft::ServerSection& serverSection : this->serverSections)
-		verifyServerSection(lineNum, serverSection); // TODO: can possibly be changed to just checking the last server section
+		verifyServerSection(lineNum, serverSection);
 }
 
 //////////////////////////////////////////

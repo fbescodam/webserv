@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 10:40:21 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/18 17:01:54 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/08/18 21:02:57 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,13 @@
 # include <algorithm>
 # include "Exceptions.hpp"
 # include "SocketAddress.hpp"
+#ifdef DEBUG
+# define LOG(...) std::cout << BLACK << __VA_ARGS__ << RESET << std::endl;
+# define ERR(...) std::cout << RED << __VA_ARGS__ << RESET << std::endl;
+#else
+# define LOG(...)
+# define ERR(...) 
+#endif
 namespace ft {
 
 typedef int32_t fd_t;
