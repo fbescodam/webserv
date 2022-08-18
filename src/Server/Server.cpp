@@ -83,13 +83,12 @@ void ft::Server::handleRequest(ft::Connection& conn)
 		return (this->respondWithStatus(conn, 403));
 
 	// Get actual path used for IO
-    const std::string* path = this->config.getValue("path");
-    if (!path)
-        return (this->respondWithStatus(conn, 500));
-    
-	filePath = this->config.getcwd() + *path + rootPath;
-	std::cout << BLACK << "Relative filePath: " << filePath << RESET << std::endl;
+	const std::string* path = this->config.getValue("path");
+	if (!path)
+		return (this->respondWithStatus(conn, 500));
 
+	filePath = this->config.getcwd() + *path + rootPath; // Get the FULL PATH to the file, starting at the root /
+	std::cout << BLACK << "Relative filePath: " << filePath << RESET << std::endl;
 
 	// Check for redirect
 	std::list<std::string> redirInfo;
@@ -145,11 +144,11 @@ void ft::Server::handleRequest(ft::Connection& conn)
 	}
 
 	// Gets the allowed methods for path
-    std::list<std::string> methodList;
-    static std::list<std::string> methodGet = {{"GET"}}; // Default allowed methods, if methods is not set in config
-    bool methodRules = conn.response->pathConfig.getValueAsList("methods", methodList);
-    if (!checkMethods(methodRules ? methodList : methodGet, conn.request->method))
-        return (this->respondWithStatus(conn, 405));
+	std::list<std::string> methodList;
+	static std::list<std::string> methodGet = {{"GET"}}; // Default allowed methods, if methods is not set in config
+	bool methodRules = conn.response->pathConfig.getValueAsList("methods", methodList);
+	if (!checkMethods(methodRules ? methodList : methodGet, conn.request->method))
+		return (this->respondWithStatus(conn, 405));
 
 	// If something fails within the GET, POST or DELETE methods
 	// they set the appropriate content, worst case they kill the app.
