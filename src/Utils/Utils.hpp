@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 10:40:21 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/18 14:28:51 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/08/18 15:32:48 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@
 # define BUFF_SIZE 4096
 # define CONN_TIMEOUT 30 // in seconds
 # define MAX_CLIENTS 60
+# define DEFAULT_LIMIT_BODY_SIZE 8000000 // 8MB
 # define IPV4 PF_INET
 # define TCP SOCK_STREAM
 # define MASTER_SOCKET 0
