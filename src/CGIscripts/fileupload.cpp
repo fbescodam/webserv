@@ -6,7 +6,7 @@
 /*   By: lde-la-h <main@w2wizard.dev>                 +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/08/17 10:35:10 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/19 12:03:32 by fbes          ########   odam.nl         */
+/*   Updated: 2022/08/19 12:49:24 by pvan-dij      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,7 +109,7 @@ void GenerateResponse(const std::string &uploadPath, const std::vector<std::stri
 }
 
 
-void GenerateResponse(const std::string &uploadPath, const std::vector<std::string> &fileNames, const std::vector<std::string> &formData)
+void GenerateResponse(const std::string &uploadPath, const std::vector<std::string> &fileNames, std::vector<std::string> &formData)
 {
 	std::string out;
 
@@ -130,12 +130,14 @@ void GenerateResponse(const std::string &uploadPath, const std::vector<std::stri
 		out += "<pre>";
 		// Formdata in a table
 		out += "<table><tr><th>field</th><th>value</th></tr>";
-		for (const std::string &val : formData)
+		for (std::string &val : formData)
 		{
 			out += "<tr>";
-			size_t delimPos = val.find('=');
-			out += "<td>" + val.substr(0, delimPos) + "</td>";
-			out += "<td>" + val .substr(delimPos + 1) + "</td>";
+			size_t delimPos = val.find("name=");
+			out += "<td>" + getFileName(delimPos + 5, val) + "</td>";
+			val.erase(0, val.find("\r\n\r\n"));
+			val.erase(0, val.find_first_not_of(" \t\r\n\t\f\v"));
+			out += "<td>" + val + "</td>";
 			out += "</tr>"; //TODO: actually parse val
 		}
 		out += "</table></pre><hr>";
