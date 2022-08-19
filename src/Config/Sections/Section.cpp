@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 15:39:35 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/18 21:04:38 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/08/19 11:11:45 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ std::map<std::string, std::string> ft::Section::exportFields(void) const
 
 void ft::Section::importFields(std::map<std::string, std::string> fields)
 {
-	for (const std::pair<std::string, std::string> &vals: fields)
+	for (const auto &vals: fields)
 	{
 		LOG("Importing " << vals.first << ": " << vals.second);
 		LOG("Currently " << vals.first << ": " << this->fields[vals.first]);
