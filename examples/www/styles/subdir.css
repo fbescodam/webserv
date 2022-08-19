@@ -1,0 +1,89 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        ::::::::            */
+/*   subdir.css                                         :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: lde-la-h <main@w2wizard.dev>                 +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2022/08/19 10:29:02 by lde-la-h      #+#    #+#                 */
+/*   Updated: 2022/08/19 11:42:32 by lde-la-h      ########   odam.nl         */
+/*                                                                            */
+/* ************************************************************************** */
+
+/* Elements */
+
+img {
+	image-rendering: pixelated;
+}
+
+body {
+	background-image: url("../imgs/80s/bg2.jpeg");
+}
+
+a {
+	text-shadow: 1px 1px 2px rgb(255, 255, 255), 0 0 1em rgb(208, 255, 0), 0 0 0.4em rgb(45, 150, 0);
+}
+
+button {
+	color: blueviolet;
+	text-shadow: 1px 1px 2px rgb(255 255 255), 0 0 1em rgb(216 255 46), 0 0 0.4em rgb(255 208 237);
+	background-image: url("../imgs/frek.jpeg");
+}
+
+/* ID */
+
+#title {
+	color: white;
+	border: 8px double rgba(142, 128, 0, 1);
+	background-image: url("../imgs/80s/bg.png");
+	text-shadow: 1px 1px 2px rgb(255 255 255), 0 0 1em rgb(216 255 46), 0 0 0.4em rgb(255 208 237);
+    transition: all 0.3s ease-out;
+	display: flex;
+
+}
+
+#doot {
+	animation: scrolling-bg-9-10 30s linear infinite;
+}
+
+#mixtape {
+	overflow: hidden;
+	display: flex;
+	color: blueviolet;
+	margin-top: 1rem;
+	border: 4px double rgb(50, 2, 99);
+}
+
+#about-us {
+	padding: 0.5rem;
+	color: white;
+	margin-top: 1rem;
+	border: 4px double rgb(50, 2, 99);
+}
+
+/* Classes */
+
+.stack-mid {
+	
+	align-items: center;
+    justify-content: center;
+	
+    margin: 0px;
+	padding: 2px;
+
+	overflow: hidden;
+}
+
+::-webkit-scrollbar {
+    width: 21px;
+    height: 21px;
+	border-left: ridge 2px #fff;
+	border-top: ridge 2px #fff;
+	border-right: ridge 2px grey;
+	border-bottom: ridge 2px grey;
+}
+
+::-webkit-scrollbar-track {
+	
+background-size: 2px;
+}
