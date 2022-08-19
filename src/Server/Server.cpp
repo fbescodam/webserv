@@ -28,6 +28,7 @@ void ft::Server::respondWithStatus(ft::Connection& conn, int32_t statusCode)
 
 void ft::Server::setSocket(const ft::Socket* socket)
 {
+	LOG("Socket for server " << *this->config.getValue("server_name") << " set to fd " << socket->fd);
 	this->socket = const_cast<ft::Socket*>(socket);
 }
 

@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:07:35 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/19 12:02:33 by fbes          ########   odam.nl         */
+/*   Updated: 2022/08/19 12:43:25 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -163,12 +163,7 @@ void ft::Response::respond(const std::string& filePath)
 
 	if (!ft::filesystem::fileExists(filePath))
 		this->generateStatus(404);
-    if (!this->config.getValueAsList("cgi_bin", cgiBin))
-    {
-		ERR("ERROR: cgi_bin not set!");
-		this->generateStatus(500);
-    }
-	else if (endsWith(filePath, cgiBin.front()))
+	if (this->config.getValueAsList("cgi_bin", cgiBin) && endsWith(filePath, cgiBin.front()))
 	{
 		std::string out;
 		if (!ft::CGI::runCGI(this->conn, filePath, out, cgiBin.back()))
