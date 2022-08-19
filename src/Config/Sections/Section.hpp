@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 13:54:52 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/11 19:30:27 by fbes          ########   odam.nl         */
+/*   Updated: 2022/08/19 11:46:48 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,15 +129,6 @@ public: // Functions
 	 * @param prefix a prefix prepended to every printed line
 	 */
 	void print(std::string prefix) const;
-
-	/**
-	 * @brief checks if a value is acceptable for the use with a certain key. Throws an error if something's wrong.
-	 *
-	 * @param lineNum the line number in the config file where the field is defined
-	 * @param key a key
-	 * @param value a value
-	 */
-	void verifyKeyValue(uint32_t lineNum, std::string& key, std::string& value) const;
 
 	std::map<std::string, std::string> exportFields(void) const;
 	void importFields(std::map<std::string, std::string> fields);

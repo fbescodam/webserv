@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 15:39:35 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/19 11:11:45 by fbes          ########   odam.nl         */
+/*   Updated: 2022/08/19 11:46:11 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -159,108 +159,6 @@ void ft::Section::print(std::string prefix) const
 const std::string& ft::Section::getcwd() const
 {
 	return (this->cwd);
-}
-
-// TODO: change to map with string keys and function pointer values instead of this ugly switch case
-void ft::Section::verifyKeyValue(uint32_t lineNum, std::string& key, std::string& value) const
-{
-	// all possible keys
-	const std::string possibleKeys[] = {
-		"limit_body_size",
-		"listen",
-		"server_name",
-		"index",
-		"access",
-		"dir_listing",
-		"error_404", // TODO: add more custom error pages
-		"methods",
-		"path",
-		"redir",
-		"error_403",
-		"cgi_bin",
-		"upload_dir"
-	};
-
-	int8_t index = -1;
-	for (int8_t i = 0; i < (int8_t)possibleKeys->size(); i++)
-	{
-		if (possibleKeys[i] == key)
-		{
-			index = i;
-			break;
-		}
-	}
-	size_t space;
-	int32_t statusCode;
-	std::string::difference_type n;
-
-	if (index == -1)
-		throw ft::UnknownFieldKeyException(lineNum);
-
-	long bignum;
-	switch (index)
-	{
-		// expecting integer in range > 0 < INT_MAX
-		case 0: // limit_body_size
-			bignum = std::stol(value);
-			if (bignum <= 0 || bignum > INT_MAX)
-				throw ft::InvalidFieldValueException(lineNum);
-			break;
-
-		// expecting integer in range > 0 < USHRT_MAX
-		case 1: // listen
-			bignum = std::stol(value);
-			if (bignum <= 0 || bignum > USHRT_MAX)
-				throw ft::InvalidFieldValueException(lineNum);
-			break;
-
-		// expecting a path that starts with /
-		case 8: // path
-		case 12: // upload_dir
-			if (value.length() == 0)
-				throw ft::InvalidFieldValueException(lineNum);
-			if (value.front() != '/')
-				throw ft::InvalidFieldValueException(lineNum);
-			break;
-
-		// expecting a non-empty string
-		case 2: // server_name
-		case 3: // index
-		case 6: // error_404
-		case 7: // methods
-		case 10: //error_403
-			if (value.size() == 0)
-				throw ft::InvalidFieldValueException(lineNum);
-			break;
-
-		// expecting a boolean in the form of "yes" or "no"
-		case 4: // access
-		case 5: // dir_listing
-			if (value != "yes" && value != "no")
-				throw ft::InvalidFieldValueException(lineNum);
-			break;
-
-		// expecting two strings, of which 1st is either "temp" or "perm" or a number (status code) and 2nd is a path
-		case 9: // redir
-			space = value.find(' ');
-			if (space == std::string::npos)
-				throw ft::InvalidFieldValueException(lineNum);
-			statusCode = std::stoi(value.substr(0, space));
-			if (statusCode != 301 && statusCode != 302 && statusCode != 307 && statusCode != 308)
-				throw ft::InvalidFieldValueException(lineNum);
-			n = std::count(value.begin(), value.end(), ' '); // count amount of spaces
-			if (n > 1)
-				throw ft::InvalidFieldValueException(lineNum);
-			break;
-		case 11: // cgi_bin
-			space = value.find(' ');
-			if (space == std::string::npos)
-				throw ft::InvalidFieldValueException(lineNum);
-			n = std::count(value.begin(), value.end(), ' '); // count amount of spaces
-			if (n > 1)
-				throw ft::InvalidFieldValueException(lineNum);
-			break;
-	}
 }
 
 //////////////////////////////////////////

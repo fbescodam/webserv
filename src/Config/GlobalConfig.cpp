@@ -6,13 +6,13 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/06/01 14:59:11 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/18 20:38:25 by fbes          ########   odam.nl         */
+/*   Updated: 2022/08/19 11:49:12 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <array>
 #include "GlobalConfig.hpp"
 #include "Filesystem.hpp"
-#include <array>
 
 //////////////////////////////////////////
 
@@ -167,16 +167,11 @@ static void verifyServerSection(const uint32_t& lineNum, const ft::ServerSection
 
 void ft::GlobalConfig::readFile(const std::string& filePath)
 {
-	struct stat s;
-	if (stat(filePath.c_str(), &s) == 0) {
-		if (s.st_mode & S_IFDIR)
-			throw ft::IOException(); // it's a fucking directory you twat
-	}
-	else
-		throw ft::IOException(); // generic file read error
+	if (ft::filesystem::isDir(filePath))
+		throw ft::IOException(); // filePath points to a directory or read error
 	std::ifstream fstream(filePath);
 	if (!fstream.good())
-		throw ft::IOException();
+		throw ft::IOException(); // read error
 	std::string line;
 	uint32_t lineNum = 0;
 	std::pair<std::string, std::string> output;
@@ -233,7 +228,7 @@ void ft::GlobalConfig::readFile(const std::string& filePath)
 		ft::slice(line, "=", output);
 		ft::trim(output.first);
 		ft::trim(output.second);
-		currentSection->verifyKeyValue(lineNum, output.first, output.second);
+		this->keyValueVerifier.run(lineNum, output.first, output.second);
 		currentSection->setValue(output.first, output.second);
 	}
 
