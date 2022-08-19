@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/28 15:48:13 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/19 12:01:10 by fbes          ########   odam.nl         */
+/*   Updated: 2022/08/19 13:00:17 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,7 +99,7 @@ void ft::Poller::pollAll(void)
 
 		// First few polls are the listening thingies (one for each server), attaches new clients to a pollfd.
 		// When a POLLIN event happens here, we need to specify which pollfd to use for this connection.
-		if (i < this->servers.size() && (fd->revents & POLLIN))
+		if (i < this->reservedSocketAmount && (fd->revents & POLLIN))
 			this->acceptIncoming(this->servers.at(i));
 		else if (fd->revents & POLLIN) // Client connection ready for reading
 			this->pollInEvent(conn);

@@ -6,7 +6,7 @@
 #    By: lde-la-h <lde-la-h@student.codam.nl>         +#+                      #
 #                                                    +#+                       #
 #    Created: 2022/05/13 11:36:28 by lde-la-h      #+#    #+#                  #
-#    Updated: 2022/08/18 22:09:21 by pvan-dij      ########   odam.nl          #
+#    Updated: 2022/08/19 12:59:21 by fbes          ########   odam.nl          #
 #                                                                              #
 # **************************************************************************** #
 
@@ -29,7 +29,7 @@ HEADERS :=	$(addprefix -I , $(shell find ./src -iname '*.hpp' | sed -E "s|/[^/]+
 # Project requires you do it in 98, frankly we don't care (We asked)
 CFLAGS	:= -std=c++17 -Wextra -Wall -Werror -Wunreachable-code -Wno-char-subscripts -Wno-unused-parameter -Wno-sign-compare
 ifdef DEBUG
-	CFLAGS	+=	-g3
+	CFLAGS	+=	-g3 -D DEBUG
 else ifdef FSAN
 	CFLAGS	+=	-fsanitize=address -DCMAKE_EXE_LINKER_FLAGS="-fsanitize=address"
 else
