@@ -6,7 +6,7 @@
 /*   By: lde-la-h <main@w2wizard.dev>                 +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/08/17 10:35:10 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/18 22:09:59 by pvan-dij      ########   odam.nl         */
+/*   Updated: 2022/08/19 12:03:32 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,7 @@ void cppSplit(std::string string, std::vector<std::string> &outVector, const std
 	size_t pos;
 
 	trimWhiteSpace(string);
-	while ((pos = string.find(delim)) != std::string::npos) 
+	while ((pos = string.find(delim)) != std::string::npos)
 	{
 		std::string temp = string.substr(0, pos);
 		if (!temp.empty())
@@ -65,11 +65,11 @@ void cppSplit(std::string string, std::vector<std::string> &outVector, const std
 std::string getFileName(size_t name, const std::string& data)
 {
 	std::string fileName = data.substr(name, data.find_first_of("\t\r\n\t\f\v", name) - (name));
-	
-	trimQoutes(fileName);	
+
+	trimQoutes(fileName);
 	if (fileName.back()== '\"')
 		fileName.pop_back();
-	
+
 	std::replace(fileName.begin(), fileName.end(), ' ', '+');
 	return fileName;
 }
@@ -140,7 +140,7 @@ void GenerateResponse(const std::string &uploadPath, const std::vector<std::stri
 		}
 		out += "</table></pre><hr>";
 	}
-	
+
 	out += "</body></html>";
 	std::cout << "HTTP/1.1 200 OK\nContent-Length: " + std::to_string(out.size()) + "\n\n" + out;
 }
@@ -152,7 +152,7 @@ void parseMultipart(const std::string &data, const std::string &cType, const std
 	std::vector<std::string> formData;
 
 	// Set variables, substring magic to get all the data we need
-	time_t randomFileName = std::time(0);
+	// time_t randomFileName = std::time(0); // TODO: unused var
 	size_t boundaryIt = cType.find_first_of("=");
 	std::string boundary = "--" + cType.substr(boundaryIt + 1, cType.find("\n") - (boundaryIt - 1));
 	std::string body = data.substr(data.find("\r\n\r\n"));
@@ -176,11 +176,11 @@ void parseMultipart(const std::string &data, const std::string &cType, const std
 		}
 		else
 			fname = getFileName(namePos + 9, val);
-		
+
 		if (fname.empty())
 			continue;
 		fileNames.push_back(fname);
-	
+
 		// Erase all content info and write the data to file
 		val.erase(0, val.find("\r\n\r\n"));
 		val.erase(0, val.find_first_not_of(" \t\r\n\t\f\v"));
@@ -212,25 +212,25 @@ void makeFile(const std::string &data, const std::string &uploadDir, const std::
 // application/x-www-form-urlencoded
 void parseFormData(const std::string &data)
 {
-    std::string body = data.substr(data.find("\r\n\r\n"));
-    body.erase(0, body.find("\r\n\r\n"));
-    body.erase(0, body.find_first_not_of(" \t\r\n\t\f\v"));
+	std::string body = data.substr(data.find("\r\n\r\n"));
+	body.erase(0, body.find("\r\n\r\n"));
+	body.erase(0, body.find_first_not_of(" \t\r\n\t\f\v"));
 
-    std::vector<std::string> formData;
-    cppSplit(body, formData, "&");
+	std::vector<std::string> formData;
+	cppSplit(body, formData, "&");
 
-    std::string out = "<table><tr><th>field</th><th>value</th></tr>";
-    for (const std::string &val : formData)
-    {
-        out += "<tr>";
-        size_t delimPos = val.find('=');
-        out += "<td>" + val.substr(0, delimPos) + "</td>";
-        out += "<td>" + val .substr(delimPos + 1) + "</td>";
-        out += "</tr>";
-    }
-    out += "</table>";
+	std::string out = "<table><tr><th>field</th><th>value</th></tr>";
+	for (const std::string &val : formData)
+	{
+		out += "<tr>";
+		size_t delimPos = val.find('=');
+		out += "<td>" + val.substr(0, delimPos) + "</td>";
+		out += "<td>" + val .substr(delimPos + 1) + "</td>";
+		out += "</tr>";
+	}
+	out += "</table>";
 
-    std::cout << "HTTP/1.1 200 OK\nContent-Length: " + std::to_string(out.size()) + "\n\n" + out;
+	std::cout << "HTTP/1.1 200 OK\nContent-Length: " + std::to_string(out.size()) + "\n\n" + out;
 }
 
 int main(int ac, char **av, char **envp)
@@ -258,17 +258,17 @@ int main(int ac, char **av, char **envp)
 	}
 	if (!doesPathExist(uploadDir))
 		mkdir(uploadDir.c_str(), 0700);
-	
+
 	// vector for storinga all the uploaded filenames
 	std::vector<std::string> fileNames;
 
 	// Get the content type from data
-	auto cTypeIt = data.find("Content-Type");
+	size_t cTypeIt = data.find("Content-Type");
 	std::string cType = data.substr(cTypeIt, data.find("\r\n", cTypeIt) - cTypeIt);
-    if (cType.find("multipart/form-data") != std::string::npos)
-        parseMultipart(data, cType, uploadDir, uploadPath);
-    else if (cType.find("application/x-www-form-urlencoded") != std::string::npos)
-        parseFormData(data);
-    else
-        makeFile(data, uploadDir, uploadPath);
+	if (cType.find("multipart/form-data") != std::string::npos)
+		parseMultipart(data, cType, uploadDir, uploadPath);
+	else if (cType.find("application/x-www-form-urlencoded") != std::string::npos)
+		parseFormData(data);
+	else
+		makeFile(data, uploadDir, uploadPath);
 }

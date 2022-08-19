@@ -6,7 +6,7 @@
 /*   By: fbes <fbes@student.codam.nl>                 +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/31 16:27:42 by fbes          #+#    #+#                 */
-/*   Updated: 2022/08/18 19:15:20 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/08/19 12:01:45 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,16 +24,16 @@ static std::vector<const char*> c_arr(const std::vector<std::string> &v)
 
 bool ft::CGI::runCGI(const ft::Connection& conn, const std::string& path, std::string& out, const std::string& cgiBin)
 {
-	auto servPath = conn.server->config.getValue("path");
-	auto uploadPath = conn.server->config.getValue("upload_dir");
-	auto servName = conn.server->config.getValue("server_name");
+	const std::string* servPath = conn.server->config.getValue("path");
+	const std::string* uploadPath = conn.server->config.getValue("upload_dir");
+	const std::string* servName = conn.server->config.getValue("server_name");
 	if (!servName || !servPath || !uploadPath) return (false);
-	
-    std::map<ft::Exchange::Method, std::string> methods = {
-        {ft::Exchange::Method::GET, "GET"},
-        {ft::Exchange::Method::POST, "POST"},
-        {ft::Exchange::Method::DELETE, "DELETE"},
-    };
+
+	std::map<ft::Exchange::Method, std::string> methods = {
+		{ft::Exchange::Method::GET, "GET"},
+		{ft::Exchange::Method::POST, "POST"},
+		{ft::Exchange::Method::DELETE, "DELETE"},
+	};
 
 	std::vector<std::string> argv = {cgiBin, path};
 	std::vector<std::string> envp;
@@ -87,7 +87,7 @@ bool ft::CGI::runCGI(const ft::Connection& conn, const std::string& path, std::s
 		::dup2(body_pipe[READ], STDIN_FILENO);
 		::dup2(fds[WRITE], STDOUT_FILENO);
 		::dup2(fds[WRITE], STDERR_FILENO);
-		
+
 		close(body_pipe[WRITE]);
 		close(fds[WRITE]);
 		close(fds[READ]);

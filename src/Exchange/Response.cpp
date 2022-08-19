@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:07:35 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/18 21:11:57 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/08/19 12:02:33 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ void ft::Response::importFieldsForPath(std::string& rootPath)
 	this->pathConfig = ft::Section(this->config.getcwd(), "response", this->config);
 	std::string* overridePath = nullptr;
 	LOG("rootPath: " << rootPath);
-	for (const auto &location: this->config.locations)
+	for (const ft::Section &location: this->config.locations)
 	{
 		if (location.appliesForPath(rootPath))
 		{
@@ -56,7 +56,7 @@ void ft::Response::importFieldsForPath(std::string& rootPath)
 				if (location.getAppliedPath().back() != '/' && rootPath.front() != '/')
 					rootPath.erase(0, rootPath.find_first_of('/') + 1);
 				LOG("rootPath after erasure of starting /: " << rootPath);
-			
+
 				rootPath = *overridePath + rootPath;
 				LOG("rootPath after override: " << rootPath);
 			}

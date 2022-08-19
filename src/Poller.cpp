@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/28 15:48:13 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/18 20:51:42 by lde-la-h      ########   odam.nl         */
+/*   Updated: 2022/08/19 12:01:10 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,9 +120,9 @@ void ft::Poller::pollAll(void)
 
 ft::Server* ft::Poller::getFirstServerOfPort(uint16_t port)
 {
-	for (auto& server : this->servers)
+	for (ft::Server& server : this->servers)
 	{
-		auto servPort = server.config.returnValueAsInt("listen");
+		int32_t servPort = server.config.returnValueAsInt("listen");
 		if (servPort == -1)
 			break;
 		else if (port == servPort)
@@ -188,7 +188,7 @@ bool ft::Poller::acceptIncoming(const ft::Server& server)
 				// Populate the connection struct
 				this->connections[i].poll = fd;
 				this->connections[i].lastActivity = std::time(nullptr);
-				this->connections[i].server = this->getFirstServerOfPort(getPortBySocket(serverSocket->fd)); 
+				this->connections[i].server = this->getFirstServerOfPort(getPortBySocket(serverSocket->fd));
 				this->connections[i].ipv4 = ft::inet_ntop(*const_cast<ft::SocketAddress*>(&server.getSocket()->addr));
 
 				// Increment the active connection count
@@ -225,7 +225,7 @@ void ft::Poller::pollInEvent(ft::Connection& conn)
 	{
 		if (brecv < 0) { ERR("Receive function has failed!"); }
 		else LOG("Connection closed by peer");
-		
+
 		this->closeConnection(conn);
 		return;
 	}
