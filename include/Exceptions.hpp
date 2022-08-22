@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/23 18:05:00 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/18 20:24:41 by fbes          ########   odam.nl         */
+/*   Updated: 2022/08/22 11:17:57 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -182,6 +182,13 @@ struct IOException : public std::exception
 {
 	const char* what() const throw() override {
 		return ("IO Error on file. Is it actually a file?");
+	}
+};
+
+struct SocketLimitException : public std::exception
+{
+	const char* what() const throw() override {
+		return ("Maximum amount (16) of sockets used!");
 	}
 };
 }

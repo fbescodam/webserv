@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/28 15:48:13 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/19 13:00:17 by fbes          ########   odam.nl         */
+/*   Updated: 2022/08/22 11:18:06 by lde-la-h      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,9 @@ const ft::Socket* ft::Poller::createSocket(const uint16_t port)
 	ft::Socket* socket;
 	try
 	{
+		if (this->reservedSocketAmount + 1 > 16)
+			throw ft::SocketLimitException();
+
 		// Add a new socket
 		this->sockets.push_back((socket = new ft::Socket(port, MAX_CLIENTS)));
 
