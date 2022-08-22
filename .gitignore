@@ -26,9 +26,9 @@
 *.a
 *.lib
 
-# Shit
+# Misc
 .DS_Store
-.vscode/*.log
+.vscode
 examples/www/delete/*
 
 # Executables
