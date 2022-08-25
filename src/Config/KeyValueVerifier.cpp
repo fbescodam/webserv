@@ -6,7 +6,7 @@
 /*   By: fbes <fbes@student.codam.nl>                 +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/20 20:09:48 by fbes          #+#    #+#                 */
-/*   Updated: 2022/08/19 11:48:00 by fbes          ########   odam.nl         */
+/*   Updated: 2022/08/25 14:42:37 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,8 +89,14 @@ void ft::KeyValueVerifier::setupParseFunctions(std::unordered_map<std::string, f
 	// Paths
 	fieldParseFunctions.emplace("path", &ft::KeyValueVerifier::parsePath);
 	fieldParseFunctions.emplace("upload_dir", &ft::KeyValueVerifier::parsePath);
-	fieldParseFunctions.emplace("error_403", &ft::KeyValueVerifier::parsePath);
-	fieldParseFunctions.emplace("error_404", &ft::KeyValueVerifier::parsePath);
+
+	// Error pages
+	std::map<uint16_t, std::string> statusCodes = ft::getStatusCodes();
+	for (auto statusCode : statusCodes)
+	{
+		std::string errorField = "error_" + std::to_string(statusCode.first);
+		fieldParseFunctions.emplace(errorField, &ft::KeyValueVerifier::parsePath);
+	}
 
 	// Strings
 	fieldParseFunctions.emplace("server_name", &ft::KeyValueVerifier::parseNonEmptyString);
