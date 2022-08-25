@@ -6,7 +6,7 @@
 /*   By: lde-la-h <lde-la-h@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/27 11:07:35 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/19 12:43:25 by fbes          ########   odam.nl         */
+/*   Updated: 2022/08/25 17:26:52 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -150,7 +150,7 @@ void ft::Response::deleteMethod(const std::string& filePath)
 		return (this->generateStatus(404));
 
 	if (std::remove(filePath.c_str()) != 0)
-		return (this->generateStatus(500, "<h1>File failed to deleted</h1>"));
+		return (this->generateStatus(500, "<h1>Failed to delete file</h1>"));
 	this->generateStatus(200, "<h1>File deleted</h1>");
 }
 
@@ -167,7 +167,10 @@ void ft::Response::respond(const std::string& filePath)
 	{
 		std::string out;
 		if (!ft::CGI::runCGI(this->conn, filePath, out, cgiBin.back()))
+		{
+			ERR("CGI execution failed! Responding with internal server error (500).");
 			return (this->generateStatus(500));
+		}
 
 		this->data = out;
 		LOG("Set sendRes to sendDynamic");
@@ -201,9 +204,7 @@ void ft::Response::notCGI(const std::string& filePath)
 	}
 	catch(const std::exception& e)
 	{
-#ifdef DEBUG
-		std::cerr << RED << "Webserv: " << e.what() << RESET << std::endl;
-#endif
+		LOG("Exception occurred in dirlisting: " << e.what());
 		try { return (this->generateStatus(500)); }
 		catch (const std::exception& e) { exit(EXIT_FAILURE); }
 	}
@@ -213,7 +214,10 @@ void ft::Response::notCGI(const std::string& filePath)
 			return (this->generateStatus(404));
 
 		if ((this->file = fopen(filePath.c_str(), "r")) == nullptr)
+		{
+			ERR("Unable to run fopen on file " << filePath);
 			return (this->generateStatus(500));
+		}
 
 		this->writeStatusLine(200);
 		this->fileSize = ft::filesystem::getFileSize(this->file);

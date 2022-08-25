@@ -6,7 +6,7 @@
 /*   By: fbes <fbes@student.codam.nl>                 +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/07/31 16:27:42 by fbes          #+#    #+#                 */
-/*   Updated: 2022/08/19 12:01:45 by fbes          ########   odam.nl         */
+/*   Updated: 2022/08/25 17:24:08 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,8 +27,12 @@ bool ft::CGI::runCGI(const ft::Connection& conn, const std::string& path, std::s
 	const std::string* servPath = conn.server->config.getValue("path");
 	const std::string* uploadPath = conn.server->config.getValue("upload_dir");
 	const std::string* servName = conn.server->config.getValue("server_name");
-	if (!servName || !servPath || !uploadPath) return (false);
-
+	if (!servName || !servPath)
+	{
+		ERR("Missing value path or server_name in config");
+		return (false);
+	}
+	
 	std::map<ft::Exchange::Method, std::string> methods = {
 		{ft::Exchange::Method::GET, "GET"},
 		{ft::Exchange::Method::POST, "POST"},
@@ -49,10 +53,21 @@ bool ft::CGI::runCGI(const ft::Connection& conn, const std::string& path, std::s
 		envp.push_back("SERVER_NAME=" + *servName);
 		envp.push_back("PATH_INFO=" + path);
 		envp.push_back("CONTENT_LENGTH=" + conn.request->headers["content-length"]);
-		envp.push_back("UPLOAD_DIR=" + conn.server->config.getcwd() + *servPath + *uploadPath);
-		envp.push_back("UPLOAD_PATH=" + *uploadPath);
+		if (uploadPath)
+		{
+			envp.push_back("UPLOAD_DIR=" + conn.server->config.getcwd() + *servPath + *uploadPath);
+			envp.push_back("UPLOAD_PATH=" + *uploadPath);
+			LOG("UPLOAD_DIR=" << conn.server->config.getcwd() << *servPath << *uploadPath);
+			LOG("UPLOAD_PATH=" << *uploadPath);
+		}
+		else
+			LOG("[WARNING] upload_dir is not set in config while running CGI! This could result in errors when using our custom cgi-bin.");
 	}
-	catch(...) { return (false); } // Allocation failure or something.
+	catch(...)
+	{
+		LOG("CGI envp error occurred")
+		return (false);
+	}
 
 	int32_t fds[2];
 	int32_t body_pipe[2];
@@ -64,7 +79,7 @@ bool ft::CGI::runCGI(const ft::Connection& conn, const std::string& path, std::s
 		close(body_pipe[READ]);
 		close(body_pipe[WRITE]);
 
-		std::cerr << e.what() << std::endl;
+		ERR("Pipe failure: " << e.what())
 		return (false);
 	}
 
@@ -78,7 +93,7 @@ bool ft::CGI::runCGI(const ft::Connection& conn, const std::string& path, std::s
 		close(body_pipe[READ]);
 		close(body_pipe[WRITE]);
 
-		std::cerr << e.what() << std::endl;
+		ERR("Fork failure: " << e.what())
 		return (false);
 	}
 
@@ -87,13 +102,14 @@ bool ft::CGI::runCGI(const ft::Connection& conn, const std::string& path, std::s
 		::dup2(body_pipe[READ], STDIN_FILENO);
 		::dup2(fds[WRITE], STDOUT_FILENO);
 		::dup2(fds[WRITE], STDERR_FILENO);
-
+		
 		close(body_pipe[WRITE]);
 		close(fds[WRITE]);
 		close(fds[READ]);
 
 		::execve(cgiBin.c_str(), (char *const *)c_arr(argv).data(), (char *const *)c_arr(envp).data());
 		close(body_pipe[READ]);
+		ERR("[WARNING] child execution error in CGI, execve did not run properly")
 		exit(EXIT_FAILURE);
 	}
 	else // Parent
@@ -108,7 +124,15 @@ bool ft::CGI::runCGI(const ft::Connection& conn, const std::string& path, std::s
 		close(body_pipe[READ]);
 		close(fds[WRITE]);
 
-		wait(NULL);
+		int32_t status = INT32_MIN;
+		if (wait(&status) == -1 || ((status) & 0xff00) >> 8 != 0 || (WIFSIGNALED(status) && WTERMSIG(status) == SIGSEGV))
+		{
+			ERR("CGI binary returned a non-zero exit status, segfaulted or webserv's wait failed!");
+			ERR("CGI exit code: " << (((status) & 0xff00) >> 8));
+			close(fds[READ]);
+			return (false);
+		}
+		LOG("CGI exit code: " << (((status) & 0xff00) >> 8));
 		char buff[4096] = {0};
 		while (read(fds[READ], buff, sizeof(buff)) > 0)
 		{
@@ -118,9 +142,9 @@ bool ft::CGI::runCGI(const ft::Connection& conn, const std::string& path, std::s
 		close(fds[READ]);
 	}
 
-	std::cout << RED << "Exiting cgi"<<RESET<<std::endl;
-	std::cout << out<<std::endl;
-	std::cout << out.size()<<std::endl;
+	LOG("CGI exited properly");
+	LOG("CGI out: " << out);
+	LOG("CGI out size: " << out.size());
 
 	return (true);
 }

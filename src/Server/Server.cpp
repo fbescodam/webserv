@@ -71,8 +71,7 @@ void ft::Server::handleRequest(ft::Connection& conn)
 	}
 	catch (const std::exception& e)
 	{
-		ERR(e.what());
-
+		ERR("Exception occurred on request handling: " << e.what());
 		try { this->respondWithStatus(conn, 500); }
 		catch (const std::exception& e) { exit(EXIT_FAILURE); }
 	}
@@ -84,7 +83,10 @@ void ft::Server::handleRequest(ft::Connection& conn)
 	// Get actual path used for IO
 	const std::string* path = this->config.getValue("path");
 	if (!path)
+	{
+		ERR("No path set in request config!");
 		return (this->respondWithStatus(conn, 500));
+	}
 
 	filePath = this->config.getcwd() + *path + rootPath; // Get the FULL PATH to the file, starting at the root /
 	LOG("Relative filePath: " << filePath);
