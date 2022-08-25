@@ -3,10 +3,10 @@
 /*                                                        ::::::::            */
 /*   fileupload.cpp                                     :+:    :+:            */
 /*                                                     +:+                    */
-/*   By: lde-la-h <main@w2wizard.dev>                 +#+                     */
+/*   By: pvan-dij <pvan-dij@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
-/*   Created: 2022/08/17 10:35:10 by lde-la-h      #+#    #+#                 */
-/*   Updated: 2022/08/19 12:49:24 by pvan-dij      ########   odam.nl         */
+/*   Created: 2022/08/17 10:35:10 by pvan-dij      #+#    #+#                 */
+/*   Updated: 2022/08/25 17:25:14 by fbes          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -240,24 +240,32 @@ int main(int ac, char **av, char **envp)
 	(void)ac;
 	(void)av;
 
+	// Set unhandled exception handler
+	std::set_terminate([]() {
+		std::cerr << "Unhandled exception caught" << std::endl;
+		exit(1);
+	});
+
 	// Get data from cin
 	std::istreambuf_iterator<char> begin(std::cin), end;
 	std::string data(begin, end);
 
 	// Get upload_dir from envp
-	std::string uploadDir;
-	std::string uploadPath;
+	std::string uploadDir = "";
+	std::string uploadPath = "";
 	while (envp)
 	{
 		if (!*envp)
 			break;
 		std::string var(*envp);
-		if (var.find("UPLOAD_DIR") != std::string::npos)
+		if (var.find("UPLOAD_DIR=") != std::string::npos)
 			uploadDir = var.substr(var.find_first_of("=") + 1);
-		if (var.find("UPLOAD_PATH") != std::string::npos)
+		if (var.find("UPLOAD_PATH=") != std::string::npos)
 			uploadPath = var.substr(var.find_first_of("=") + 1);
 		envp++;
 	}
+	if (uploadDir.empty() || uploadDir.empty())
+		exit(2);
 	if (!doesPathExist(uploadDir))
 		mkdir(uploadDir.c_str(), 0700);
 
