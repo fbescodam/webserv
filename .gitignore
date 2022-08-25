@@ -30,6 +30,7 @@
 .DS_Store
 .vscode
 examples/www/delete/*
+*.DSYM
 
 # Executables
 *.exe
