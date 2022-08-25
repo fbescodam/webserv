@@ -6,7 +6,7 @@
 #    By: lde-la-h <lde-la-h@student.codam.nl>         +#+                      #
 #                                                    +#+                       #
 #    Created: 2022/05/13 11:36:28 by lde-la-h      #+#    #+#                  #
-#    Updated: 2022/08/19 12:59:21 by fbes          ########   odam.nl          #
+#    Updated: 2022/08/25 17:03:09 by fbes          ########   odam.nl          #
 #                                                                              #
 # **************************************************************************** #
 
@@ -70,9 +70,10 @@ clean:
 
 fclean: clean
 	@rm -f $(NAME)
+	@rm -f cgi-bin
 
 cgi-bin:
-	@$(CC) $(CFLAGS) -o cgi-bin ./src/CGIscripts/fileupload.cpp
+	@$(CC) $(CFLAGS) -o cgi-bin ./src/CGIscripts/fileupload.cpp && printf "$(GREEN)$(BOLD)\rCompiling: fileupload.cpp\r\e[35C[OK]\n$(RESET)"
 
 re:	fclean all
 
