@@ -17,6 +17,7 @@
 # include "Utils.hpp"
 # include "Exceptions.hpp"
 # include <unordered_map>
+# include <limits.h>
 # define VERIFIER_PARAMS_DEF uint32_t lineNum, std::string& key, std::string& value
 # define VERIFIER_PARAMS lineNum, key, value
 # define VERIFIER_PARAMS_KEY key

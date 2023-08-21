@@ -40,12 +40,11 @@ public: // Functions
 	// Converts the wrapper to the C Style type.
 	struct sockaddr_in getCStyle(void) const
 	{
-		struct sockaddr_in out = {
-			.sin_len = length,
-			.sin_family = addressFamily,
-			.sin_port = port,
-			.sin_addr.s_addr = address,
-		};
+		struct sockaddr_in out;
+		// out.sin_len = length;
+		out.sin_family = addressFamily;
+		out.sin_port = port;
+		out.sin_addr.s_addr = address;
 
 		std::memset(out.sin_zero, 0, sizeof(out.sin_zero));
 		return (out);
@@ -58,7 +57,7 @@ public: // Functions
 	}
 
 public: // Attributes
-	uint8_t		length;
+	// uint8_t		length;
 	uint8_t		addressFamily;
 	uint16_t	port;
 	uint32_t	address;

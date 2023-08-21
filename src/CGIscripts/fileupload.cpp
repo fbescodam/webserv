@@ -17,6 +17,7 @@
 #include <ctime>
 #include <random>
 #include <sys/stat.h>
+#include <algorithm>
 
 
 bool doesPathExist(const std::string &s)

@@ -16,6 +16,7 @@
 # define EXCHANGE_HPP
 # include <map>
 # include <string>
+# include <sys/sendfile.h>
 
 namespace ft
 {

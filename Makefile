@@ -54,13 +54,13 @@ OBJS	:=	${SRCS:.cpp=.o}
 
 #//= Recipes =//#
 all: cgi-bin # Multi threading badness because C++ is slow
-	@$(MAKE) $(NAME) -j4
+	$(MAKE) $(NAME) -j4
 
 %.o: %.cpp
-	@$(CC) $(CFLAGS) -o $@ -c $< $(HEADERS) && printf "$(GREEN)$(BOLD)\rCompiling: $(notdir $<)\r\e[35C[OK]\n$(RESET)"
+	$(CC) $(CFLAGS) -o $@ -c $< $(HEADERS) && printf "$(GREEN)$(BOLD)\rCompiling: $(notdir $<)\r\e[35C[OK]\n$(RESET)"
 
 $(NAME): $(OBJS)
-	@$(CC) $(CFLAGS) $(OBJS) -o $(NAME)
+	$(CC) $(CFLAGS) $(OBJS) -o $(NAME)
 	@printf "$(GREEN)$(BOLD)Done\n$(RESET)"
 
 clean:
@@ -73,7 +73,7 @@ fclean: clean
 	@rm -f cgi-bin
 
 cgi-bin:
-	@$(CC) $(CFLAGS) -o cgi-bin ./src/CGIscripts/fileupload.cpp && printf "$(GREEN)$(BOLD)\rCompiling: fileupload.cpp\r\e[35C[OK]\n$(RESET)"
+	$(CC) $(CFLAGS) -o cgi-bin ./src/CGIscripts/fileupload.cpp && printf "$(GREEN)$(BOLD)\rCompiling: fileupload.cpp\r\e[35C[OK]\n$(RESET)"
 
 re:	fclean all
 

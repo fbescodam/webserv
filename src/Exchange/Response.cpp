@@ -269,14 +269,11 @@ ft::Response::Status ft::Response::sendHeaders(ft::fd_t socket)
 
 ft::Response::Status ft::Response::sendFile(ft::fd_t socket)
 {
-	off_t bsent = 0;
-
 	if (this->file == nullptr)
 		throw std::exception();
 
 	LOG("Sending file...");
-	sendfile(fileno(this->file), socket, offset, &bsent, NULL, NONE);
-	this->offset += bsent;
+	sendfile(fileno(this->file), socket, &(this->offset), this->fileSize);
 
 	if (this->offset < this->fileSize)
 		return (ft::Response::Status::NOT_DONE);

@@ -16,6 +16,7 @@
 # define EXCEPTIONS_HPP
 # include <exception>
 # include <string>
+# include <cstring>
 # include <errno.h>
 
 namespace ft {

@@ -15,6 +15,7 @@
 #ifndef CGI_HPP
 # define CGI_HPP
 # include <iostream>
+# include <sys/wait.h>
 # include "Utils.hpp"
 # include "Connection.hpp"
 # include "Request.hpp"
